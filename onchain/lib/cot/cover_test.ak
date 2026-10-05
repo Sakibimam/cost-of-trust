@@ -28,6 +28,8 @@ const cover_script: ByteArray =
 const config_policy: ByteArray =
   #"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 
+const task_expiry = 1_000
+
 const decide_by = 2_000
 
 const locked = 10_000_000
@@ -45,6 +47,17 @@ fn own_ref() -> OutputReference {
   }
 }
 
+fn task() -> OutputReference {
+  OutputReference {
+    transaction_id: vectors.task_tx,
+    output_index: vectors.task_index,
+  }
+}
+
+fn window() -> interval.Interval {
+  interval.between(task_expiry, decide_by)
+}
+
 fn other_ref() -> OutputReference {
   OutputReference {
     transaction_id: #"4444444444444444444444444444444444444444444444444444444444444444",
@@ -59,6 +72,7 @@ fn config() -> ConfigDatum {
     workflow_owner: vectors.owner,
     workflow_name: vectors.name,
     workflow_cid: vectors.cid,
+    don_config_digest: vectors.don_config_digest,
   }
 }
 
@@ -66,9 +80,10 @@ fn datum() -> CoverageDatum {
   CoverageDatum {
     terms_hash: vectors.terms_hash,
     buyer: wallet(buyer_key),
-    underwriter,
+    underwriter: wallet(underwriter),
     payout,
-    task_ref: other_ref(),
+    task_ref: task(),
+    task_expiry,
     decide_by,
     config_digest: vectors.config_digest,
   }
@@ -180,7 +195,7 @@ fn settle_with(
     config(),
     settle(raw, pick(sigs, [0, 1]), pick(vectors.pubkeys, [0, 1])),
     outputs,
-    interval.before(2_000),
+    window(),
     [],
   )
 }
@@ -189,8 +204,12 @@ fn flip_byte(raw: ByteArray, at: Int) -> ByteArray {
   let n = builtin.length_of_bytearray(raw)
   let b = builtin.index_bytearray(raw, at)
   builtin.slice_bytearray(0, at, raw)
-    |> builtin.append_bytearray(builtin.integer_to_bytearray(True, 1, ( b + 1 ) % 256))
-    |> builtin.append_bytearray(builtin.slice_bytearray(at + 1, n - at - 1, raw))
+    |> builtin.append_bytearray(
+        builtin.integer_to_bytearray(True, 1, ( b + 1 ) % 256),
+      )
+    |> builtin.append_bytearray(
+        builtin.slice_bytearray(at + 1, n - at - 1, raw),
+      )
 }
 
 test config_digest_matches_the_generator() {
@@ -205,8 +224,8 @@ test success_settle_pays_underwriter() {
   settle_with(vectors.report_success, vectors.sigs_success, success_outputs())
 }
 
-test inconclusive_settle_pays_underwriter() {
-  settle_with(
+test inconclusive_settle_rejected() {
+  !settle_with(
     vectors.report_inconclusive,
     vectors.sigs_inconclusive,
     success_outputs(),
@@ -242,7 +261,7 @@ test f_signatures_not_f_plus_one_rejected() {
       pick(vectors.pubkeys, [0]),
     ),
     failure_outputs(),
-    interval.before(2_000),
+    window(),
     [],
   )
 }
@@ -256,7 +275,7 @@ test f_plus_one_signatures_accepted_from_any_two_signers() {
       pick(vectors.pubkeys, [3, 2]),
     ),
     failure_outputs(),
-    interval.before(2_000),
+    window(),
     [],
   )
 }
@@ -270,7 +289,7 @@ test duplicate_signer_counted_twice_rejected() {
       pick(vectors.pubkeys, [0, 0]),
     ),
     failure_outputs(),
-    interval.before(2_000),
+    window(),
     [],
   )
 }
@@ -280,14 +299,11 @@ test non_allowlisted_signer_rejected() {
     config(),
     settle(
       vectors.report_failure,
-      [
-        builtin.head_list(vectors.sigs_failure),
-        vectors.outsider_sig_failure,
-      ],
+      [builtin.head_list(vectors.sigs_failure), vectors.outsider_sig_failure],
       [builtin.head_list(vectors.pubkeys), vectors.outsider_pubkey],
     ),
     failure_outputs(),
-    interval.before(2_000),
+    window(),
     [],
   )
 }
@@ -302,7 +318,7 @@ test signature_from_a_different_key_than_the_pubkey_rejected() {
       pick(vectors.pubkeys, [0, 1]),
     ),
     failure_outputs(),
-    interval.before(2_000),
+    window(),
     [],
   )
 }
@@ -405,7 +421,7 @@ test config_digest_not_matching_the_pinned_digest_rejected() {
       pick(vectors.pubkeys, [0]),
     ),
     failure_outputs(),
-    interval.before(2_000),
+    window(),
     [],
   )
 }
@@ -421,13 +437,7 @@ test expire_before_decide_by_rejected() {
 }
 
 test expire_after_decide_by_by_underwriter_ok() {
-  run(
-    config(),
-    Expire,
-    success_outputs(),
-    interval.after(2_000),
-    [underwriter],
-  )
+  run(config(), Expire, success_outputs(), interval.after(2_000), [underwriter])
 }
 
 test expire_unsigned_rejected() {

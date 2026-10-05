@@ -1,6 +1,6 @@
 use cardano/transaction.{OutputReference, Transaction}
-use cot/vault
 use cot/model.{ClaimDatum, ClaimRedeemer}
+use cot/vault
 
 validator claim_vault {
   spend(

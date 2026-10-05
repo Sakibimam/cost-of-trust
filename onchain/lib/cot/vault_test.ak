@@ -1,13 +1,14 @@
 use aiken/interval
-use cardano/address.{Address, Script, VerificationKey}
+use cardano/address.{Address, Inline, Script, VerificationKey}
 use cardano/assets
 use cardano/transaction.{
   InlineDatum, Input, NoDatum, Output, OutputReference, Transaction,
 }
-use cot/vault
 use cot/model.{Claim, ClaimDatum, Forfeit}
+use cot/vault
 
-const sponsor: ByteArray = #"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+const sponsor: ByteArray =
+  #"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 const beneficiary_key: ByteArray =
   #"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
@@ -29,11 +30,7 @@ fn vault_address() -> Address {
 }
 
 fn datum() -> ClaimDatum {
-  ClaimDatum {
-    beneficiary: wallet(beneficiary_key),
-    expiry,
-    sponsor,
-  }
+  ClaimDatum { beneficiary: wallet(beneficiary_key), expiry, sponsor }
 }
 
 fn ref(n: Int) -> OutputReference {
@@ -55,13 +52,18 @@ fn vault_input(n: Int, lovelace: Int) -> Input {
   }
 }
 
+/// A payout tagged with the first vault's out-ref, as every honest Claim and Forfeit output is.
 fn pay(address: Address, lovelace: Int) -> Output {
   Output {
     address,
     value: assets.from_lovelace(lovelace),
-    datum: NoDatum,
+    datum: InlineDatum(ref(0)),
     reference_script: None,
   }
+}
+
+fn pay_untagged(address: Address, lovelace: Int) -> Output {
+  Output { ..pay(address, lovelace), datum: NoDatum }
 }
 
 fn tx(
@@ -178,8 +180,9 @@ test claim_two_vaults_with_one_payment_rejected() {
   )
 }
 
-test claim_two_vaults_with_full_payment_ok() {
-  vault.validate(
+// Batching is unsupported: exactly one vault input per transaction, even when the payment covers both.
+test claim_two_vaults_with_full_payment_rejected() {
+  !vault.validate(
     Some(datum()),
     Claim,
     ref(0),
@@ -258,6 +261,90 @@ test spending_without_a_datum_fails() fail {
       [pay(wallet(beneficiary_key), 9_000_000)],
       interval.between(100, 999),
       [],
+    ),
+  )
+}
+
+test claim_untagged_payment_rejected() {
+  !vault.validate(
+    Some(datum()),
+    Claim,
+    ref(0),
+    tx(
+      [vault_input(0, 9_000_000)],
+      [pay_untagged(wallet(beneficiary_key), 9_000_000)],
+      interval.between(100, 999),
+      [],
+    ),
+  )
+}
+
+test claim_payment_tagged_for_another_vault_rejected() {
+  !vault.validate(
+    Some(datum()),
+    Claim,
+    ref(0),
+    tx(
+      [vault_input(0, 9_000_000)],
+      [
+        Output {
+          ..pay(wallet(beneficiary_key), 9_000_000),
+          datum: InlineDatum(ref(1)),
+        },
+      ],
+      interval.between(100, 999),
+      [],
+    ),
+  )
+}
+
+test forfeit_untagged_payment_rejected() {
+  !vault.validate(
+    Some(datum()),
+    Forfeit,
+    ref(0),
+    tx(
+      [vault_input(0, 9_000_000)],
+      [pay_untagged(wallet(sponsor), 9_000_000)],
+      interval.after(1_000),
+      [sponsor],
+    ),
+  )
+}
+
+test claim_two_vaults_at_stake_variant_addresses_rejected() {
+  let staked =
+    Address {
+      payment_credential: Script(vault_script),
+      stake_credential: Some(Inline(VerificationKey(stranger_key))),
+    }
+  let second = vault_input(1, 9_000_000)
+  !vault.validate(
+    Some(datum()),
+    Claim,
+    ref(0),
+    tx(
+      [
+        vault_input(0, 9_000_000),
+        Input { ..second, output: Output { ..second.output, address: staked } },
+      ],
+      [pay(wallet(beneficiary_key), 9_000_000)],
+      interval.between(100, 999),
+      [],
+    ),
+  )
+}
+
+test forfeit_two_vaults_in_one_tx_rejected() {
+  !vault.validate(
+    Some(datum()),
+    Forfeit,
+    ref(0),
+    tx(
+      [vault_input(0, 9_000_000), vault_input(1, 9_000_000)],
+      [pay(wallet(sponsor), 9_000_000)],
+      interval.after(1_000),
+      [sponsor],
     ),
   )
 }

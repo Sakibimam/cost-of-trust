@@ -28,12 +28,15 @@ pub type ClaimRedeemer {
 pub type CoverageDatum {
   terms_hash: ByteArray,
   buyer: Address,
-  underwriter: ByteArray,
+  /// Full address the collateral returns to. Its payment credential must be a key: that key signs Expire.
+  underwriter: Address,
   /// Lovelace owed to the buyer on a FAILURE decision.
   payout: Int,
   /// The claim_vault UTxO this coverage insures.
   task_ref: OutputReference,
-  /// POSIX milliseconds.
+  /// POSIX milliseconds. The claim_vault expiry: Settle opens here.
+  task_expiry: Int,
+  /// POSIX milliseconds. Settle closes and Expire opens here.
   decide_by: Int,
   config_digest: ByteArray,
 }
@@ -45,6 +48,8 @@ pub type ConfigDatum {
   workflow_owner: ByteArray,
   workflow_name: ByteArray,
   workflow_cid: ByteArray,
+  /// 32-byte DON config digest: the first 32 bytes of every Settle report_context.
+  don_config_digest: ByteArray,
 }
 
 pub type CoverageRedeemer {
@@ -63,6 +68,14 @@ pub type CoverageRedeemer {
 pub fn upper_bound_before(tx: Transaction, t: Int) -> Bool {
   when tx.validity_range.upper_bound.bound_type is {
     Finite(u) -> u < t
+    _ -> False
+  }
+}
+
+/// The transaction validity range ends at or before `t`, so it cannot overlap a window opening at `t`.
+pub fn upper_bound_at_most(tx: Transaction, t: Int) -> Bool {
+  when tx.validity_range.upper_bound.bound_type is {
+    Finite(u) -> u <= t
     _ -> False
   }
 }
@@ -144,43 +157,52 @@ fn tag_matches(o: Output, tag: Option<OutputReference>) -> Bool {
   }
 }
 
-/// Total value of every transaction input locked at the same address as `own`.
-pub fn script_inputs_value(tx: Transaction, own: Output) -> Value {
-  list.foldl(
+/// True when exactly one input is locked under the payment credential of `own`, whatever its stake part.
+/// Stake-variant addresses of one script therefore cannot be batched around a per-input check.
+pub fn sole_script_input(tx: Transaction, own: Output) -> Bool {
+  list.count(
     tx.inputs,
-    assets.zero,
-    fn(i, acc) {
-      if i.output.address == own.address {
-        assets.merge(acc, i.output.value)
-      } else {
-        acc
-      }
+    fn(i) {
+      i.output.address.payment_credential == own.address.payment_credential
     },
-  )
+  ) == 1
+}
+
+/// The key hash behind a payment credential, or None for a script.
+pub fn key_hash_of(address: Address) -> Option<ByteArray> {
+  when address.payment_credential is {
+    VerificationKey(h) -> Some(h)
+    _ -> None
+  }
 }
 
 /// Shape rules for a config datum. Enforced once, when the config NFT is minted.
 pub fn config_ok(c: ConfigDatum) -> Bool {
   and {
-    c.f >= 0,
-    list.length(c.signers) >= c.f + 1,
+    c.f >= 1,
+    list.length(c.signers) >= 2 * c.f + 1,
+    list.unique(c.signers) == c.signers,
     list.length(c.signers) < 256,
     list.all(c.signers, fn(a) { length_of_bytearray(a) == 20 }),
     length_of_bytearray(c.workflow_owner) == 20,
     length_of_bytearray(c.workflow_name) == 10,
     length_of_bytearray(c.workflow_cid) == 32,
+    length_of_bytearray(c.don_config_digest) == 32,
   }
 }
 
-/// Digest the coverage datum pins: blake2b_256(f(1) | owner(20) | name(10) | cid(32) | n(1) | signers(20 each)).
+/// Digest the coverage datum pins: blake2b_256(f(1) | owner(20) | name(10) | cid(32) | don_config_digest(32) | n(1) | signers(20 each)).
 pub fn config_digest(c: ConfigDatum) -> ByteArray {
   let head =
     integer_to_bytearray(True, 1, c.f)
       |> append_bytearray(c.workflow_owner)
       |> append_bytearray(c.workflow_name)
       |> append_bytearray(c.workflow_cid)
+      |> append_bytearray(c.don_config_digest)
       |> append_bytearray(integer_to_bytearray(True, 1, list.length(c.signers)))
-  blake2b_256(list.foldl(c.signers, head, fn(s, acc) { append_bytearray(acc, s) }))
+  blake2b_256(
+    list.foldl(c.signers, head, fn(s, acc) { append_bytearray(acc, s) }),
+  )
 }
 
 pub fn config_policy_holds(value: Value, policy: PolicyId) -> Bool {

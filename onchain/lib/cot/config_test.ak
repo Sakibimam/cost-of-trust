@@ -1,5 +1,5 @@
 use aiken/interval
-use cardano/address.{Address, VerificationKey}
+use cardano/address.{Address, Script, VerificationKey}
 use cardano/assets
 use cardano/transaction.{
   InlineDatum, Input, NoDatum, Output, OutputReference, Transaction,
@@ -7,6 +7,9 @@ use cardano/transaction.{
 use cot/config
 use cot/model.{ConfigDatum, config_nft_name}
 use cot/vectors
+
+const lock: ByteArray =
+  #"f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0"
 
 const policy: ByteArray =
   #"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
@@ -25,6 +28,7 @@ fn good() -> ConfigDatum {
     workflow_owner: vectors.owner,
     workflow_name: vectors.name,
     workflow_cid: vectors.cid,
+    don_config_digest: vectors.don_config_digest,
   }
 }
 
@@ -39,7 +43,10 @@ fn wallet() -> Address {
 
 fn nft_output(datum: transaction.Datum) -> Output {
   Output {
-    address: wallet(),
+    address: Address {
+      payment_credential: Script(lock),
+      stake_credential: None,
+    },
     value: assets.add(
       assets.from_lovelace(2_000_000),
       policy,
@@ -78,28 +85,53 @@ fn mint_tx(
 }
 
 test mint_consuming_the_seed_with_a_valid_config_ok() {
-  config.validate(seed_ref(), policy, mint_tx(seed_ref(), 1, InlineDatum(good())))
+  config.validate(
+    seed_ref(),
+    lock,
+    policy,
+    mint_tx(seed_ref(), 1, InlineDatum(good())),
+  )
 }
 
 test mint_without_consuming_the_seed_rejected() {
   let other = OutputReference { ..seed_ref(), output_index: 2 }
-  !config.validate(seed_ref(), policy, mint_tx(other, 1, InlineDatum(good())))
+  !config.validate(
+    seed_ref(),
+    lock,
+    policy,
+    mint_tx(other, 1, InlineDatum(good())),
+  )
 }
 
 test minting_two_nfts_rejected() {
-  !config.validate(seed_ref(), policy, mint_tx(seed_ref(), 2, InlineDatum(good())))
+  !config.validate(
+    seed_ref(),
+    lock,
+    policy,
+    mint_tx(seed_ref(), 2, InlineDatum(good())),
+  )
 }
 
 test mint_with_threshold_above_signer_count_rejected() {
   let bad = ConfigDatum { ..good(), f: 4 }
-  !config.validate(seed_ref(), policy, mint_tx(seed_ref(), 1, InlineDatum(bad)))
+  !config.validate(
+    seed_ref(),
+    lock,
+    policy,
+    mint_tx(seed_ref(), 1, InlineDatum(bad)),
+  )
 }
 
 test mint_with_a_short_workflow_name_rejected() {
   let bad = ConfigDatum { ..good(), workflow_name: "short" }
-  !config.validate(seed_ref(), policy, mint_tx(seed_ref(), 1, InlineDatum(bad)))
+  !config.validate(
+    seed_ref(),
+    lock,
+    policy,
+    mint_tx(seed_ref(), 1, InlineDatum(bad)),
+  )
 }
 
 test mint_without_an_inline_config_datum_rejected() {
-  !config.validate(seed_ref(), policy, mint_tx(seed_ref(), 1, NoDatum))
+  !config.validate(seed_ref(), lock, policy, mint_tx(seed_ref(), 1, NoDatum))
 }

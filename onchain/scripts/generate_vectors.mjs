@@ -26,26 +26,32 @@ const otherTermsHash = keccak_256(ascii('cost-of-trust other terms'));
 const coverageTx = Uint8Array.from(Buffer.from('11'.repeat(32), 'hex'));
 const otherTx = Uint8Array.from(Buffer.from('33'.repeat(32), 'hex'));
 const COVERAGE_INDEX = 2;
+const taskTx = Uint8Array.from(Buffer.from('77'.repeat(32), 'hex'));
+const otherTaskTx = Uint8Array.from(Buffer.from('88'.repeat(32), 'hex'));
+const TASK_INDEX = 1;
 
 const signers = privs.map((p) => addr20(pub64(p)));
 
+const donConfigDigest = keccak_256(ascii('cost-of-trust ocr config digest'));
+
 // config digest, mirrored by lib/cot/model.ak config_digest
 const digest = Buffer.from(
-  blake2b(cat(Uint8Array.of(F), owner, name, cid, Uint8Array.of(signers.length), ...signers), { dkLen: 32 }),
+  blake2b(cat(Uint8Array.of(F), owner, name, cid, donConfigDigest, Uint8Array.of(signers.length), ...signers), { dkLen: 32 }),
 );
 
 const header = (wfName) =>
   cat(Uint8Array.of(1), fill(32, 0xaa), fill(4, 0), fill(4, 0), fill(4, 0), cid, wfName, owner, Uint8Array.of(0, 0));
-const body = (terms, decision, tx, index) =>
-  cat(terms, Uint8Array.of(decision), tx, Uint8Array.of(index >> 8, index & 255));
+const body = (terms, decision, tx, index, task, taskIndex) =>
+  cat(terms, Uint8Array.of(decision), tx, Uint8Array.of(index >> 8, index & 255), task, Uint8Array.of(taskIndex >> 8, taskIndex & 255));
 const report = (o) =>
-  cat(header(o.name ?? name), body(o.terms ?? termsHash, o.decision, o.tx ?? coverageTx, o.index ?? COVERAGE_INDEX));
+  cat(header(o.name ?? name), body(o.terms ?? termsHash, o.decision, o.tx ?? coverageTx, o.index ?? COVERAGE_INDEX, o.task ?? taskTx, o.taskIndex ?? TASK_INDEX));
 
 // What the DON signs besides the report: OCR config digest(32) ++ seq_nr as a 32-byte big-endian word.
-const context = cat(keccak_256(ascii('cost-of-trust ocr config digest')), fill(31, 0), Uint8Array.of(7));
-const signedDigest = (raw) => keccak_256(cat(keccak_256(raw), context));
-const sign = (priv, raw) => {
-  const sig = secp256k1.sign(signedDigest(raw), priv, { lowS: true });
+const context = cat(donConfigDigest, fill(31, 0), Uint8Array.of(7));
+const contextOther = cat(keccak_256(ascii('cost-of-trust other config digest')), fill(31, 0), Uint8Array.of(7));
+const signedDigest = (raw, ctx = context) => keccak_256(cat(keccak_256(raw), ctx));
+const sign = (priv, raw, ctx = context) => {
+  const sig = secp256k1.sign(signedDigest(raw, ctx), priv, { lowS: true });
   return cat(sig.toCompactRawBytes(), Uint8Array.of(sig.recovery + 27));
 };
 
@@ -57,9 +63,11 @@ const reports = {
   wrongRef: report({ decision: 1, tx: otherTx }),
   wrongIndex: report({ decision: 1, index: 3 }),
   wrongTerms: report({ decision: 1, terms: otherTermsHash }),
+  wrongTask: report({ decision: 1, task: otherTaskTx }),
+  wrongTaskIndex: report({ decision: 1, taskIndex: 2 }),
   wrongName: report({ decision: 1, name: ascii('othername1') }),
 };
-for (const r of Object.values(reports)) if (r.length !== 176) throw new Error('report length');
+for (const r of Object.values(reports)) if (r.length !== 210) throw new Error('report length');
 
 const L = (xs) => `[${xs.map(hex).join(', ')}]`;
 const pubs = privs.map(pub64);
@@ -80,6 +88,12 @@ pub const coverage_tx: ByteArray = ${hex(coverageTx)}
 
 pub const coverage_index: Int = ${COVERAGE_INDEX}
 
+pub const task_tx: ByteArray = ${hex(taskTx)}
+
+pub const task_index: Int = ${TASK_INDEX}
+
+pub const don_config_digest: ByteArray = ${hex(donConfigDigest)}
+
 pub const context: ByteArray = ${hex(context)}
 
 pub const signers: List<ByteArray> = ${L(signers)}
@@ -96,5 +110,7 @@ for (const [k, raw] of Object.entries(reports)) {
   out += `\npub const sigs_${snake}: List<ByteArray> = ${L(privs.map((p) => sign(p, raw)))}\n`;
 }
 out += `\npub const outsider_sig_failure: ByteArray = ${hex(sign(outsider, reports.failure))}\n`;
+out += `\npub const context_other: ByteArray = ${hex(contextOther)}\n`;
+out += `\npub const sigs_failure_other_context: List<ByteArray> = ${L(privs.map((p) => sign(p, reports.failure, contextOther)))}\n`;
 await writeFile('../lib/cot/vectors.ak', out);
 console.log('wrote ../lib/cot/vectors.ak');
