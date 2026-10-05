@@ -63,10 +63,10 @@ export function startServer(port = 8787) {
         return json({ ...saved, termsHash: termsHash(selectedTerms(saved.result)) });
       }
       if (request.method === "POST" && url.pathname === "/best-route") {
-        const body = await request.json() as { task: string; serviceType: string; deadline: string; downstreamLossAda: number; candidateSellers: string[]; constraints?: Parameters<typeof evaluateRoutes>[0]["constraints"] };
+        const body = await request.json() as { task: string; serviceType: string; deadline: string; downstreamLossAda: number; riskAversion?: number; candidateSellers: string[]; constraints?: Parameters<typeof evaluateRoutes>[0]["constraints"] };
         const candidates = body.candidateSellers.map((id) => sellers.find((seller) => seller.id === id));
         if (candidates.some((seller) => !seller)) return json({ error: "unknown seller" }, 400);
-        const result = evaluateRoutes({ downstreamLossAda: body.downstreamLossAda, candidateSellers: candidates as Seller[], constraints: body.constraints, underwriter: underwriterConfig });
+        const result = evaluateRoutes({ downstreamLossAda: body.downstreamLossAda, riskAversion: body.riskAversion, candidateSellers: candidates as Seller[], constraints: body.constraints, underwriter: underwriterConfig });
         const quoteId = crypto.randomUUID();
         quotes.set(quoteId, { result, task: body.task, serviceType: body.serviceType, deadline: body.deadline });
         return json({ ...result, quoteId, termsHash: termsHash(selectedTerms(result)) });

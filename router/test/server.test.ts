@@ -24,17 +24,20 @@ test("POST /best-route then GET /quotes/:id, /sellers, /health, CORS", async () 
   expect(response.status).toBe(200);
   expect(response.headers.get("access-control-allow-origin")).toBe("*");
   const body = await response.json();
-  expect(body.selectedRoute).toBe("underwritten-single");
-  expect(body.selectedSellers).toEqual(["seller-b"]);
-  const under = body.routes.find((r: any) => r.route === "underwritten-single" && r.sellers[0] === "seller-b");
+  expect(body.selectedRoute).toBe("redundant");
+  expect(body.selectedSellers).toEqual(["seller-a", "seller-b"]);
+  expect(body.riskAversion ?? body.assumptions.riskAversion.value).toBe(0);
+  const under = body.routes.find((r: any) => r.route === "underwritten" && r.sellers[0] === "seller-b");
   expect(under.premiumAda).toBeCloseTo(8.6, 2);
-  expect(under.expectedTotalCostAda).toBeCloseTo(20.6, 2);
+  expect(under.expectedTotalCostAda).toBeCloseTo(22.2, 2);
+  expect(under.sdLossAda).toBeCloseTo(14.8, 2);
+  expect(under.riskAdjustedCostAda).toBeCloseTo(22.2, 2);
   expect(body.termsHash).toMatch(/^[0-9a-f]{64}$/);
-  const hash = Buffer.from(blake2b(new TextEncoder().encode(canonicalJson({ route: "underwritten-single", sellers: ["seller-b"], servicePriceAda: 10, premiumAda: under.premiumAda, coverageAda: 80 })), { dkLen: 32 })).toString("hex");
+  const hash = Buffer.from(blake2b(new TextEncoder().encode(canonicalJson({ route: "redundant", sellers: ["seller-a", "seller-b"], servicePriceAda: 18, premiumAda: 0, coverageAda: 0 })), { dkLen: 32 })).toString("hex");
   expect(body.termsHash).toBe(hash);
 
   const quote = await (await fetch(`${base()}/quotes/${body.quoteId}`)).json();
-  expect(quote.result.selectedRoute).toBe("underwritten-single");
+  expect(quote.result.selectedRoute).toBe("redundant");
   const sellerQuote = await (await fetch(`${base()}/quotes/seller-b`)).json();
   expect(sellerQuote.coverageOffers[0].premiumAda).toBeCloseTo(8.6, 2);
   expect(sellerQuote.coverageOffers[0].termsHash).toMatch(/^[0-9a-f]{64}$/);
@@ -51,8 +54,12 @@ test("POST /best-route then GET /quotes/:id, /sellers, /health, CORS", async () 
 
 test("requireCoverage and maxServiceSpendAda over HTTP; unknown seller 400", async () => {
   server = startServer(0);
+  const averse = await (await post({ ...req, riskAversion: 0.25, constraints: { allowRedundancy: false } })).json();
+  expect(averse.selectedRoute).toBe("underwritten");
+  expect(averse.routes.find((r: any) => r.route === "underwritten" && r.sellers[0] === "seller-b").riskAdjustedCostAda).toBeCloseTo(25.9, 2);
+  expect(averse.reason).toContain("coverage wins because riskAversion 0.25");
   const covered = await (await post({ ...req, constraints: { allowRedundancy: true, requireCoverage: true } })).json();
-  expect(covered.selectedRoute).toBe("underwritten-single");
+  expect(covered.selectedRoute).toBe("underwritten");
   const capped = await (await post({ ...req, constraints: { allowRedundancy: true, maxServiceSpendAda: 9 } })).json();
   expect(capped.selectedSellers).not.toContain("seller-b");
   expect((await post({ ...req, candidateSellers: ["seller-x"] })).status).toBe(400);
