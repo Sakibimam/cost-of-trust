@@ -3,7 +3,7 @@ import { buildBody, DECISION_BYTE, decide, type Decision } from "./src/decide";
 import { readFacts, type Ref, type Post } from "./src/koios";
 
 export type Config = { koiosUrl: string; koiosKeySecret: string; relayerUrl: string; verbose?: boolean };
-type Trigger = { coverageRef: string; taskRef: string; termsHash: string };
+type Trigger = { coverageRef: string };
 type ReportResponse = { rawReport: Uint8Array; reportContext: Uint8Array; sigs: Array<{ signature: Uint8Array }> };
 type RequestJson = { url: string; method: "POST"; body: string; headers: Record<string, string>; cacheSettings: { store: boolean; maxAge: string } };
 const hex = (b: Uint8Array) => Buffer.from(b).toString("hex");
@@ -14,13 +14,15 @@ const postFor = (runtime: TeeRuntime<Config>, bearer: string): Post => (path, bo
 
 export const onTrigger = (runtime: TeeRuntime<Config>, payload: HTTPPayload): string => {
   const trigger = decodeJson(payload.input) as Trigger;
-  if (!trigger || typeof trigger.coverageRef !== "string" || typeof trigger.taskRef !== "string" || !/^[0-9a-f]{64}$/i.test(trigger.termsHash)) throw new Error("trigger needs coverageRef, taskRef and termsHash");
+  if (!trigger || typeof trigger.coverageRef !== "string") throw new Error("trigger needs coverageRef");
   const bearer = runtime.getSecret({ id: runtime.config.koiosKeySecret }).result().value;
-  const coverage = parseRef(trigger.coverageRef); const task = parseRef(trigger.taskRef); const outcome = readFacts(postFor(runtime, bearer), coverage, task, trigger.termsHash.toLowerCase(), runtime.now().getTime());
+  const coverage = parseRef(trigger.coverageRef); const outcome = readFacts(postFor(runtime, bearer), coverage, runtime.now().getTime());
   const decision = decide(outcome.facts).decision; const don = runtime.usingTheDons();
   const agreedByte = don.runInNodeMode((_node, value: number) => value, consensusIdenticalAggregation<number>())(DECISION_BYTE[decision]).result();
   const agreed = (Object.entries(DECISION_BYTE).find(([, value]) => value === agreedByte)?.[0] ?? "INCONCLUSIVE") as Decision;
-  const body = buildBody(outcome.termsHash, agreed, outcome.coverageTxHash, outcome.coverageIndex);
+  // Settle is only open from task_expiry to decide_by and never takes INCONCLUSIVE: no report is cut outside that, the underwriter recovers through Expire.
+  if (agreed === "INCONCLUSIVE" || outcome.facts.now > outcome.facts.decideBy) return JSON.stringify({ report: false, decision: agreed, delivered: false });
+  const body = buildBody(outcome.termsHash, agreed, outcome.coverageTxHash, outcome.coverageIndex, outcome.taskRef.txHash, outcome.taskRef.index);
   const report = runtime.reportFromDon({ encodedPayload: hexToBase64(hex(body)), encoderName: "evm", signingAlgo: "ecdsa", hashingAlgo: "keccak256" }).result();
   const sent = new HTTPClient().sendRequest(don, (sr: HTTPSendRequester) => { const response = send(sr, report, `${runtime.config.relayerUrl.replace(/\/$/, "")}/report`); return { status: response.statusCode, body: new TextDecoder().decode(response.body) }; }, consensusIdenticalAggregation<{ status: number; body: string }>())().result();
   if (runtime.config.verbose) runtime.log(`decision ${agreed}: ${sent.status}`);

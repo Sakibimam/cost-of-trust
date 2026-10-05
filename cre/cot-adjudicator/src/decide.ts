@@ -31,17 +31,25 @@ export function decide(facts: AdjudicationFacts): DecisionResult {
   return { decision: "INCONCLUSIVE", reason: "claim-state-not-final" };
 }
 
-export function buildBody(termsHash: string, decision: Decision, coverageTxHash: string, coverageIndex: number): Uint8Array {
+// 101-byte report body: terms_hash(32) | decision(1) | coverage_tx(32) | coverage_idx(2 BE) | task_tx(32) | task_idx(2 BE).
+// The coverage validator only settles SUCCESS (0) and FAILURE (1), so INCONCLUSIVE has no body.
+export function buildBody(termsHash: string, decision: Decision, coverageTxHash: string, coverageIndex: number, taskTxHash: string, taskIndex: number): Uint8Array {
+  if (decision === "INCONCLUSIVE") throw new Error("INCONCLUSIVE is never settleable on chain");
   const clean = (value: string, name: string) => {
     if (!/^[0-9a-f]{64}$/i.test(value)) throw new Error(`${name} must be 32-byte hex`);
     return Uint8Array.from(value.match(/../g)!.map((x) => parseInt(x, 16)));
   };
-  if (!Number.isInteger(coverageIndex) || coverageIndex < 0 || coverageIndex > 0xffff) throw new Error("coverage index out of range");
-  const body = new Uint8Array(67);
+  const index16 = (value: number, name: string) => { if (!Number.isInteger(value) || value < 0 || value > 0xffff) throw new Error(`${name} out of range`); };
+  index16(coverageIndex, "coverage index");
+  index16(taskIndex, "task index");
+  const body = new Uint8Array(101);
   body.set(clean(termsHash, "terms hash"), 0);
   body[32] = DECISION_BYTE[decision];
   body.set(clean(coverageTxHash, "coverage tx hash"), 33);
   body[65] = coverageIndex >> 8;
   body[66] = coverageIndex & 0xff;
+  body.set(clean(taskTxHash, "task tx hash"), 67);
+  body[99] = taskIndex >> 8;
+  body[100] = taskIndex & 0xff;
   return body;
 }

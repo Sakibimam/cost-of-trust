@@ -9,9 +9,21 @@ describe("coverage adjudication", () => {
   test("FAILURE from an unspent claim after expiry", () => expect(decide({ ...base, now: base.expiry, spend: undefined }).decision).toBe("FAILURE"));
   test("INCONCLUSIVE when the chain has halted", () => expect(decide({ ...base, blocksInWindow: 0, now: base.expiry }).decision).toBe("INCONCLUSIVE"));
   test("FAILURE from a buyer-signed forfeit", () => expect(decide({ ...base, spend: spend("forfeit") }).decision).toBe("FAILURE"));
-  test("the report body is exactly 67 bytes and big-endian", () => {
-    const body = buildBody("11".repeat(32), "FAILURE", "22".repeat(32), 513);
-    expect(body.length).toBe(67);
-    expect(Buffer.from(body).toString("hex")).toBe("11".repeat(32) + "01" + "22".repeat(32) + "0201");
+  test("the report body is exactly 101 bytes, names the task, and is big-endian", () => {
+    const body = buildBody("11".repeat(32), "FAILURE", "22".repeat(32), 513, "33".repeat(32), 258);
+    expect(body.length).toBe(101);
+    expect(Buffer.from(body).toString("hex")).toBe("11".repeat(32) + "01" + "22".repeat(32) + "0201" + "33".repeat(32) + "0102");
+  });
+
+  test("SUCCESS encodes decision byte 0", () => {
+    expect(buildBody("11".repeat(32), "SUCCESS", "22".repeat(32), 0, "33".repeat(32), 0)[32]).toBe(0);
+  });
+
+  test("INCONCLUSIVE has no body because the validator never settles it", () => {
+    expect(() => buildBody("11".repeat(32), "INCONCLUSIVE", "22".repeat(32), 0, "33".repeat(32), 0)).toThrow("never settleable");
+  });
+
+  test("a task index outside 16 bits is rejected", () => {
+    expect(() => buildBody("11".repeat(32), "FAILURE", "22".repeat(32), 0, "33".repeat(32), 0x10000)).toThrow("task index out of range");
   });
 });
