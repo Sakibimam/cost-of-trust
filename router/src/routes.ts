@@ -80,7 +80,7 @@ function explain(selected: RouteQuote, eligible: RouteQuote[], lambda: number, s
   }
   if (selected.route === "underwritten") {
     const own = eligible.concat().find((r) => r.route === "single" && r.sellers[0] === selected.sellers[0]);
-    const tail = own ? `caps the ${own.sdLossAda.toFixed(2)} ADA loss sd of ${selected.sellers[0]}` : "caps the tail";
+    const tail = own ? `caps the ${own.sdLossAda.toFixed(2)} ADA loss swing of ${selected.sellers[0]}` : "caps the tail";
     return `${shared ? "sellers share infrastructure, so backups fail together; " : (eligible.some((r) => r.route === "redundant") ? "no backup pair is cheaper at this riskAversion; " : "no backup pair is quoted; ")}coverage ${tail}; risk-adjusted cost ${cost} at riskAversion ${lambda}`;
   }
   return `${label(selected)} has the minimum risk-adjusted cost ${cost}; at riskAversion ${lambda} neither a backup nor coverage pays for itself${cover ? ` (best coverage ${cover.riskAdjustedCostAda.toFixed(2)} ADA)` : ""}`;

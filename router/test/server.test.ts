@@ -60,7 +60,7 @@ test("requireCoverage and maxServiceSpendAda over HTTP; unknown seller 400", asy
   const averse = await (await post({ ...req, riskAversion: 0.25, constraints: { allowRedundancy: false } })).json();
   expect(averse.selectedRoute).toBe("underwritten");
   expect(averse.routes.find((r: any) => r.route === "underwritten" && r.sellers[0] === "seller-b").riskAdjustedCostAda).toBeCloseTo(25.9, 2);
-  expect(averse.reason).toContain("coverage caps the 30.00 ADA loss sd of seller-b");
+  expect(averse.reason).toContain("coverage caps the 30.00 ADA loss swing of seller-b");
   const covered = await (await post({ ...req, constraints: { allowRedundancy: true, requireCoverage: true } })).json();
   expect(covered.selectedRoute).toBe("underwritten");
   const capped = await (await post({ ...req, constraints: { allowRedundancy: true, maxServiceSpendAda: 9 } })).json();

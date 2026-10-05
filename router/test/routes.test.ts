@@ -79,7 +79,7 @@ test("ties break by lower sd then route id", () => {
 });
 test("reason names the mechanism", () => {
   expect(run([a, b, c], 0.25).reason).toContain("sellers fail independently, so a backup keeper (redundant seller-a+seller-b) caps the tail cheaper than coverage");
-  expect(run([a, b, c], 0.25, { allowRedundancy: true }, true).reason).toContain("sellers share infrastructure, so backups fail together; coverage caps the 30.00 ADA loss sd of seller-b");
+  expect(run([a, b, c], 0.25, { allowRedundancy: true }, true).reason).toContain("sellers share infrastructure, so backups fail together; coverage caps the 30.00 ADA loss swing of seller-b");
 });
 
 test("constraints filter route families", () => {
