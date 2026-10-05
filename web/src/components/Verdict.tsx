@@ -1,5 +1,5 @@
 import { fmt } from "@/lib/format";
-import { KIND_GLOSS, type RouteQuote, type RouteResult, rankedRoutes, riskChargeAda, routeNames, upfrontAda } from "@/lib/router";
+import { routeGloss, type RouteQuote, type RouteResult, rankedRoutes, riskChargeAda, routeNames, upfrontAda } from "@/lib/router";
 
 const TIE_ADA = 0.005; // same threshold the router uses to call two risk-adjusted costs a tie
 
@@ -26,7 +26,7 @@ export function Verdict({ result, lossAda, names }: { result: RouteResult; lossA
       <div className="min-w-0 border-b border-rule py-6 lg:col-span-7 lg:border-b-0 lg:border-r lg:pr-8">
         <p className="label">Why it won, against a downstream loss L of {fmt(lossAda)} ADA</p>
         <h2 className="m-0 mt-2 text-[22px] font-extrabold leading-tight" data-testid="selected-label"><span className="text-muted">{selected.route}</span> {routeNames(selected, names)}</h2>
-        <p className="mt-1 text-[14px] text-muted">{KIND_GLOSS[selected.route]}</p>
+        <p className="mt-1 text-[14px] text-muted">{routeGloss(selected, names)}</p>
         <p className="mt-3 max-w-[62ch] text-[17px] leading-snug first-letter:uppercase" data-testid="reason">{result.reason}.</p>
         {tie && <p className="mt-3 max-w-[62ch] border-l-[6px] border-ink bg-paper-2 p-3 text-[15px] leading-snug" data-testid="tie-break">{tie}</p>}
       </div>

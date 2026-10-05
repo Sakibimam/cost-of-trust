@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { fmt } from "@/lib/format";
-import { type RouteQuote, type RouteResult, rankedRoutes, riskChargeAda, routeKey, routeNames, upfrontAda } from "@/lib/router";
+import { type RouteQuote, type RouteResult, rankedRoutes, riskChargeAda, routeGloss, routeKey, routeNames, upfrontAda } from "@/lib/router";
 
 const niceMax = (v: number) => Math.max(10, Math.ceil(v / 10) * 10);
 const COLLAPSED_ROWS = 3;
@@ -87,6 +87,7 @@ export function Ranking({ result, riskAversion, names }: { result: RouteResult; 
               <span className={`fig flex h-8 w-8 items-center justify-center ${selected ? "bg-ink text-paper" : "border border-ink"}`}><span className="sr-only">Rank </span>{rank + 1}</span>
               <div className="min-w-0">
                 <p className="m-0 text-[16px] font-extrabold leading-tight"><span className="text-muted">{r.route}</span> {routeNames(r, names)}</p>
+                {r.route === "staggered" && <p className="m-0 mt-1 text-[13px] leading-snug text-muted" data-testid="staggered-gloss">{routeGloss(r, names)}</p>}
                 <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                   {selected && <span className="label !text-ink">Chosen</span>}
                   {lowest && <span className={`label ${selected ? "!text-ink" : "!text-signal-ink"}`}>{selected ? "Also lowest price" : "Lowest price, rejected"}</span>}

@@ -1,6 +1,6 @@
 export const ROUTER_URL = (process.env.NEXT_PUBLIC_ROUTER_URL ?? "http://localhost:8787").replace(/\/$/, "");
 
-export type RouteId = "single" | "redundant" | "underwritten";
+export type RouteId = "single" | "redundant" | "staggered" | "underwritten";
 
 export type RouteQuote = {
   route: RouteId;
@@ -96,8 +96,15 @@ export const roundArithmetic = (s: string) => s.replace(/\d+(?:\.\d+)?(?:e-?\d+)
 export const KIND_GLOSS: Record<RouteId, string> = {
   single: "one keeper, no backup and no cover",
   redundant: "two keepers, either one can finish the job",
+  staggered: "two keepers, one after the other, one claim and one fee",
   underwritten: "one keeper, with an insurer paying out if it fails",
 };
 
 export const nameOf = (names: Record<string, string>, id: string) => names[id] ?? id;
-export const routeNames = (r: Pick<RouteQuote, "sellers">, names: Record<string, string>) => r.sellers.map((id) => nameOf(names, id)).join(" + ");
+export const routeNames = (r: Pick<RouteQuote, "sellers"> & { route?: RouteId }, names: Record<string, string>) => r.sellers.map((id) => nameOf(names, id)).join(r.route === "staggered" ? " then " : " + ");
+
+export function routeGloss(r: Pick<RouteQuote, "route" | "sellers">, names: Record<string, string>): string {
+  if (r.route !== "staggered") return KIND_GLOSS[r.route];
+  const [first, second] = r.sellers.map((id) => nameOf(names, id));
+  return `${first} gets the first window; if it misses, ${second} may claim. The chain lets exactly one claim through and pays only the keeper who landed it.`;
+}

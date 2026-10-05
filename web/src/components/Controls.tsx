@@ -1,7 +1,7 @@
 "use client";
 
 export type Buyer = "bot" | "treasury";
-export const RISK_AVERSION: Record<Buyer, number> = { bot: 0, treasury: 0.25 };
+export const RISK_AVERSION: Record<Buyer, number> = { bot: 0, treasury: 0.5 };
 
 const BUYERS: { id: Buyer; name: string; who: string; note: string }[] = [
   { id: "bot", name: "Can absorb a loss", who: "Risk-neutral bot", note: "Cares about the average loss only." },
@@ -36,6 +36,7 @@ export function Controls({ buyer, onBuyer, shared, onShared, busy }: {
           <span aria-hidden className={`block h-4 w-4 ${shared ? "bg-yellow" : "bg-ink"}`} />
         </button>
       </div>
+      <p className="m-0 border-b border-rule p-3 text-[13px] leading-snug text-muted sm:p-4" data-testid="cardano-default">On Cardano the default protection is a backup keeper the chain itself schedules. Coverage only wins when keepers share infrastructure and the buyer cannot absorb the loss.</p>
     </form>
   );
 }
