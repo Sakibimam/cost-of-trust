@@ -8,5 +8,6 @@
   "correlationRiskAda": 0.5,
   "marginAda": 1,
   "coverageApplicabilityRate": 0.8,
-  "sharedProviderCorrelation": 0.5
+  "sharedProviderCorrelation": 0.5,
+  "lateSlotPenalty": 0.05
 }

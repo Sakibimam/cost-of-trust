@@ -9,13 +9,13 @@ export type Seller = {
 export type UnderwriterConfig = {
   underwriter: string; coverageLimitAda: number; deductibleAda: number; collateralRef: string;
   capitalCostRate: number; fraudRiskAda: number; correlationRiskAda: number; marginAda: number;
-  coverageApplicabilityRate: number; sharedProviderCorrelation: number;
+  coverageApplicabilityRate: number; sharedProviderCorrelation: number; lateSlotPenalty: number;
 };
 
 export type RouteConstraints = { allowRedundancy?: boolean; requireCoverage?: boolean; maxServiceSpendAda?: number };
 export type RouteInput = { downstreamLossAda: number; candidateSellers: Seller[]; constraints?: RouteConstraints; underwriter: UnderwriterConfig; riskAversion?: number; sharedInfrastructure?: boolean };
 export type RouteQuote = {
-  route: "single" | "redundant" | "underwritten";
+  route: "single" | "redundant" | "staggered" | "underwritten";
   sellers: string[]; servicePriceAda: number; premiumAda: number; premiumBreakdown: Record<string, number>;
   coverageAda: number; pLoss: number; pClaim: number; confidence: number;
   expectedLossAda: number; sdLossAda: number; expectedTotalCostAda: number; riskAdjustedCostAda: number;
@@ -60,6 +60,18 @@ function redundant(a: Seller, b: Seller, loss: number, underwriter: UnderwriterC
   return finish({ route: "redundant", sellers: [a.id, b.id], servicePriceAda: a.priceAda + b.priceAda, premiumAda: 0, premiumBreakdown: {}, coverageAda: 0, pLoss: jointFailureProbability, pClaim: 0, confidence: ra.confidence + rb.confidence, expectedLossAda, sdLossAda, jointFailureProbability, arithmetic: `${a.priceAda} + ${b.priceAda} + ${jointFailureProbability} * ${loss} + ${lambda} * ${sdLossAda}` }, lambda);
 }
 
+function staggered(a: Seller, b: Seller, loss: number, underwriter: UnderwriterConfig, lambda: number, sharedInfrastructure: boolean): RouteQuote {
+  const ra = riskFor(a, underwriter); const rb = riskFor(b, underwriter);
+  const pbLate = Math.min(rb.pLoss + underwriter.lateSlotPenalty, 0.999);
+  const shared = sharedInfrastructure || a.provider === b.provider;
+  const covariance = underwriter.sharedProviderCorrelation * Math.sqrt(ra.pLoss * (1 - ra.pLoss) * pbLate * (1 - pbLate));
+  const jointFailureProbability = ra.pLoss * pbLate + (shared ? covariance : 0);
+  const expectedFeeAda = a.priceAda * (1 - ra.pLoss) + b.priceAda * ra.pLoss * (1 - pbLate);
+  const expectedLossAda = jointFailureProbability * loss;
+  const sdLossAda = loss * Math.sqrt(jointFailureProbability * (1 - jointFailureProbability));
+  return finish({ route: "staggered", sellers: [a.id, b.id], servicePriceAda: expectedFeeAda, premiumAda: 0, premiumBreakdown: {}, coverageAda: 0, pLoss: jointFailureProbability, pClaim: 0, confidence: ra.confidence + rb.confidence, expectedLossAda, sdLossAda, jointFailureProbability, arithmetic: `${a.priceAda} * ${1 - ra.pLoss} + ${b.priceAda} * ${ra.pLoss} * ${1 - pbLate} + ${jointFailureProbability} * ${loss} + ${lambda} * ${sdLossAda}` }, lambda);
+}
+
 function underwritten(seller: Seller, loss: number, underwriter: UnderwriterConfig, lambda: number): RouteQuote {
   const risk = riskFor(seller, underwriter); const coverageAda = Math.min(loss, underwriter.coverageLimitAda);
   const premiumBreakdown = { coveredClaim: risk.pClaim * coverageAda, capitalCost: underwriter.capitalCostRate * coverageAda, fraudRisk: underwriter.fraudRiskAda, correlationRisk: underwriter.correlationRiskAda, margin: underwriter.marginAda };
@@ -73,6 +85,9 @@ function underwritten(seller: Seller, loss: number, underwriter: UnderwriterConf
 function explain(selected: RouteQuote, eligible: RouteQuote[], lambda: number, shared: boolean): string {
   const cost = `${selected.riskAdjustedCostAda.toFixed(2)} ADA`;
   const cover = eligible.filter((r) => r.route === "underwritten").sort(byCost)[0];
+  if (selected.route === "staggered") {
+    return `${shared ? "sellers share infrastructure, so the late keeper is correlated, yet" : "sellers fail independently, so"} an escrowed schedule (${selected.sellers[0]} first, ${selected.sellers[1]} as late backup) pays only the keeper that lands and caps the tail cheaper than coverage or parallel backups; risk-adjusted cost ${cost}`;
+  }
   if (selected.route === "redundant") {
     const mechanism = shared ? "backups still beat coverage despite shared infrastructure" : "sellers fail independently, so a backup keeper";
     const tail = cover ? ` caps the tail cheaper than coverage (${cover.riskAdjustedCostAda.toFixed(2)} ADA for ${label(cover)})` : " caps the tail";
@@ -80,7 +95,7 @@ function explain(selected: RouteQuote, eligible: RouteQuote[], lambda: number, s
   }
   if (selected.route === "underwritten") {
     const own = eligible.concat().find((r) => r.route === "single" && r.sellers[0] === selected.sellers[0]);
-    const tail = own ? `caps the ${own.sdLossAda.toFixed(2)} ADA loss swing of ${selected.sellers[0]}` : "caps the tail";
+    const tail = own ? `caps the ${own.sdLossAda.toFixed(2)} ADA loss sd of ${selected.sellers[0]}` : "caps the tail";
     return `${shared ? "sellers share infrastructure, so backups fail together; " : (eligible.some((r) => r.route === "redundant") ? "no backup pair is cheaper at this riskAversion; " : "no backup pair is quoted; ")}coverage ${tail}; risk-adjusted cost ${cost} at riskAversion ${lambda}`;
   }
   return `${label(selected)} has the minimum risk-adjusted cost ${cost}; at riskAversion ${lambda} neither a backup nor coverage pays for itself${cover ? ` (best coverage ${cover.riskAdjustedCostAda.toFixed(2)} ADA)` : ""}`;
@@ -95,6 +110,7 @@ export function evaluateRoutes(input: RouteInput): RouteResult {
   const routes: RouteQuote[] = sellers.map((seller) => single(seller, loss, underwriter, lambda));
   if (constraints.allowRedundancy) {
     for (let i = 0; i < sellers.length; i++) for (let j = i + 1; j < sellers.length; j++) routes.push(redundant(sellers[i], sellers[j], loss, underwriter, lambda, sharedInfrastructure));
+    for (let i = 0; i < sellers.length; i++) for (let j = 0; j < sellers.length; j++) if (i !== j) routes.push(staggered(sellers[i], sellers[j], loss, underwriter, lambda, sharedInfrastructure));
   }
   routes.push(...sellers.map((seller) => underwritten(seller, loss, underwriter, lambda)));
   const eligible = routes.filter((route) => (!constraints.requireCoverage || route.route === "underwritten") && (constraints.maxServiceSpendAda === undefined || route.servicePriceAda <= constraints.maxServiceSpendAda));
