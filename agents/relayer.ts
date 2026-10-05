@@ -23,8 +23,8 @@ async function simulateCre(payload: { coverageRef: string }): Promise<Report> {
 }
 function flipped(report: Report): Report {
   const raw = Buffer.from(report.raw_report, "hex");
-  if (raw.length !== 176) throw new Error(`CRE raw report must be 176 bytes, got ${raw.length}`);
-  raw[109] ^= 1;
+  if (raw.length !== 210) throw new Error(`CRE raw report must be 210 bytes, got ${raw.length}`);
+  raw[141] ^= 1;
   return { ...report, raw_report: raw.toString("hex") };
 }
 Bun.serve({ port: Number(process.env.PORT ?? 4111), async fetch(request) { try {
