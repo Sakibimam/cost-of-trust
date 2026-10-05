@@ -1,0 +1,36 @@
+[
+  {
+    "id": "seller-a",
+    "name": "Seller A",
+    "priceAda": 8,
+    "provider": "koios-shared",
+    "payTo": "addr_test1seller_a",
+    "endpoint": "https://seller-a.example/quote",
+    "successes": 0,
+    "failures": 0,
+    "evidence": []
+  },
+  {
+    "id": "seller-b",
+    "name": "Seller B",
+    "priceAda": 10,
+    "provider": "own-node",
+    "payTo": "addr_test1seller_b",
+    "endpoint": "https://seller-b.example/quote",
+    "successes": 18,
+    "failures": 2,
+    "bondDiscount": 0.033333,
+    "evidence": []
+  },
+  {
+    "id": "seller-c",
+    "name": "Seller C",
+    "priceAda": 8,
+    "provider": "koios-shared",
+    "payTo": "addr_test1seller_c",
+    "endpoint": "https://seller-c.example/quote",
+    "successes": 0,
+    "failures": 0,
+    "evidence": []
+  }
+]
