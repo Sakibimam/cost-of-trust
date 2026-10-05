@@ -38,3 +38,23 @@ Archivo 400, 500, 600 and 800 are loaded (`document.fonts`). Tabular figures: `1
 - `uicraft look --url http://localhost:3100/` exits 0 with `tells=[]`.
 
 Blind spots: Koios and Cardanoscan links are not followed (no real evidence or run transactions exist yet); a keyboard-only pass was not run beyond native radio and button semantics; Safari and Firefox were not opened.
+
+## Follow-up round (critic: 1440 pass, 375 fail)
+
+Re-run on a fresh production build at 375x812 and 1440x900 (tab brought to front so transitions run). The same 4-scenario script: 8 of 8 scenarios match the router (winner and total), 9 rows each, 0 mismatches, scrollW equals innerWidth, 0 console errors.
+
+| Item | Before | After (DOM read) |
+|---|---|---|
+| Default | bot + independent, tie among three 20.00 routes | treasury + shared, unique winner underwritten seller-b 25.90 (`input[name=buyer]:checked` = treasury, switch aria-checked = true) |
+| Tie-break | none | bot + independent: "Tied with single Seller B at 20.00; chosen because its loss swing is 14.00 vs 30.00 ADA." Treasury + independent states the exact-twin case (B+C, same 14.00 swing, broken by name). Treasury + shared and bot + shared have no tie and render no tie text |
+| 375 order | controls, then numbers far below | h1 at y=125, hero pair at y=223, controls at y=642; first figures at y=314 (above the 812 fold) |
+| Mobile ranking | 9 rows | 3 visible of 9, button "Show all 9 routes" toggles to 9 visible and "Show the top 3 routes only" |
+| Hero numbers | route names | Paid / true cost 10.00 / 25.90 vs 8.00 / 38.00, from the live response, 56px at 375 and 92px at 1440, tabular |
+| Names | seller-a, koios-shared | "Seller A", "Seller B" from the router name field; provider shown as "Shared Koios node" / "Own node" |
+| Plain words | riskAversion 0 / 0.25 first | "Can absorb a loss" / "Cannot absorb a loss", riskAversion small underneath; keeper defined above the h1; "Typical swing"; the starting-assumption gloss under the prior; arithmetic rounded to 2 decimals ("10.00 + 8.60 + (0.10 * 100.00 - 0.08 * 80.00) + 0.25 * 14.80") |
+| Paths | absolute path printed in the empty run state | no `/Users/` in the page text; command `bun run agents/buyer.ts` shown only when `agents/buyer.ts` exists |
+| Bars | re-created, grow from 0 | same element per route (node identity kept), single seller-b bar 501.9px to 365px in 280ms, never 0 (samples 459.6, 391.6, 372.3, 366.7, 365.2, 365); disabled under prefers-reduced-motion |
+| Nav targets | 21px | 44px, 44px, 44px |
+| Run section | guessed field names, synthetic fixture used in QA | parser rewritten to the real record shape `{startedAt, selectedRoute, records[{step, txHash, confirmed, error, detail}]}` read from `agents/buyer.ts`; no synthetic data is shipped or rendered; `agents/runs` is empty so the section shows the command |
+
+Blind spots: the run section has still not rendered a real record, and a tab in the background freezes CSS transitions (the first animation sample was invalid until the tab was foregrounded).

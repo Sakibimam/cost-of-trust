@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { fmt } from "@/lib/format";
 import { ROUTER_URL, type RouteResult, type SellerRecord, fetchBestRoute, fetchSellers } from "@/lib/router";
 import { type Buyer, Controls, RISK_AVERSION } from "./Controls";
 import { Detail } from "./Detail";
+import { HeroPair } from "./HeroPair";
 import { Ranking } from "./Ranking";
 import { Sellers } from "./Sellers";
 import { Verdict } from "./Verdict";
@@ -48,8 +49,8 @@ function Section({ id, title, kicker, children }: { id: string; title: string; k
 }
 
 export function Board({ runs }: { runs: React.ReactNode }) {
-  const [buyer, setBuyer] = useState<Buyer>("bot");
-  const [shared, setShared] = useState(false);
+  const [buyer, setBuyer] = useState<Buyer>("treasury");
+  const [shared, setShared] = useState(true);
   const [sellers, setSellers] = useState<Load<SellerRecord[]>>({ status: "loading" });
   const [route, setRoute] = useState<Load<RouteResult>>({ status: "loading" });
   const [busy, setBusy] = useState(false);
@@ -63,8 +64,8 @@ export function Board({ runs }: { runs: React.ReactNode }) {
     return () => ctl.abort();
   }, [nonce]);
 
-  const ids = sellers.status === "ready" ? sellers.data.map((s) => s.id) : null;
-  const idKey = ids?.join(",") ?? "";
+  const idKey = sellers.status === "ready" ? sellers.data.map((s) => s.id).join(",") : "";
+  const names = useMemo(() => (sellers.status === "ready" ? Object.fromEntries(sellers.data.map((s) => [s.id, s.name])) : {}), [sellers]);
   useEffect(() => {
     if (!idKey) return;
     const ctl = new AbortController();
@@ -78,37 +79,41 @@ export function Board({ runs }: { runs: React.ReactNode }) {
 
   const failed = sellers.status === "error" ? sellers.message : route.status === "error" ? route.message : null;
   const riskAversion = RISK_AVERSION[buyer];
+  const ready = !failed && route.status === "ready" ? route.data : null;
 
   return (
     <>
       <header className="border-b border-ink">
-        <div className="wrap flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3">
-          <p className="m-0 text-[17px] font-extrabold tracking-tight">Cost of Trust</p>
-          <nav aria-label="Sections" className="flex gap-5 text-[14px] font-semibold">
-            <a href="#ranking" className="!text-ink">Routes</a>
-            <a href="#sellers" className="!text-ink">Sellers</a>
-            <a href="#run" className="!text-ink">Latest run</a>
+        <div className="wrap flex flex-wrap items-center justify-between gap-x-6">
+          <p className="m-0 py-3 text-[17px] font-extrabold tracking-tight">Cost of Trust</p>
+          <nav aria-label="Sections" className="flex gap-x-1 text-[14px] font-semibold">
+            <a href="#ranking" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Routes</a>
+            <a href="#sellers" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Sellers</a>
+            <a href="#run" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Latest run</a>
           </nav>
         </div>
       </header>
 
       <section aria-labelledby="top-h" className="relative">
         <div className="hero-rules" aria-hidden><div className="wrap h-full"><div className="rules" /></div></div>
-        <div className="wrap relative z-10 grid grid-cols-1 gap-x-10 gap-y-8 py-6 md:py-8 lg:grid-cols-12">
-          <div className="min-w-0 lg:col-span-7">
-            <p className="label">A buyer agent, three keepers, one deadline</p>
-            <h1 id="top-h" className="display mt-4">Price is not the cost of execution.</h1>
-            <p className="mt-5 max-w-[58ch] text-[18px] leading-[1.45]">When keepers fail independently, Cardano makes a backup keeper safe: a UTxO can only be spent once. When they share infrastructure, backups fail together and coverage is cheaper.</p>
+        <div className="wrap relative z-10 grid grid-cols-1 gap-x-10 gap-y-6 py-6 md:py-8 lg:grid-cols-12 lg:gap-y-8">
+          <div className="min-w-0 lg:col-span-7 lg:row-start-1">
+            <p className="m-0 max-w-[48ch] text-[14px] leading-snug text-muted">A keeper is an agent paid to submit a transaction before a deadline.</p>
+            <h1 id="top-h" className="display mt-3">Price is not the cost of execution.</h1>
           </div>
-          <div className="min-w-0 lg:col-span-5">
+          <div className="min-w-0 lg:col-span-12 lg:row-start-3" data-testid="hero-pair">
+            {ready ? <HeroPair result={ready} names={names} /> : failed ? <p className="m-0 text-[15px] text-muted">The numbers appear once the router answers.</p> : <Loading what={`Pricing every route at ${ROUTER_URL}.`} />}
+          </div>
+          <div className="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
             <Controls buyer={buyer} onBuyer={setBuyer} shared={shared} onShared={setShared} busy={busy} />
           </div>
+          <p className="m-0 max-w-[58ch] text-[18px] leading-[1.45] lg:col-span-7 lg:row-start-2">When keepers fail independently, Cardano makes a backup keeper safe: a UTxO can only be spent once. When they share infrastructure, backups fail together and coverage is cheaper.</p>
         </div>
       </section>
 
       <section id="ranking" aria-labelledby="ranking-h" className="scroll-mt-6 pb-12 md:pb-16">
         <div className="wrap">
-          <h2 id="ranking-h" className="sr-only">The router's decision and every route it quoted</h2>
+          <h2 id="ranking-h" className="sr-only">Why the router chose, and every route it quoted</h2>
           {failed ? (
             <Failure what="The router did not answer." message={failed} onRetry={retry} />
           ) : route.status === "loading" || sellers.status === "loading" ? (
@@ -118,20 +123,20 @@ export function Board({ runs }: { runs: React.ReactNode }) {
           ) : route.status === "ready" ? (
             <div aria-busy={busy} className={busy ? "opacity-60" : undefined} style={{ transition: "opacity 140ms var(--ease-out)" }}>
               {busy && <p role="status" className="label mb-2">Re-pricing at riskAversion {riskAversion}, sharedInfrastructure {String(shared)}</p>}
-              <Verdict result={route.data} lossAda={LOSS_ADA} />
-              <div className="mt-10"><Ranking result={route.data} riskAversion={riskAversion} /></div>
+              <Verdict result={route.data} lossAda={LOSS_ADA} names={names} />
+              <div className="mt-10"><Ranking result={route.data} riskAversion={riskAversion} names={names} /></div>
             </div>
           ) : null}
         </div>
       </section>
 
-      {route.status === "ready" && !failed && (
-        <Section id="why" title="How the selected route was priced" kicker="The router returns its arithmetic and the status of every input, so a buyer can check the number instead of trusting it.">
-          <Detail result={route.data} />
+      {ready && (
+        <Section id="why" title="How the chosen route was priced" kicker="The router returns its arithmetic and the status of every input, so a buyer can check the number instead of trusting it.">
+          <Detail result={ready} />
         </Section>
       )}
 
-      <Section id="sellers" title="Track records, with the prior shown as a prior" kicker="A seller with no history is not scored as clean. The hatched block is the configured Beta prior; only the solid blocks are observed outcomes.">
+      <Section id="sellers" title="Track records, with the starting assumption shown as one" kicker="A seller with no history is not scored as clean. The hatched block is the configured starting assumption; only the solid blocks are observed outcomes.">
         {sellers.status === "loading" ? <Loading what={`Reading ${ROUTER_URL}/sellers.`} /> : sellers.status === "error" ? <Failure what="Seller records unavailable." message={sellers.message} onRetry={retry} /> : <Sellers sellers={sellers.data} />}
       </Section>
 

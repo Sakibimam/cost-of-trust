@@ -77,3 +77,27 @@ export function rankedRoutes(result: RouteResult): RouteQuote[] {
 }
 
 export const upfrontAda = (r: RouteQuote) => r.servicePriceAda + r.premiumAda;
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+export function providerLabel(provider: string): string {
+  const words = provider.split("-").filter(Boolean);
+  const rest = words.filter((w) => w !== "shared" && w !== "node");
+  return [...(words.includes("shared") ? ["shared"] : []), ...rest, "node"].map((w, i, all) => (w === "node" && i === all.length - 1 ? w : cap(w))).join(" ");
+}
+
+export function priorGloss(alpha0: number, beta0: number): string {
+  const ratio = (alpha0 + beta0) / alpha0;
+  const odds = Number.isInteger(ratio) ? `1 in ${ratio}` : `${Math.round((alpha0 / (alpha0 + beta0)) * 100)} in 100`;
+  return `starting assumption: ${odds} jobs fail until a seller has a track record`;
+}
+
+export const roundArithmetic = (s: string) => s.replace(/\d+(?:\.\d+)?(?:e-?\d+)?/g, (m) => Number(m).toFixed(2));
+
+export const KIND_GLOSS: Record<RouteId, string> = {
+  single: "one keeper, no backup and no cover",
+  redundant: "two keepers, either one can finish the job",
+  underwritten: "one keeper, with an insurer paying out if it fails",
+};
+
+export const nameOf = (names: Record<string, string>, id: string) => names[id] ?? id;
+export const routeNames = (r: Pick<RouteQuote, "sellers">, names: Record<string, string>) => r.sellers.map((id) => nameOf(names, id)).join(" + ");

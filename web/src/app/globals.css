@@ -35,6 +35,7 @@
   .wrap { max-width: 1280px; margin-inline: auto; padding-inline: 16px; }
   @media (min-width: 30rem) { .wrap { padding-inline: 24px; } }
 
+  [class*="seg-"] { box-shadow: inset -1px 0 0 var(--color-paper); }
   .seg-price { background: var(--color-ink); }
   .seg-premium { background: var(--color-blue); }
   .seg-loss { background: var(--color-signal); }
@@ -57,6 +58,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .bar-t { transition: width 280ms var(--ease-out), flex-grow 280ms var(--ease-out); }
   .grow { transform-origin: left center; animation: grow 280ms var(--ease-out) both; }
   .progress::after { animation: sweep 1.1s var(--ease-out) infinite; }
   @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }

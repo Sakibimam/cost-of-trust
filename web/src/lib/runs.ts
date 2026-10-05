@@ -1,72 +1,57 @@
-import { readdir, readFile } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
-export const RUNS_DIR = process.env.RUNS_DIR ?? path.resolve(/*turbopackIgnore: true*/ process.cwd(), "../agents/runs");
-export const RUN_COMMAND = "DEMO_LOSS_ADA=10 bun run agents/buyer.ts";
+const RUNS_DIR = process.env.RUNS_DIR ?? path.resolve(/*turbopackIgnore: true*/ process.cwd(), "../agents/runs");
+const BUYER_FILE = path.resolve(/*turbopackIgnore: true*/ process.cwd(), "../agents/buyer.ts");
+export const RUN_COMMAND = "bun run agents/buyer.ts";
 
-export type RunTx = { hash: string; label: string; status: string; detail: string };
-export type Run = { file: string; startedAt: string | null; txs: RunTx[]; outcome: { label: string; value: string }[] };
+export type RunTx = { hash: string; step: string; confirmed: boolean };
+export type RunStep = { step: string; error: string | null };
+export type Run = { file: string; startedAt: string | null; route: string | null; txs: RunTx[]; problems: RunStep[]; ingest: string | null };
 
-const HASH = /^[0-9a-f]{64}$/i;
-const HASH_KEYS = ["txHash", "tx_hash", "hash", "txId", "txid", "tx", "id"];
-const LABEL_KEYS = ["label", "name", "step", "action", "kind", "role", "what", "event", "phase"];
-const STATUS_KEYS = ["status", "tx_status", "koiosStatus", "koios_status", "confirmation", "state"];
-const DETAIL_KEYS = ["description", "detail", "details", "note", "message", "summary"];
-const OUTCOME_KEYS = ["outcome", "decision", "settlement", "result", "adjudication", "verdict"];
+type RecordItem = { step?: string; txHash?: string; confirmed?: boolean; error?: string; detail?: unknown };
+type RunFile = { startedAt?: string; selectedRoute?: { selectedRoute?: string; selectedSellers?: string[] }; records?: RecordItem[] };
 
-const pick = (o: Record<string, unknown>, keys: string[]) => {
-  for (const k of keys) {
-    const v = o[k];
-    if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") return { key: k, value: String(v) };
-  }
-  return null;
+export const STEP_WORDS: Record<string, string> = {
+  claim_vault_lock: "Sponsor locks the claim vault",
+  coverage_lock: "Underwriter locks coverage collateral",
+  claim_vault_forfeit: "Claim vault forfeited after the deadline",
+  coverage_settle: "Coverage settled by the CRE report",
 };
-
-function collectTxs(node: unknown, hint: string, out: RunTx[], seen: Set<string>) {
-  if (Array.isArray(node)) return node.forEach((n, i) => collectTxs(n, hint || String(i), out, seen));
-  if (!node || typeof node !== "object") return;
-  const o = node as Record<string, unknown>;
-  const h = pick(o, HASH_KEYS);
-  if (h && HASH.test(h.value) && !seen.has(h.value)) {
-    seen.add(h.value);
-    out.push({ hash: h.value, label: pick(o, LABEL_KEYS)?.value ?? hint, status: pick(o, STATUS_KEYS)?.value ?? "", detail: pick(o, DETAIL_KEYS)?.value ?? "" });
-  }
-  for (const [k, v] of Object.entries(o)) {
-    if (typeof v === "string" && HASH.test(v) && !HASH_KEYS.includes(k) && !seen.has(v)) {
-      seen.add(v);
-      out.push({ hash: v, label: k, status: "", detail: "" });
-    } else if (v && typeof v === "object") collectTxs(v, k, out, seen);
-  }
+export function stepWords(step: string): string {
+  if (STEP_WORDS[step]) return STEP_WORDS[step];
+  const m = /^(seller-[a-z0-9]+)_(payment|claim)$/.exec(step);
+  if (m) return m[2] === "payment" ? `Buyer pays ${m[1]} over x402` : `${m[1]} claims the vault before the deadline`;
+  return step.replace(/_/g, " ");
 }
 
-function collectOutcome(rec: Record<string, unknown>): Run["outcome"] {
-  for (const k of OUTCOME_KEYS) {
-    const v = rec[k];
-    if (v == null) continue;
-    if (typeof v === "object" && !Array.isArray(v)) {
-      const rows = Object.entries(v as Record<string, unknown>).filter(([, x]) => ["string", "number", "boolean"].includes(typeof x) && !(typeof x === "string" && HASH.test(x)));
-      if (rows.length) return rows.map(([a, b]) => ({ label: a, value: String(b) }));
-    } else return [{ label: k, value: String(v) }];
-  }
-  return [];
+export async function buyerAgentExists(): Promise<boolean> {
+  try { await access(BUYER_FILE); return true; } catch { return false; }
 }
 
 export async function readRuns(): Promise<{ runs: Run[]; error: string | null }> {
   let names: string[];
   try {
-    names = (await readdir(/*turbopackIgnore: true*/ RUNS_DIR)).filter((n) => n.endsWith(".json")).sort();
+    names = (await readdir(/*turbopackIgnore: true*/ RUNS_DIR)).filter((n) => n.endsWith(".json")).sort().reverse();
   } catch (e) {
-    return (e as NodeJS.ErrnoException).code === "ENOENT" ? { runs: [], error: null } : { runs: [], error: `cannot read ${RUNS_DIR}: ${(e as Error).message}` };
+    return (e as NodeJS.ErrnoException).code === "ENOENT" ? { runs: [], error: null } : { runs: [], error: `the agents/runs folder could not be read (${(e as NodeJS.ErrnoException).code ?? "error"})` };
   }
   const runs: Run[] = [];
-  for (const file of names.reverse()) {
+  for (const file of names) {
     try {
-      const rec = JSON.parse(await readFile(/*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ RUNS_DIR, file), "utf8")) as Record<string, unknown>;
-      const txs: RunTx[] = [];
-      collectTxs(rec, "", txs, new Set());
-      runs.push({ file, startedAt: pick(rec, ["startedAt", "started_at", "timestamp", "createdAt", "date"])?.value ?? null, txs, outcome: collectOutcome(rec) });
-    } catch (e) {
-      return { runs, error: `${file} is not valid JSON: ${(e as Error).message}` };
+      const rec = JSON.parse(await readFile(/*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ RUNS_DIR, file), "utf8")) as RunFile;
+      const records = Array.isArray(rec.records) ? rec.records : [];
+      const ingest = records.find((r) => r.step === "router_ingest")?.detail as { status?: number } | undefined;
+      runs.push({
+        file,
+        startedAt: rec.startedAt ?? null,
+        route: rec.selectedRoute?.selectedRoute ? `${rec.selectedRoute.selectedRoute} ${(rec.selectedRoute.selectedSellers ?? []).join(" + ")}` : null,
+        txs: records.filter((r) => typeof r.txHash === "string" && /^[0-9a-f]{64}$/i.test(r.txHash)).map((r) => ({ hash: r.txHash!, step: r.step ?? "transaction", confirmed: r.confirmed === true })),
+        problems: records.filter((r) => r.error).map((r) => ({ step: r.step ?? "step", error: r.error! })),
+        ingest: ingest?.status != null ? (ingest.status < 300 ? "recorded in the router" : `router answered HTTP ${ingest.status}`) : null,
+      });
+    } catch {
+      return { runs, error: `${file} is not valid JSON` };
     }
   }
   return { runs, error: null };

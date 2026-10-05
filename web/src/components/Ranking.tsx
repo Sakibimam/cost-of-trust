@@ -1,14 +1,18 @@
+"use client";
+
+import { useState } from "react";
 import { fmt } from "@/lib/format";
-import { type RouteQuote, type RouteResult, rankedRoutes, riskChargeAda, routeKey, upfrontAda } from "@/lib/router";
+import { type RouteQuote, type RouteResult, rankedRoutes, riskChargeAda, routeKey, routeNames, upfrontAda } from "@/lib/router";
 
 const niceMax = (v: number) => Math.max(10, Math.ceil(v / 10) * 10);
+const COLLAPSED_ROWS = 3;
 
 export function Legend({ riskAversion }: { riskAversion: number }) {
   const items = [
     ["seg-price", "Price", "what the seller charges"],
     ["seg-premium", "Premium", "what coverage costs"],
-    ["seg-loss", "Expected loss", "probability the keeper fails times L"],
-    ["seg-risk", "Risk charge", `${riskAversion} x the standard deviation of the loss`],
+    ["seg-loss", "Expected loss", "chance the keeper fails times L"],
+    ["seg-risk", "Risk charge", `${riskAversion} x the typical swing of the loss`],
   ] as const;
   return (
     <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-2 p-0 text-[13px] xs:grid-cols-2 lg:grid-cols-4">
@@ -42,20 +46,22 @@ function Figures({ r }: { r: RouteQuote }) {
 }
 
 function Bar({ r, axis }: { r: RouteQuote; axis: number }) {
-  const segs = [["seg-price", r.servicePriceAda], ["seg-premium", r.premiumAda], ["seg-loss", r.expectedLossAda], ["seg-risk", riskChargeAda(r)]] as const;
+  const segs = [["seg-price", r.servicePriceAda], ["seg-premium", r.premiumAda], ["seg-loss", r.expectedLossAda], ["seg-risk", Math.max(riskChargeAda(r), 0)]] as const;
   return (
     <div className="relative h-8 w-full" style={{ backgroundImage: `repeating-linear-gradient(to right, var(--color-rule) 0 1px, transparent 1px calc(100% / ${axis / 10}))` }}>
-      <div className="grow flex h-full gap-px" style={{ width: `${(r.riskAdjustedCostAda / axis) * 100}%` }}>
-        {segs.map(([cls, v]) => (v > 0.004 ? <div key={cls} className={cls} style={{ flex: `${v} 1 0` }} /> : null))}
+      <div className="grow bar-t flex h-full" style={{ width: `${(r.riskAdjustedCostAda / axis) * 100}%` }}>
+        {segs.map(([cls, v]) => <div key={cls} className={`bar-t ${cls}`} style={{ flexGrow: v < 0.004 ? 0 : v, flexShrink: 1, flexBasis: 0 }} />)}
       </div>
     </div>
   );
 }
 
-export function Ranking({ result, riskAversion }: { result: RouteResult; riskAversion: number }) {
-  const rows = rankedRoutes(result);
-  const axis = niceMax(Math.max(...rows.map((r) => r.riskAdjustedCostAda)));
-  const minPrice = Math.min(...rows.map(upfrontAda));
+export function Ranking({ result, riskAversion, names }: { result: RouteResult; riskAversion: number; names: Record<string, string> }) {
+  const [showAll, setShowAll] = useState(false);
+  const ranked = rankedRoutes(result);
+  const rankOf = new Map(ranked.map((r, i) => [routeKey(r), i]));
+  const axis = niceMax(Math.max(...ranked.map((r) => r.riskAdjustedCostAda)));
+  const minUpfront = Math.min(...ranked.map(upfrontAda));
   const ticks = Array.from({ length: axis / 10 + 1 }, (_, i) => i * 10);
   const selectedKey = routeKey({ route: result.selectedRoute, sellers: result.selectedSellers });
   return (
@@ -67,21 +73,22 @@ export function Ranking({ result, riskAversion }: { result: RouteResult; riskAve
         <span className="relative h-4">
           {ticks.map((t) => <span key={t} className="label absolute top-0 -translate-x-1/2 first:translate-x-0 last:-translate-x-full" style={{ left: `${(t / axis) * 100}%` }}>{t}</span>)}
         </span>
-        <span className="label text-right">Risk-adjusted</span>
+        <span className="label text-right">True cost</span>
       </div>
-      <ol className="m-0 list-none p-0" aria-label="Routes ranked by risk-adjusted cost">
-        {rows.map((r, i) => {
+      <ol id="route-list" className="m-0 mt-6 flex list-none flex-col p-0 md:mt-0" aria-label="Routes, best first. Each row states its rank.">
+        {result.routes.map((r) => {
           const key = routeKey(r);
+          const rank = rankOf.get(key) ?? 0;
           const selected = key === selectedKey;
-          const lowest = upfrontAda(r) === minPrice;
+          const lowest = upfrontAda(r) === minUpfront;
           return (
-            <li key={`${key}:${riskAversion}:${result.quoteId}`} data-route={r.route} data-sellers={r.sellers.join("+")} data-selected={selected} data-total={r.riskAdjustedCostAda.toFixed(2)}
-              className={`grid grid-cols-[2rem_minmax(0,1fr)_auto] gap-x-3 gap-y-2 border-b border-rule py-3 md:grid-cols-[2.5rem_minmax(0,17rem)_minmax(0,1fr)_8rem] md:items-start md:gap-x-4 border-l-[6px] pl-2 ${selected ? "border-l-ink bg-paper-2" : "border-l-transparent"}`}>
-              <span className={`fig flex h-8 w-8 items-center justify-center ${selected ? "bg-ink text-paper" : "border border-ink"}`}>{i + 1}</span>
+            <li key={key} data-route={r.route} data-sellers={r.sellers.join("+")} data-selected={selected} data-rank={rank + 1} data-total={r.riskAdjustedCostAda.toFixed(2)} style={{ order: rank }}
+              className={`grid-cols-[2rem_minmax(0,1fr)_auto] gap-x-3 gap-y-2 border-b border-rule border-l-[6px] py-3 pl-2 md:grid-cols-[2.5rem_minmax(0,17rem)_minmax(0,1fr)_8rem] md:items-start md:gap-x-4 ${rank >= COLLAPSED_ROWS && !showAll ? "hidden sm:grid" : "grid"} ${selected ? "border-l-ink bg-paper-2" : "border-l-transparent"}`}>
+              <span className={`fig flex h-8 w-8 items-center justify-center ${selected ? "bg-ink text-paper" : "border border-ink"}`}><span className="sr-only">Rank </span>{rank + 1}</span>
               <div className="min-w-0">
-                <p className="m-0 text-[16px] font-extrabold leading-tight"><span className="text-muted">{r.route}</span> {r.sellers.join(" + ")}</p>
+                <p className="m-0 text-[16px] font-extrabold leading-tight"><span className="text-muted">{r.route}</span> {routeNames(r, names)}</p>
                 <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                  {selected && <span className="label !text-ink">Selected</span>}
+                  {selected && <span className="label !text-ink">Chosen</span>}
                   {lowest && <span className={`label ${selected ? "!text-ink" : "!text-signal-ink"}`}>{selected ? "Also lowest price" : "Lowest price, rejected"}</span>}
                 </div>
               </div>
@@ -91,7 +98,10 @@ export function Ranking({ result, riskAversion }: { result: RouteResult; riskAve
           );
         })}
       </ol>
-      <p className="mt-3 text-[13px] text-muted">Bar length is risk-adjusted cost on one shared axis, 0 to {axis} ADA, gridlines every 10 ADA. Total = price + premium + expected loss + risk charge.</p>
+      <button type="button" aria-expanded={showAll} aria-controls="route-list" onClick={() => setShowAll((v) => !v)} className="btn mt-4 w-full sm:hidden">
+        {showAll ? `Show the top ${COLLAPSED_ROWS} routes only` : `Show all ${ranked.length} routes`}
+      </button>
+      <p className="mt-3 text-[13px] text-muted">Bar length is true cost on one shared axis, 0 to {axis} ADA, gridlines every 10 ADA. True cost = price + premium + expected loss + risk charge.</p>
     </div>
   );
 }
