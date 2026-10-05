@@ -1,0 +1,6 @@
+{
+  "koiosUrl": "https://preprod.koios.rest/api/v1",
+  "koiosKeySecret": "KAIOS_KEY",
+  "relayerUrl": "http://127.0.0.1:3919",
+  "verbose": true
+}
