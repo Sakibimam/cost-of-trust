@@ -9,7 +9,7 @@ const id = process.env.SELLER_ID ?? "seller-b";
 const port = Number(process.env.PORT ?? (id === "seller-a" ? 4101 : id === "seller-c" ? 4103 : 4102));
 const stall = process.env.STALL === "true";
 const { lucid, deployment: d, address } = await context(id === "seller-a" ? "relayer" : id === "seller-c" ? "admin2" : "seller");
-const signer = toFacilitatorCardanoSigner({ network: "cardano:preprod", provider: { koios: { baseUrl: "https://preprod.koios.rest/api/v1", token: process.env.KAIOS_KEY }, requestTimeoutMs: 120_000 }, awaitConfirmation: false });
+const signer = toFacilitatorCardanoSigner({ network: "cardano:preprod", provider: { koios: { baseUrl: "https://preprod.koios.rest/api/v1", token: process.env.KAIOS_KEY }, requestTimeoutMs: 120_000 } });
 const facilitator = new x402Facilitator();
 facilitator.register("cardano:preprod", new ExactCardanoScheme(signer));
 
