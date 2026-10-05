@@ -9,7 +9,7 @@ const c = make("seller-c", 8, "koios-shared");
 const cIndependent = { ...c, provider: "other" };
 const config = underwriter;
 
-const run = (sellers: Seller[], riskAversion: number, constraints = { allowRedundancy: true }): RouteResult => evaluateRoutes({ downstreamLossAda: 100, candidateSellers: sellers, constraints, underwriter: config, riskAversion });
+const run = (sellers: Seller[], riskAversion: number, constraints = { allowRedundancy: true }, sharedInfrastructure = false): RouteResult => evaluateRoutes({ downstreamLossAda: 100, candidateSellers: sellers, constraints, underwriter: config, riskAversion, sharedInfrastructure });
 const find = (result: RouteResult, route: string, ...ids: string[]) => {
   const hit = result.routes.find((r) => r.route === route && r.sellers.join("+") === ids.join("+"));
   if (!hit) throw new Error(`missing route ${route} ${ids}`);
@@ -49,30 +49,37 @@ test("every route is quoted, none pruned", () => {
   expect(run([a, b, c], 0, { allowRedundancy: false }).routes).toHaveLength(6);
 });
 
-// SPEC section 3 selections name single B / underwritten B / redundant A+C as winners. With every pair quoted,
-// redundant A+B and B+C (independent providers, pJ 0.02, sd 14.00) cost 20.00 at lambda 0 and 23.50 at 0.25 and beat all of them.
-// These tests pin the measured winners and the spec's named route values.
-test("four selections as computed with every route quoted", () => {
-  for (const [sellers, lambda, cost, sdWinner] of [[[a, b, c], 0, 20, 14], [[a, b, cIndependent], 0, 20, 14], [[a, b, c], 0.25, 23.5, 14], [[a, b, cIndependent], 0.25, 23.5, 14]] as const) {
-    const r = run([...sellers], lambda);
-    expect(r.selectedRoute).toBe("redundant");
-    expect(r.selectedSellers).toContain("seller-b");
-    const winner = find(r, "redundant", ...r.selectedSellers);
-    expect(winner.riskAdjustedCostAda).toBeCloseTo(cost, 2);
-    expect(winner.sdLossAda).toBeCloseTo(sdWinner, 2);
-  }
-  expect(find(run([a, b, c], 0.25), "underwritten", "seller-b").riskAdjustedCostAda).toBeCloseTo(25.9, 2);
-  expect(find(run([a, b, cIndependent], 0.25), "redundant", "seller-a", "seller-c").riskAdjustedCostAda).toBeCloseTo(24.9, 2);
+const winner = (r: RouteResult) => find(r, r.selectedRoute, ...r.selectedSellers);
+test("2x2 selection table, sharedInfrastructure false", () => {
+  const r0 = run([a, b, c], 0);
+  expect([r0.selectedRoute, r0.selectedSellers]).toEqual(["redundant", ["seller-a", "seller-b"]]);
+  expect(winner(r0).riskAdjustedCostAda).toBeCloseTo(20, 2);
+  expect(winner(r0).sdLossAda).toBeCloseTo(14, 2);
+  const r25 = run([a, b, c], 0.25);
+  expect([r25.selectedRoute, r25.selectedSellers]).toEqual(["redundant", ["seller-a", "seller-b"]]);
+  expect(winner(r25).riskAdjustedCostAda).toBeCloseTo(23.5, 2);
 });
-
-test("risk-neutral tie goes to lower sd, and coverage wins when the cheaper routes are removed", () => {
+test("2x2 selection table, sharedInfrastructure true", () => {
+  const r0 = run([a, b, c], 0, { allowRedundancy: true }, true);
+  expect([r0.selectedRoute, r0.selectedSellers]).toEqual(["single", ["seller-b"]]);
+  expect(winner(r0).riskAdjustedCostAda).toBeCloseTo(20, 2);
+  const r25 = run([a, b, c], 0.25, { allowRedundancy: true }, true);
+  expect([r25.selectedRoute, r25.selectedSellers]).toEqual(["underwritten", ["seller-b"]]);
+  expect(winner(r25).riskAdjustedCostAda).toBeCloseTo(25.9, 2);
+  const ab = find(r25, "redundant", "seller-a", "seller-b");
+  expect(ab.jointFailureProbability).toBeCloseTo(0.08, 4);
+  expect(ab.expectedTotalCostAda).toBeCloseTo(26, 2);
+  expect(ab.sdLossAda).toBeCloseTo(27.13, 2);
+  expect(ab.riskAdjustedCostAda).toBeCloseTo(32.78, 2);
+});
+test("ties break by lower sd then route id", () => {
   const r = run([a, b, c], 0);
-  expect(find(r, "single", "seller-b").riskAdjustedCostAda).toBeCloseTo(find(r, "redundant", "seller-a", "seller-b").riskAdjustedCostAda, 2);
-  expect(r.selectedSellers).toEqual(["seller-a", "seller-b"]);
-  const covered = run([a, b, c], 0.25, { allowRedundancy: false });
-  expect([covered.selectedRoute, covered.selectedSellers]).toEqual(["underwritten", ["seller-b"]]);
-  expect(covered.reason).toContain("coverage wins because riskAversion 0.25 penalises the 30.00 ADA loss sd of single seller-b");
-  expect(run([a, b, c], 0, { allowRedundancy: false }).reason).toContain("minimum risk-adjusted cost 20.00");
+  expect(find(r, "redundant", "seller-b", "seller-c").riskAdjustedCostAda).toBeCloseTo(find(r, "redundant", "seller-a", "seller-b").riskAdjustedCostAda, 2);
+  expect(r.alternatives[0].sellers).toEqual(["seller-b", "seller-c"]);
+});
+test("reason names the mechanism", () => {
+  expect(run([a, b, c], 0.25).reason).toContain("sellers fail independently, so a backup keeper (redundant seller-a+seller-b) caps the tail cheaper than coverage");
+  expect(run([a, b, c], 0.25, { allowRedundancy: true }, true).reason).toContain("sellers share infrastructure, so backups fail together; coverage caps the 30.00 ADA loss sd of seller-b");
 });
 
 test("constraints filter route families", () => {
