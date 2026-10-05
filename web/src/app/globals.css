@@ -1,0 +1,67 @@
+/* Hallmark · macrostructure: Route Board · theme: Grid · tone: technical, austere · anchor hue: blue 258 */
+@import "tailwindcss";
+
+@theme {
+  --color-paper: oklch(99% 0.003 255);
+  --color-paper-2: oklch(97.2% 0.004 255);
+  --color-paper-3: oklch(94.5% 0.005 255);
+  --color-ink: oklch(16% 0.01 255);
+  --color-muted: oklch(44% 0.012 255);
+  --color-rule: oklch(88% 0.004 255);
+  --color-blue: oklch(46% 0.19 258);
+  --color-signal: oklch(55% 0.21 28);
+  --color-signal-ink: oklch(46% 0.19 28);
+  --color-yellow: oklch(82% 0.17 95);
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --breakpoint-xs: 30rem;
+}
+
+@layer base {
+  html, body { overflow-x: clip; }
+  html { background: var(--color-paper); color: var(--color-ink); }
+  body { font-family: var(--font-sans); font-size: 16px; line-height: 1.5; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 3px solid var(--color-blue); outline-offset: 2px; }
+  a { color: var(--color-blue); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+  ::selection { background: var(--color-yellow); color: var(--color-ink); }
+}
+
+@layer components {
+  .display { font-weight: 800; letter-spacing: -0.045em; line-height: 0.92; font-size: clamp(40px, 4.8vw, 70px); overflow-wrap: anywhere; min-width: 0; text-wrap: balance; }
+  .head { font-weight: 800; letter-spacing: -0.03em; line-height: 1; font-size: clamp(26px, 2.6vw, 40px); overflow-wrap: anywhere; text-wrap: balance; }
+  .label { font-size: 12px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--color-muted); line-height: 1.2; }
+  .fig { font-weight: 600; font-size: 15px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1280px; margin-inline: auto; padding-inline: 16px; }
+  @media (min-width: 30rem) { .wrap { padding-inline: 24px; } }
+
+  .seg-price { background: var(--color-ink); }
+  .seg-premium { background: var(--color-blue); }
+  .seg-loss { background: var(--color-signal); }
+  .seg-risk { background: var(--color-yellow); background-image: repeating-linear-gradient(45deg, var(--color-ink) 0 1px, transparent 1px 5px); }
+  .seg-prior { background: var(--color-paper); background-image: repeating-linear-gradient(45deg, var(--color-muted) 0 1px, transparent 1px 5px); outline: 1px solid var(--color-muted); outline-offset: -1px; }
+
+  .hero-rules { display: none; }
+  .hero-rules .rules { height: 100%; }
+  @media (min-width: 768px) {
+    .hero-rules { display: block; position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+    .hero-rules .rules { background-image: repeating-linear-gradient(to right, color-mix(in oklch, var(--color-rule) 45%, transparent) 0 1px, transparent 1px calc(100% / 12)); }
+  }
+
+  .btn { min-height: 44px; padding-inline: 16px; font-weight: 600; font-size: 15px; border: 2px solid var(--color-ink); background: var(--color-paper); color: var(--color-ink); cursor: pointer; transition: background-color 140ms var(--ease-out), color 140ms var(--ease-out); }
+  .btn:hover { background: var(--color-ink); color: var(--color-paper); }
+  .btn:active { background: var(--color-paper-3); color: var(--color-ink); }
+
+  .progress { height: 2px; background: var(--color-rule); position: relative; overflow: hidden; }
+  .progress::after { content: ""; position: absolute; inset: 0; width: 30%; background: var(--color-ink); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .grow { transform-origin: left center; animation: grow 280ms var(--ease-out) both; }
+  .progress::after { animation: sweep 1.1s var(--ease-out) infinite; }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress::after { width: 100%; opacity: 0.35; }
+}
