@@ -15,7 +15,7 @@ export async function context(actor: string): Promise<{ lucid: Awaited<ReturnTyp
 }
 export function config(): Config {
   const path = process.env.COT_CONFIG ?? resolve(import.meta.dirname, "../offchain/config.json");
-  const c = JSON.parse(readFileSync(path, "utf8")) as { signers: string[]; f: number; workflowOwner: string; workflowName: string; workflowCid: string };
+  const c = JSON.parse(readFileSync(path, "utf8")) as { signers: string[]; f: number; workflowOwner: string; workflowName: string; workflowCid: string; donConfigDigest: string };
   return { ...c, f: BigInt(c.f) };
 }
 export const json = (body: unknown, status = 200, headers: Record<string, string> = {}) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", ...headers } });

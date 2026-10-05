@@ -9,7 +9,8 @@ export function loadBlueprint(path = process.env.COT_BLUEPRINT ?? resolve(import
 const code = (title: string) => { const v = loadBlueprint().validators.find((x) => x.title === title); if (!v) throw new Error(`missing blueprint validator ${title}`); return v.compiledCode; };
 const ref = (r: OutRef) => new Constr(0, [r.txHash, BigInt(r.outputIndex)]);
 export const claimVaultScript = (): SpendingValidator => ({ type: "PlutusV3", script: code("claim_vault.claim_vault.spend") });
-export const configPolicy = (seed: OutRef): MintingPolicy => ({ type: "PlutusV3", script: applyParamsToScript(code("config_nft.config_nft.mint"), [ref(seed)]) });
+export const configLockScript = (): SpendingValidator => ({ type: "PlutusV3", script: code("config_lock.config_lock.spend") });
+export const configPolicy = (seed: OutRef, configLockHash: string): MintingPolicy => ({ type: "PlutusV3", script: applyParamsToScript(code("config_nft.config_nft.mint"), [ref(seed), configLockHash]) });
 export const coverageScript = (policyId: string): SpendingValidator => ({ type: "PlutusV3", script: applyParamsToScript(code("coverage.coverage.spend"), [policyId]) });
 export const scriptAddress = (network: Network, validator: SpendingValidator) => validatorToAddress(network, validator);
 export const scriptHash = validatorToScriptHash;
