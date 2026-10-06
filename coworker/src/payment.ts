@@ -20,19 +20,31 @@ export function sha256(value: string): string { return createHash("sha256").upda
 
 export async function createPayment(input: string): Promise<Payment> {
   const now = Date.now();
-  return mpsJson("/payment", { method: "POST", body: JSON.stringify({
+  const identifierFromPurchaser = randomBytes(10).toString("hex");
+  const payment = await mpsJson("/payment", { method: "POST", body: JSON.stringify({
     network: "Preprod",
     paymentSourceType: env("MPS_PAYMENT_SOURCE_TYPE", "Web3CardanoV2"),
     supportedPaymentSourceIndex: Number(env("MPS_PAYMENT_SOURCE_INDEX", "0")),
     agentIdentifier: env("MPS_AGENT_IDENTIFIER"),
     inputHash: sha256(input),
-    identifierFromPurchaser: randomBytes(10).toString("hex"),
+    identifierFromPurchaser,
     RequestedFunds: [{ amount: env("MPS_TASK_AMOUNT", "1000000"), unit: env("MPS_TASK_UNIT", "16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d") }],
     payByTime: new Date(now + 10 * 60_000).toISOString(),
     submitResultTime: new Date(now + 20 * 60_000).toISOString(),
-    unlockTime: new Date(now + 25 * 60_000).toISOString(),
-    externalDisputeUnlockTime: new Date(now + 30 * 60_000).toISOString(),
+    unlockTime: new Date(now + 40 * 60_000).toISOString(),
+    externalDisputeUnlockTime: new Date(now + 55 * 60_000).toISOString(),
   }) });
+  const data = payment.data && typeof payment.data === "object" ? payment.data as Payment : payment;
+  const funds = Array.isArray(data.RequestedFunds) ? data.RequestedFunds : [];
+  const sellerVkey = (data.SmartContractWallet as Payment | undefined)?.walletVkey;
+  return { ...payment, data: {
+    ...data,
+    network: "Preprod",
+    identifierFromPurchaser,
+    sellerVkey,
+    Amounts: funds,
+    supportedPaymentSourceIndex: Number(env("MPS_PAYMENT_SOURCE_INDEX", "0")),
+  } };
 }
 
 function identifier(payment: Payment): string {

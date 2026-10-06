@@ -29,11 +29,11 @@ Set `ENABLE_MPS_PAYMENTS=true`, `MPS_API_TOKEN`, and `MPS_AGENT_IDENTIFIER` for 
 
 The local report validation test and TypeScript check pass. The OpenRouter primary and fallback path were smoke-tested against the live API. MPS is seeded on Preprod and its selling wallet was funded with a confirmed transaction. Vendor creation, Coworker registration, Task execution, paid collection, and event approval require the private human actions listed in `SETUP-RECORD.md`.
 
-## Verified paid-flow evidence
+## Evidence snapshot
 
 - Personal Preprod credits: 3,250 spendable. No real card was used.
-- Task: `01a1100a-8fbd-762a-9d32-b708380d25aa`, created in READY state.
+- Trust Check registration: confirmed on the local Preprod MPS V2 source. [Registration transaction](https://preprod.cardanoscan.io/transaction/90dedd393ceb5e51f413867aa0e6e3a040306f2e8c1ea8e7e3cdb38f2671f7b2).
+- Paid Task: `01a1102c-8866-753d-a715-f1d8fadd85d0`, charged 100 credits and currently RUNNING while escrow funding is pending.
 - Seller input: Deepfake Knight V1 registry asset `asset1h6lypyuwtgjqjf9wd4wmg53pgk7gtv08nk40pn`.
-- Payment request: rejected by local MPS with HTTP 404, `Network and policyId combination not supported`. The MPS source is V2, while this seller asset is V1.
-- Escrow, result-hash, and collection transaction hashes: not produced.
-- TOKEN2049 access: not granted. The account is not a member of the event organization, and the seat check returned HTTP 403.
+- Escrow, result-hash, and collection transactions: no confirmed hashes yet.
+- TOKEN2049 access: membership required. The access request returned the account membership error, and the workspace seat check returned HTTP 403.
