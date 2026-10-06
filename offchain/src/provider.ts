@@ -29,6 +29,20 @@ export function installKoios(): void {
   }) as typeof fetch;
   installed = true;
 }
+// Koios reports datum_hash for inline-datum outputs too. Lucid treats datumHash+datum as a hash output
+// with communication data, so the script would see no inline datum. Inline datums must drop the hash.
+export function koiosOutputToUtxo(output: any): UTxO {
+  return {
+    txHash: output.tx_hash,
+    outputIndex: output.tx_index,
+    address: output.payment_addr.bech32,
+    assets: { lovelace: BigInt(output.value), ...Object.fromEntries((output.asset_list ?? []).map((asset: any) => [`${asset.policy_id}${asset.asset_name ?? ""}`, BigInt(asset.quantity)])) },
+    datum: output.inline_datum?.bytes ?? undefined,
+    datumHash: output.inline_datum ? undefined : output.datum_hash ?? undefined,
+    scriptRef: undefined,
+  } as UTxO;
+}
+
 export async function makeLucid(): Promise<LucidEvolution> {
   installKoios();
   const koios = new Koios(KOIOS_URL);
@@ -37,15 +51,7 @@ export async function makeLucid(): Promise<LucidEvolution> {
       const response = await fetch(`${KOIOS_URL}/tx_info`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ _tx_hashes: [...new Set(refs.map((ref) => ref.txHash))], _assets: true, _scripts: true, _bytecode: true }) });
       if (!response.ok) throw new Error(`Koios tx_info returned ${response.status}`);
       const rows = await response.json() as Array<{ block_height: number; outputs: Array<any> }>;
-      return rows.flatMap((row) => row.outputs.map((output) => ({
-        txHash: output.tx_hash,
-        outputIndex: output.tx_index,
-        address: output.payment_addr.bech32,
-        assets: { lovelace: BigInt(output.value), ...Object.fromEntries((output.asset_list ?? []).map((asset: any) => [`${asset.policy_id}${asset.asset_name ?? ""}`, BigInt(asset.quantity)])) },
-        datum: output.inline_datum?.bytes ?? undefined,
-        datumHash: output.datum_hash ?? undefined,
-        scriptRef: undefined,
-      }))).filter((utxo) => refs.some((ref) => ref.txHash === utxo.txHash && ref.outputIndex === utxo.outputIndex)) as UTxO[];
+      return rows.flatMap((row) => row.outputs.map(koiosOutputToUtxo)).filter((utxo) => refs.some((ref) => ref.txHash === utxo.txHash && ref.outputIndex === utxo.outputIndex));
     },
   });
   return Lucid(provider, "Preprod" as Network);
