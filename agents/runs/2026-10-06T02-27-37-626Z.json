@@ -1,0 +1,110 @@
+{
+  "startedAt": "2026-10-06T02:27:37.626Z",
+  "records": [
+    {
+      "step": "claim_vault_lock",
+      "txHash": "f9572a05c7b67e3dc8686a21d2bf23331e983bf9fdde07a9c255e8ddfd48e7b6",
+      "confirmed": true
+    },
+    {
+      "step": "coverage_lock",
+      "txHash": "3925fe037df399faae8d6b3100e4d317ae45cf40b9148e44d9a134b5ab7d8687",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_claim_rejected",
+      "error": "seller-b returned 400: {\"error\":\"\\\"failed script execution Spend[1] the validator crashed / exited prematurely\\\"\"}"
+    },
+    {
+      "step": "keeper_results",
+      "detail": [
+        {
+          "seller": "seller-b",
+          "error": "seller-b returned 400: {\"error\":\"\\\"failed script execution Spend[1] the validator crashed / exited prematurely\\\"\"}"
+        }
+      ]
+    },
+    {
+      "step": "fatal",
+      "error": "\"failed script execution Spend[0] the validator crashed / exited prematurely\""
+    }
+  ],
+  "selectedRoute": {
+    "selectedRoute": "underwritten",
+    "selectedSellers": [
+      "seller-b"
+    ],
+    "reason": "sellers share infrastructure, so backups fail together; coverage caps the tail; risk-adjusted cost 13.20 ADA at riskAversion 0.25",
+    "routes": [
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      }
+    ],
+    "alternatives": [],
+    "assumptions": {
+      "sharedInfrastructure": {
+        "value": true,
+        "status": "buyer-supplied"
+      },
+      "riskAversion": {
+        "value": 0.25,
+        "status": "buyer-supplied"
+      },
+      "prior": {
+        "alpha0": 2,
+        "beta0": 8,
+        "status": "configured"
+      },
+      "sharedProviderCorrelation": {
+        "value": 0.5,
+        "status": "configured"
+      },
+      "coverageApplicabilityRate": {
+        "value": 0.8,
+        "status": "configured"
+      },
+      "penalties": "seller-specific values are configured; outcome counts are measured"
+    },
+    "quoteId": "ea70b257-e4e9-4e3c-ac04-c4da143a9355",
+    "termsHash": "303ed2cdf4ec6b6b3043fd56656ca1c82d0ff3bff13dea0bd9129342a024193d"
+  }
+}
