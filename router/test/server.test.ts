@@ -44,7 +44,7 @@ test("POST /best-route then GET /quotes/:id, /sellers, /health, CORS", async () 
   expect((await fetch(`${base()}/quotes/nope`)).status).toBe(404);
 
   const sellers = await (await fetch(`${base()}/sellers`)).json();
-  expect(sellers).toHaveLength(3);
+  expect(sellers).toHaveLength(6);
   expect(sellers[1].risk.pLoss).toBeCloseTo(0.1, 4);
   expect((await (await fetch(`${base()}/health`)).json()).ok).toBe(true);
   const preflight = await fetch(`${base()}/best-route`, { method: "OPTIONS" });
@@ -90,4 +90,35 @@ test("ingestOutcome persists evidence and moves the posterior", async () => {
 test("termsHash is key-order independent blake2b-256", () => {
   expect(termsHash({ a: 1, b: 2 })).toBe(termsHash({ b: 2, a: 1 }));
   expect(termsHash({ a: 1 })).not.toBe(termsHash({ a: 2 }));
+});
+
+test("measured provider histories drive provider selection", async () => {
+  server = startServer(0);
+  const probe = JSON.parse(readFileSync(new URL("../probes/results-20261006043545.json", import.meta.url), "utf8"));
+  const measured = new Map<string, { successes: number; failures: number }>();
+  for (const record of probe.records) {
+    if (!measured.has(record.provider)) measured.set(record.provider, { successes: 0, failures: 0 });
+    const history = measured.get(record.provider)!;
+    record.ok ? history.successes++ : history.failures++;
+  }
+  const response = await post({ ...req, candidateSellers: ["provider-koios-authenticated", "provider-tatum-preprod"] });
+  expect(response.status).toBe(200);
+  const body = await response.json();
+  expect(body.selectedSellers.length).toBeGreaterThan(0);
+  expect(body.reason).toContain("risk-adjusted cost");
+  const sellers = await (await fetch(`${base()}/sellers`)).json();
+  for (const seller of sellers.filter((item: any) => item.type === "provider")) {
+    const history = measured.get(seller.id === "provider-koios-authenticated" ? "koios-preprod-authenticated" : seller.id === "provider-koios-public" ? "koios-preprod-public" : "tatum-cardano-preprod");
+    expect(seller.successes).toBe(history?.successes);
+    expect(seller.failures).toBe(history?.failures);
+  }
+});
+
+test("exactly two counterparties produce a decision with a reason", async () => {
+  server = startServer(0);
+  const response = await post({ ...req, candidateSellers: ["provider-koios-authenticated", "provider-tatum-preprod"] });
+  const body = await response.json();
+  expect(response.status).toBe(200);
+  expect(body.selectedSellers.length).toBeGreaterThan(0);
+  expect(body.reason.length).toBeGreaterThan(20);
 });

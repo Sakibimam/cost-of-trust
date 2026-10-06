@@ -4,6 +4,7 @@ export type Seller = {
   id: string; name: string; priceAda: number; provider: string; payTo: string; endpoint: string;
   successes: number; failures: number; evidence: string[]; bondDiscount?: number;
   dependencyRiskPenalty?: number; recentIncidentPenalty?: number;
+  type?: "agent" | "provider";
 };
 
 export type UnderwriterConfig = {

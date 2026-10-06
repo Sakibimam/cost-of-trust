@@ -64,8 +64,12 @@ export function startServer(port = 8787) {
       }
       if (request.method === "POST" && url.pathname === "/best-route") {
         const body = await request.json() as { task: string; serviceType: string; deadline: string; downstreamLossAda: number; riskAversion?: number; sharedInfrastructure?: boolean; candidateSellers: string[]; constraints?: Parameters<typeof evaluateRoutes>[0]["constraints"] };
-        const candidates = body.candidateSellers.map((id) => sellers.find((seller) => seller.id === id));
+        const candidates = body.candidateSellers.flatMap((id) => {
+          const exact = sellers.find((seller) => seller.id === id);
+          return exact ? [exact] : sellers.filter((seller) => seller.provider === id);
+        });
         if (candidates.some((seller) => !seller)) return json({ error: "unknown seller" }, 400);
+        if (candidates.length === 0) return json({ error: "unknown seller" }, 400);
         const result = evaluateRoutes({ downstreamLossAda: body.downstreamLossAda, riskAversion: body.riskAversion, sharedInfrastructure: body.sharedInfrastructure, candidateSellers: candidates as Seller[], constraints: body.constraints, underwriter: underwriterConfig });
         const quoteId = crypto.randomUUID();
         quotes.set(quoteId, { result, task: body.task, serviceType: body.serviceType, deadline: body.deadline });

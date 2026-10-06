@@ -1,6 +1,7 @@
 [
   {
     "id": "seller-a",
+    "type": "agent",
     "name": "Seller A",
     "priceAda": 8,
     "provider": "koios-shared",
@@ -12,6 +13,7 @@
   },
   {
     "id": "seller-b",
+    "type": "agent",
     "name": "Seller B",
     "priceAda": 10,
     "provider": "own-node",
@@ -24,6 +26,7 @@
   },
   {
     "id": "seller-c",
+    "type": "agent",
     "name": "Seller C",
     "priceAda": 8,
     "provider": "koios-shared",
@@ -32,5 +35,44 @@
     "successes": 0,
     "failures": 0,
     "evidence": []
+  },
+  {
+    "id": "provider-koios-authenticated",
+    "type": "provider",
+    "name": "Koios preprod authenticated",
+    "priceAda": 0,
+    "provider": "koios-preprod",
+    "payTo": "configured-at-payment-time",
+    "endpoint": "https://preprod.koios.rest/api/v1/tip",
+    "successes": 60,
+    "failures": 0,
+    "evidence": ["router/probes/results-20261006043545.json"],
+    "priceAssumption": "free tier = 0 ADA plus configured keeper submission fee"
+  },
+  {
+    "id": "provider-koios-public",
+    "type": "provider",
+    "name": "Koios preprod public",
+    "priceAda": 0,
+    "provider": "koios-preprod",
+    "payTo": "configured-at-payment-time",
+    "endpoint": "https://preprod.koios.rest/api/v1/tip",
+    "successes": 0,
+    "failures": 60,
+    "evidence": ["router/probes/results-20261006043545.json"],
+    "priceAssumption": "free tier = 0 ADA plus configured keeper submission fee"
+  },
+  {
+    "id": "provider-tatum-preprod",
+    "type": "provider",
+    "name": "Tatum Cardano preprod Rosetta gateway",
+    "priceAda": 0,
+    "provider": "tatum-cardano-preprod",
+    "payTo": "configured-at-payment-time",
+    "endpoint": "https://cardano-preprod.gateway.tatum.io/network/status",
+    "successes": 0,
+    "failures": 60,
+    "evidence": ["router/probes/results-20261006043545.json"],
+    "priceAssumption": "free tier = 0 ADA plus configured keeper submission fee"
   }
 ]
