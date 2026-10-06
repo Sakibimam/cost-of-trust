@@ -3,6 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { env, loadEnv } from "./config.ts";
 import { createReport } from "./report.ts";
 import { createPayment, submitResult, waitForPayment } from "./payment.ts";
+import { parseTaskInput, USAGE_RESULT } from "./task-input.ts";
 loadEnv();
 
 const run = (args: string[]) => new Promise<string>((resolve, reject) => {
@@ -32,15 +33,23 @@ async function once(): Promise<void> {
   for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker)) {
     const id = String(task.id);
     const input = typeof task.description === "string" ? task.description : String(task.input ?? "");
-    const paid = env("ENABLE_MPS_PAYMENTS") === "true";
-    const payment = paid ? await createPayment(input) : null;
-    await taskEvent(id, { status: "RUNNING", ...(payment ? { masumiPayment: payment.data ?? payment } : {}) });
-    if (payment) await waitForPayment(payment);
-    const report = await createReport(JSON.parse(input));
-    const file = `result-${id}.txt`; await writeFile(file, JSON.stringify(report, null, 2));
-    const result = await readFile(file, "utf8");
-    if (payment) { await submitResult(payment, result); await waitForPayment(payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]); }
-    await taskEvent(id, { status: "COMPLETED", comment: result });
+    try {
+      await taskEvent(id, { status: "RUNNING" });
+      const reportInput = parseTaskInput(input);
+      if (!reportInput) { await taskEvent(id, { status: "COMPLETED", comment: USAGE_RESULT }); continue; }
+      const paid = env("ENABLE_MPS_PAYMENTS") === "true";
+      const payment = paid ? await createPayment(input) : null;
+      if (payment) { await taskEvent(id, { status: "RUNNING", masumiPayment: payment.data ?? payment }); await waitForPayment(payment); }
+      const report = await createReport(reportInput);
+      const file = `result-${id}.txt`; await writeFile(file, JSON.stringify(report, null, 2));
+      const result = await readFile(file, "utf8");
+      if (payment) { await submitResult(payment, result); await waitForPayment(payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]); }
+      await taskEvent(id, { status: "COMPLETED", comment: result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "request failed";
+      try { await taskEvent(id, { status: "FAILED", comment: `Trust Check could not complete this task: ${message}` }); } catch (eventError) { console.error(`Task ${id} could not be marked FAILED: ${eventError instanceof Error ? eventError.message : "request failed"}`); }
+      console.error(`Task ${id} failed: ${message}`);
+    }
   }
 }
 

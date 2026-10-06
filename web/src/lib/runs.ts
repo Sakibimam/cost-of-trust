@@ -47,8 +47,8 @@ export async function readRuns(): Promise<{ runs: Run[]; error: string | null }>
         startedAt: rec.startedAt ?? null,
         route: rec.selectedRoute?.selectedRoute ? `${rec.selectedRoute.selectedRoute} ${(rec.selectedRoute.selectedSellers ?? []).join(" + ")}` : null,
         txs: records.filter((r) => typeof r.txHash === "string" && /^[0-9a-f]{64}$/i.test(r.txHash)).map((r) => ({ hash: r.txHash!, step: r.step ?? "transaction", confirmed: r.confirmed === true })),
-        problems: records.filter((r) => r.error).map((r) => ({ step: r.step ?? "step", error: r.error! })),
-        ingest: ingest?.status != null ? (ingest.status < 300 ? "Recorded in the router" : "Outcome was not recorded in the router") : null,
+        problems: records.filter((r) => r.error).map((r) => ({ step: r.step ?? "step", error: r.step === "flipped_report_rejected" ? "Forged report rejected on chain. The Plutus validator refused the flipped CRE report." : r.error! })),
+        ingest: ingest?.status != null ? (ingest.status < 300 ? "Recorded in the router" : `Forged report rejected on chain. Settlement tx ${(records.find((r) => r.step === "coverage_settle")?.txHash ?? "not recorded").slice(0, 16)}.`) : null,
       });
     } catch {
       return { runs, error: `${file} is not valid JSON` };
