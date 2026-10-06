@@ -136,6 +136,7 @@ s = slide(); title(s, "The buyer's route changes with risk and correlation.", 3,
 box(s, 0.85, 1.85, 3.0, 0.34, "BUYER RISK AVERSION", 11, MUTED, True, MONO)
 box(s, 3.9, 1.82, 4.1, 0.4, "INDEPENDENT KEEPERS", 13, TEAL, True, MONO, PP_ALIGN.CENTER)
 box(s, 8.2, 1.82, 4.1, 0.4, "SHARED INFRASTRUCTURE", 13, ORANGE, True, MONO, PP_ALIGN.CENTER)
+# Source: docs/SPEC.md selection table.
 rows = [
     ("0", "Staggered A > B\n11.10 ADA", "Staggered A > B\n18.24 ADA"),
     ("0.25", "Staggered A > B\n15.36 ADA", "Staggered B > A\n25.75 ADA"),
@@ -201,6 +202,7 @@ s = slide(); title(s, "Availability is a route input, not a footnote.", 7, "prov
 headers = [(0.72, 3.0, "PROVIDER"), (3.75, 0.75, "CALLS"), (4.55, 1.0, "SUCCESS"), (5.6, 0.95, "FAILURES"), (6.6, 1.2, "RATE"), (7.9, 1.15, "P50"), (9.1, 1.15, "P95")]
 for x, w, h in headers:
     box(s, x, 1.9, w, 0.35, h, 10, MUTED, True, MONO)
+# Source: docs/GTM.md and router/probes/results-20261006051159.json.
 data = [
     ("Koios authenticated", "60", "60", "0", "100%", "394 ms", "485 ms", TEAL),
     ("Koios public keyless", "60", "0", "60 HTTP 429", "0%", "181 ms", "186 ms", ORANGE),
@@ -239,6 +241,7 @@ box(s, 5.35, 6.1, 6.95, 0.52, "Missing upstream data stays unavailable. The repo
 # 9. Evidence
 s = slide(); title(s, "The proof is live, confirmed, and inspectable.", 9, "preprod evidence")
 box(s, 0.72, 1.8, 3.0, 0.36, "FOUR CONFIRMED RUNS", 11, TEAL, True, MONO)
+# Source: agents/runs/2026-10-06T04-12-36-912Z.json through 2026-10-06T04-45-57-790Z.json.
 evidence = [
     ("04:12", "underwritten", "claim vault + coverage settle", "f158c93d", "5f44c119"),
     ("04:23", "underwritten", "forfeit + coverage settle", "3f65613f", "54c5eb59"),
@@ -255,6 +258,7 @@ for i, (t, route, action, lock, settle) in enumerate(evidence):
 box(s, 0.72, 5.95, 11.78, 0.62, "On-chain suite: 78 checks passed. A flipped report byte is rejected by the validator test suite.", 18, CARD, True, BODY, PP_ALIGN.CENTER, NAVY, NAVY, 0.1, 0.18, MSO_ANCHOR.MIDDLE)
 box(s, 0.72, 6.72, 11.78, 0.25, "Full hashes and explorer links are recorded in docs/DECK.md.", 11, MUTED, False, MONO)
 
+# Source: instant/results.json, generatedAt 2026-10-06T12:31:47.741Z.
 # 10. Close
 s = slide(); title(s, "Trust is a route choice.", 10, "measured close")
 box(s, 0.75, 1.8, 7.7, 4.35, "", fill=NAVY)
