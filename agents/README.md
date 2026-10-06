@@ -32,26 +32,26 @@ Each keeper implements `GET /availability`, `GET /input_schema`, `POST /start_jo
 The buyer needs `offchain/deployment.json` and `offchain/config.json` or equivalent paths supplied by `COT_DEPLOYMENT` and `COT_CONFIG`. Run the underwritten success flow:
 
 ```sh
-BUYER_RISK_AVERSION=0.25 SHARED_INFRA=true bun buyer.ts
+CANDIDATE_SELLERS=seller-b REQUIRE_COVERAGE=true BUYER_RISK_AVERSION=0.25 SHARED_INFRA=true bun buyer.ts
 ```
 
 Run the underwritten failure flow with seller B accepting payment but not claiming:
 
 ```sh
 SELLER_ID=seller-b PORT=4102 STALL=true bun keeper.ts
-BUYER_RISK_AVERSION=0.25 SHARED_INFRA=true bun buyer.ts
+CANDIDATE_SELLERS=seller-b REQUIRE_COVERAGE=true BUYER_RISK_AVERSION=0.25 SHARED_INFRA=true bun buyer.ts
 ```
 
 Run the EUTXO redundancy race. Both selected keepers are paid, one claim confirms, and the other records the ledger rejection:
 
 ```sh
-BUYER_RISK_AVERSION=0.25 SHARED_INFRA=false bun buyer.ts
+CANDIDATE_SELLERS=seller-a,seller-b BUYER_RISK_AVERSION=0.25 SHARED_INFRA=false bun buyer.ts
 ```
 
 Run the report-integrity proof. The relayer first submits a report with one flipped raw-report byte, records the script rejection, then submits the untouched CRE report:
 
 ```sh
-FLIP_REPORT=true BUYER_RISK_AVERSION=0.25 SHARED_INFRA=true bun buyer.ts
+FLIP_REPORT=true CANDIDATE_SELLERS=seller-b REQUIRE_COVERAGE=true BUYER_RISK_AVERSION=0.25 SHARED_INFRA=true bun buyer.ts
 ```
 
 Every buyer run writes `agents/runs/<timestamp>.json`. Each accepted transaction is polled through Koios `tx_status` before it is recorded. CRE simulation output and the report received by the relayer are written under `cre/evidence/`.
