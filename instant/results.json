@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-10-06T10:48:07.326Z",
+  "status": "blocked",
+  "results": {
+    "instant": [],
+    "confirmed": []
+  },
+  "doubleSpend": {
+    "status": "not-run",
+    "reason": "benchmark could not reach the payment path"
+  },
+  "error": "Unable to connect. Is the computer able to access the url?"
+}
