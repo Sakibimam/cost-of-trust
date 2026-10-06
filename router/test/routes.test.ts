@@ -94,6 +94,11 @@ test("reason names the mechanism", () => {
 test("constraints filter route families", () => {
   const covered = run([a, b, c], 0, { allowRedundancy: true, requireCoverage: true } as never);
   expect(covered.selectedRoute).toBe("underwritten");
+  // at riskAversion 0 coverage never wins on cost, so a forced pick must say so instead of claiming coverage is cheapest
+  expect(covered.forcedByConstraints).toBe(true);
+  expect(covered.reason).toStartWith("coverage required by buyer");
+  const free = run([a, b, c], 0, { allowRedundancy: true } as never);
+  expect(free.forcedByConstraints).toBe(false);
   const capped = run([a, b, c], 0, { allowRedundancy: true, maxServiceSpendAda: 9 } as never);
   expect(capped.routes.filter((x) => x.route !== "staggered" && x.servicePriceAda > 9).length).toBeGreaterThan(0);
   expect([capped.selectedRoute, ...capped.alternatives.map((x) => x.route)].length).toBeGreaterThan(0);

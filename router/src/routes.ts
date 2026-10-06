@@ -121,7 +121,12 @@ export function evaluateRoutes(input: RouteInput): RouteResult {
     return label(a).localeCompare(label(b));
   });
   const selected = eligible[0];
-  return { selectedRoute: selected.route, selectedSellers: selected.sellers, reason: explain(selected, eligible, lambda, sharedInfrastructure), routes, alternatives: eligible.slice(1), assumptions: { sharedInfrastructure: { value: sharedInfrastructure, status: "buyer-supplied" }, riskAversion: { value: lambda, status: "buyer-supplied" }, prior: { alpha0: 2, beta0: 8, status: "configured" }, sharedProviderCorrelation: { value: underwriter.sharedProviderCorrelation, status: "configured" }, coverageApplicabilityRate: { value: underwriter.coverageApplicabilityRate, status: "configured" }, penalties: "seller-specific values are configured; outcome counts are measured" } };
+  const cheapest = routes.concat().sort((a, b) => a.riskAdjustedCostAda - b.riskAdjustedCostAda)[0];
+  const forced = constraints.requireCoverage && cheapest.riskAdjustedCostAda + TIE_ADA < selected.riskAdjustedCostAda;
+  const reason = forced
+    ? `coverage required by buyer; ${label(selected)} costs ${selected.riskAdjustedCostAda.toFixed(2)} ADA, the unconstrained best route (${label(cheapest)}) would cost ${cheapest.riskAdjustedCostAda.toFixed(2)} ADA`
+    : explain(selected, eligible, lambda, sharedInfrastructure);
+  return { selectedRoute: selected.route, selectedSellers: selected.sellers, reason, forcedByConstraints: !!forced, routes, alternatives: eligible.slice(1), assumptions: { sharedInfrastructure: { value: sharedInfrastructure, status: "buyer-supplied" }, riskAversion: { value: lambda, status: "buyer-supplied" }, prior: { alpha0: 2, beta0: 8, status: "configured" }, sharedProviderCorrelation: { value: underwriter.sharedProviderCorrelation, status: "configured" }, coverageApplicabilityRate: { value: underwriter.coverageApplicabilityRate, status: "configured" }, penalties: "seller-specific values are configured; outcome counts are measured" } };
 }
 
 export function sellerRisk(seller: Seller, underwriter: UnderwriterConfig): Risk { return riskFor(seller, underwriter); }
