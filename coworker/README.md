@@ -50,6 +50,21 @@ Task `01a1103d-6e24-7332-adf1-32bb95c4a421` on Sokosumi, paid through Masumi esc
 
 ## Fix 8 live verification
 
+The repaired report was run against the Trust Check V2 identifier from `.env.local` with value at risk 100. Koios returned registry and escrow evidence through POST `asset_info` and POST `asset_txs`; the live router returned HTTP 200 from `https://cost-of-trust.vercel.app/api/router/best-route`.
+
+| Field | Verified value |
+| --- | --- |
+| Live recommendation | `hire_with_backup_keeper` |
+| Expected route cost | `7.485609059528937 ADA` |
+| Selected route | `redundant`: `provider-koios-authenticated` plus `provider-tatum-preprod` |
+| Registry transaction | [90dedd39...17b2](https://preprod.cardanoscan.io/transaction/90dedd393ceb5e51f413867aa0e6e3a040306f2e8c1ea8e7e3cdb38f2671f7b2) |
+| Escrow history transaction | [9c560b70...86a0](https://preprod.cardanoscan.io/transaction/9c560b70982fb56766919f21087e811a52133fe665e66ccfe1a5da012f4286a0) |
+| Paid Task accepted for the rerun | `01a11089-55d6-712d-9fee-e3694bdc7088`, 100 credits, RUNNING |
+
+The rerun reached MPS `WaitingForExternalAction` without an escrow transaction because the local MPS purchase call returned `Insufficient funds`; the earlier settled Task above remains the confirmed paid escrow and result evidence.
+
+## Fix 8 live verification
+
 The corrected report path was run locally against the Trust Check V2 registry unit and the live router at `https://cost-of-trust.vercel.app/api/router`.
 
 - Registry evidence: Koios Preprod `POST /asset_info` with the 56-byte policy and 32-byte asset name returned the Trust Check registration NFT.
