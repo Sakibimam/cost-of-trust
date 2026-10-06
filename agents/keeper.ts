@@ -30,7 +30,7 @@ async function settlePayment(header: string, req: ReturnType<typeof requirements
   for (;;) {
     const settled = await facilitator.settle(payment as never, req as never);
     if (settled.success) return settled.transaction;
-    if (settled.errorReason !== "settlement_pending" || Date.now() >= deadline) throw new Error(`payment settlement failed: ${settled.errorReason ?? "failed"} ${settled.errorMessage ?? ""}`.trim());
+    if (!["settlement_pending", "exact_cardano_settlement_not_confirmed"].includes(settled.errorReason ?? "") || Date.now() >= deadline) throw new Error(`payment settlement failed: ${settled.errorReason ?? "failed"} ${settled.errorMessage ?? ""}`.trim());
     await new Promise((resolve) => setTimeout(resolve, 5_000));
   }
 }
