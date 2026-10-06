@@ -8,8 +8,9 @@ import { context, json, parseRef, refString } from "./common";
 const id = process.env.SELLER_ID ?? "seller-b";
 const port = Number(process.env.PORT ?? (id === "seller-a" ? 4101 : id === "seller-c" ? 4103 : 4102));
 const stall = process.env.STALL === "true";
+const koiosUrl = `http://127.0.0.1:${port}/koios`;
 const { lucid, deployment: d, address } = await context(id === "seller-a" ? "relayer" : id === "seller-c" ? "admin2" : "seller");
-const signer = toFacilitatorCardanoSigner({ network: "cardano:preprod", provider: { koios: { baseUrl: "https://preprod.koios.rest/api/v1", token: process.env.KAIOS_KEY }, requestTimeoutMs: 120_000 } });
+const signer = toFacilitatorCardanoSigner({ network: "cardano:preprod", provider: { koios: { baseUrl: koiosUrl }, requestTimeoutMs: 120_000 } });
 const facilitator = new x402Facilitator();
 facilitator.register("cardano:preprod", new ExactCardanoScheme(signer));
 
@@ -52,6 +53,18 @@ async function createJob(input: Record<string, unknown>): Promise<Job> {
 Bun.serve({ port, async fetch(request) {
   try {
     const url = new URL(request.url);
+    if (url.pathname.startsWith("/koios/")) {
+      const path = url.pathname.slice("/koios".length);
+      const raw = await request.text();
+      let body = raw;
+      if (path === "/tx_info" && raw) {
+        const payload = JSON.parse(raw) as Record<string, unknown>;
+        payload._bytecode = true;
+        body = JSON.stringify(payload);
+      }
+      const upstream = await fetch(`https://preprod.koios.rest/api/v1${path}${url.search}`, { method: request.method, headers: { authorization: `Bearer ${process.env.KAIOS_KEY}`, "content-type": "application/json" }, body: request.method === "GET" ? undefined : body });
+      return new Response(await upstream.arrayBuffer(), { status: upstream.status, headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" } });
+    }
     if (request.method === "GET" && url.pathname === "/availability") return json({ available: true, seller: id, network: "cardano:preprod" });
     if (request.method === "GET" && url.pathname === "/input_schema") return json({ input_data: [{ id: "taskId", type: "string", required: true }, { id: "claimVault", type: "string", required: true }, { id: "beneficiary", type: "string", required: true }, { id: "expiry", type: "string", required: true }, { id: "priceLovelace", type: "integer", required: false }, { id: "termsHash", type: "string", required: false }] });
     if (request.method === "GET" && url.pathname === "/status") {
