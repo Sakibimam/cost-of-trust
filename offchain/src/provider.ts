@@ -3,6 +3,8 @@ import { Koios, Lucid, type LucidEvolution, type Network, type Provider, type UT
 export const KOIOS_URL = "https://preprod.koios.rest/api/v1";
 const key = () => process.env.KAIOS_KEY ?? process.env.KOIOS_API_KEY ?? (() => { throw new Error("KAIOS_KEY is not set"); })();
 let installed = false;
+let lastSubmitRejection = "";
+export const submitRejection = () => lastSubmitRejection;
 export function installKoios(): void {
   if (installed) return;
   const original = globalThis.fetch.bind(globalThis);
@@ -25,7 +27,7 @@ export function installKoios(): void {
       if (response.status === 429 && attempt < 5) { /* retry below */ }
       else {
         // Lucid reduces a failed submit to "500 Something went wrong"; the ledger's reason is in the body.
-        if (url.endsWith("/submittx") && !response.ok) throw new Error(`Koios submittx ${response.status}: ${(await response.text()).slice(0, 4000)}`);
+        if (url.endsWith("/submittx") && !response.ok) lastSubmitRejection = `Koios submittx ${response.status}: ${(await response.clone().text()).slice(0, 4000)}`;
         return response;
       }
       const wait = Number(response.headers.get("retry-after") ?? 0) * 1000 || 250 * 2 ** attempt;

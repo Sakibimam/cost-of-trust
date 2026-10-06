@@ -3,7 +3,7 @@ import { keccak_256 } from "@noble/hashes/sha3.js";
 import { secp256k1 } from "@noble/curves/secp256k1.js";
 import { Constr, Data, getAddressDetails, paymentCredentialOf, type Assets, type LucidEvolution, type UTxO } from "@lucid-evolution/lucid";
 import { claimVaultScript, configLockScript, configPolicy, coverageScript, scriptAddress, scriptHash, type OutRef } from "./blueprint";
-import { installKoios, makeLucid, waitForTx } from "./provider";
+import { installKoios, makeLucid, submitRejection, waitForTx } from "./provider";
 export * from "./provider";
 export * from "./blueprint";
 export type { LucidEvolution };
@@ -36,7 +36,7 @@ const configDigest = (c: Config) => hex(blake2b(new Uint8Array([Number(c.f), ...
 export { configDigest };
 export function canonicalJson(value: unknown): string { if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`; if (value && typeof value === "object") return `{${Object.entries(value as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(",")}}`; return JSON.stringify(value); }
 export const termsHash = (value: unknown) => hex(blake2b(enc.encode(canonicalJson(value)), { dkLen: 32 }));
-async function submit(lucid: LucidEvolution, tx: any, label: string): Promise<string> { const signed = await tx.sign.withWallet().complete(); const hash = await signed.submit(); await waitForTx(hash); return hash; }
+async function submit(lucid: LucidEvolution, tx: any, label: string): Promise<string> { const signed = await tx.sign.withWallet().complete(); const hash = await signed.submit().catch((error: unknown) => { throw new Error(`${label} rejected at submission: ${submitRejection()} (${error instanceof Error ? error.message.split("\n")[0] : String(error)})`); }); await waitForTx(hash); return hash; }
 async function out(lucid: LucidEvolution, ref: OutRef): Promise<UTxO> { const found = await lucid.utxosByOutRef([ref]); if (!found[0]) throw new Error(`UTxO ${ref.txHash}#${ref.outputIndex} not found`); return found[0]; }
 async function configInput(lucid: LucidEvolution, d: Deployment): Promise<UTxO> { const u = await lucid.utxoByUnit(d.configPolicyId + CONFIG_NAME); if (!u) throw new Error("config NFT UTxO not found"); return u; }
 export async function deployRefScripts(lucid: LucidEvolution, d: Deployment, holder: string): Promise<string> { const tx = await lucid.newTx().pay.ToAddressWithData(holder, undefined, { lovelace: 2_000_000n }, claimVaultScript()).pay.ToAddressWithData(holder, undefined, { lovelace: 2_000_000n }, coverageScript(d.configPolicyId)).complete(); return submit(lucid, tx, "deployRefScripts"); }
