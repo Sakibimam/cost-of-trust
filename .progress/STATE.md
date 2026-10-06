@@ -16,7 +16,7 @@
 
 ## Broken / blocked
 - Trust Check fresh paid Task 01a1111b-318d-75de-a7e5-02edc5070204 is RUNNING. Local MPS accepted the request but reports WaitingForExternalAction with no on-chain state, so escrow/result/collection txs are not yet proven. Do not publish a fabricated verdict row or tx link.
-- Instant x402 live benchmark: Koios transport failure is fixed and seller integration bugs were corrected, but the 20+20 run did not complete. Early real submissions spent buyer inputs before JSON response serialization failed; the retry then hit Koios `All inputs are spent. Transaction has probably already been included`. `instant/results.json` remains blocked with no complete sample or double-spend result.
+- Instant x402 live benchmark: complete with one confirmed 45-output split transaction, 20 confirmed-mode requests, 20 instant-mode requests, all 40 payment hashes confirmed by Koios, and a conflicting-input refusal. The seller spent-input check now rejects Koios rows marked `is_spent=true`.
 - No GitHub remote (HUMAN: approve public repo).
 - Vercel env KAIOS_KEY missing on cost-of-trust (HUMAN) (only /ingest needs it).
 - Last live-judge score 49/100 (before fixA).

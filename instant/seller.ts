@@ -12,6 +12,7 @@ const koios = process.env.KOIOS_URL ?? "https://preprod.koios.rest/api/v1";
 const mode = process.env.INSTANT_MODE === "false" ? "confirmed" : "instant";
 const signer = toFacilitatorCardanoSigner({ network: "cardano:preprod", provider: { koios: { baseUrl: koios, token: process.env.KAIOS_KEY }, requestTimeoutMs: 120_000 }, awaitConfirmation: true });
 const mempoolSigner = { ...signer, async submitTransaction(signed: string, network: string) { void network; const response = await fetch(`${koios}/submittx`, { method: "POST", headers: { authorization: `Bearer ${process.env.KAIOS_KEY ?? ""}`, "content-type": "application/cbor" }, body: decodeCardanoTransactionBytes(signed) }); const raw = await response.text(); if (!response.ok) throw new Error(`Koios submittx returned ${response.status}: ${raw.slice(0, 300)}`); let body: unknown; try { body = JSON.parse(raw); } catch { body = raw; } const hash = Array.isArray(body) ? (body[0] as { tx_hash?: string })?.tx_hash : (body as { tx_hash?: string })?.tx_hash ?? (typeof body === "string" ? body.replaceAll('"', '').trim() : ""); if (!hash) throw new Error(`Koios submittx omitted tx hash: ${raw.slice(0, 300)}`); return { txHash: hash, status: "mempool" as const }; } };
+Object.assign(mempoolSigner, { async getTransactionEvidence(txHash: string) { const response = await fetch(`${koios}/tx_status`, { method: "POST", headers: { authorization: `Bearer ${process.env.KAIOS_KEY ?? ""}`, "content-type": "application/json" }, body: JSON.stringify({ _tx_hashes: [txHash] }) }); if (!response.ok) throw new Error(`Koios tx_status returned ${response.status}`); const row = (await response.json() as Array<{ num_confirmations?: number }>)[0]; if (!row) return { status: "unknown" as const, confirmations: -2 }; const confirmations = row.num_confirmations ?? 0; return { status: confirmations >= 1 ? "confirmed" as const : "mempool" as const, confirmations }; } });
 const facilitator = new x402Facilitator();
 facilitator.register("cardano:preprod", new ExactCardanoScheme(mempoolSigner, { acceptMempool: true, confirmationTimeoutMs: mode === "confirmed" ? 120_000 : 2_000, confirmationPollMs: 500 }));
 
@@ -31,8 +32,8 @@ async function routerRisk(amountLovelace: bigint): Promise<number> {
 async function unspent(nonce: string): Promise<boolean> {
   const response = await fetch(`${koios}/utxo_info`, { method: "POST", headers: { authorization: `Bearer ${process.env.KAIOS_KEY ?? ""}`, "content-type": "application/json" }, body: JSON.stringify({ _utxo_refs: [nonce] }) });
   if (!response.ok) throw new Error(`Koios utxo_info returned ${response.status}`);
-  const rows = await response.json() as unknown[];
-  return rows.length > 0;
+  const rows = await response.json() as Array<{ is_spent?: boolean }>;
+  return rows.length > 0 && rows[0]?.is_spent !== true;
 }
 
 async function settle(header: string, req: Req, taskId: string) {

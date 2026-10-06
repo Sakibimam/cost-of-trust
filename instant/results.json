@@ -1,12 +1,490 @@
 {
-  "generatedAt": "2026-10-06T11:38:21.274Z",
-  "status": "blocked",
+  "generatedAt": "2026-10-06T12:31:47.741Z",
+  "status": "complete",
+  "split": {
+    "txHash": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9",
+    "confirmations": 2,
+    "inputs": [
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#0",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#1",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#2",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#3",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#4",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#5",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#6",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#7",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#8",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#9",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#10",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#11",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#12",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#13",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#14",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#15",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#16",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#17",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#18",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#19",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#20",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#21",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#22",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#23",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#24",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#25",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#26",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#27",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#28",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#29",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#30",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#31",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#32",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#33",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#34",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#35",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#36",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#37",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#38",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#39",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#40",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#41",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#42",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#43",
+      "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#44"
+    ]
+  },
+  "summary": {
+    "confirmed": {
+      "requests": 20,
+      "p50Ms": 5061.852667000028,
+      "p95Ms": 6206.545458000037,
+      "confirmed": 20
+    },
+    "instant": {
+      "requests": 20,
+      "p50Ms": 4994.932792000007,
+      "p95Ms": 6462.277749999892,
+      "confirmed": 20
+    }
+  },
   "results": {
-    "instant": [],
-    "confirmed": []
+    "confirmed": [
+      {
+        "index": 0,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#0",
+        "timeTo200Ms": 5667.670791000011,
+        "txHash": "6cfdb05cd7dd1cf0e5e057299e8dfab188f8c579bfd25b997ee841d6d5a9baba",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T11:56:10.263Z"
+        }
+      },
+      {
+        "index": 1,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#1",
+        "timeTo200Ms": 6105.226750000002,
+        "txHash": "2d8a3a80e4965fad7045689573828ec2691b2b85b12f83397d3aa5a009a56448",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T11:57:00.967Z"
+        }
+      },
+      {
+        "index": 2,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#2",
+        "timeTo200Ms": 4777.87404200001,
+        "txHash": "392d69a436970aa6aa67306aa4b95fbca39e72ba26cbf08591ce812fb7129856",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T11:58:23.167Z"
+        }
+      },
+      {
+        "index": 3,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#3",
+        "timeTo200Ms": 6206.545458000037,
+        "txHash": "494e8d5575ef317b8bb1ab10e506e23561ed031648c461f77dcf2e0bbf5a9287",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T11:58:42.595Z"
+        }
+      },
+      {
+        "index": 4,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#4",
+        "timeTo200Ms": 5037.482000000018,
+        "txHash": "a1cadaf233eac44f0f1bfcb178b82a535fbca147f4a1fd51865b17340f7de6c3",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T11:59:26.617Z"
+        }
+      },
+      {
+        "index": 5,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#5",
+        "timeTo200Ms": 4774.8676250000135,
+        "txHash": "3d478cd492451781b301a050c1981aef68d4842e4a67da1804db052da16611e4",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:01:06.476Z"
+        }
+      },
+      {
+        "index": 6,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#6",
+        "timeTo200Ms": 5378.863249999995,
+        "txHash": "7af7411df2b0ef4f701cdcd414583240f5e19e6a814b8395f507682c0aa62130",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:01:55.513Z"
+        }
+      },
+      {
+        "index": 7,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#7",
+        "timeTo200Ms": 5286.386500000022,
+        "txHash": "10e7402b4ee1b48a74106af35a45df1e5d5514d1cd59e1d3268b9eaede00515d",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:02:52.712Z"
+        }
+      },
+      {
+        "index": 8,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#8",
+        "timeTo200Ms": 4160.265375000075,
+        "txHash": "888ce2d3e18b15e2da6d0dcda9daa5d0c289a1b3fd2e9407018b6466f1a1d43a",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:03:54.449Z"
+        }
+      },
+      {
+        "index": 9,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#9",
+        "timeTo200Ms": 4972.25779199996,
+        "txHash": "f4f54f82c367fada8a4069037b79a195669eee8e0c17ec858def22bf4cad9a32",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:04:08.747Z"
+        }
+      },
+      {
+        "index": 10,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#10",
+        "timeTo200Ms": 4542.858750000014,
+        "txHash": "b89d5426041e57f049c70c6802c86aef9a9713d4f84328a207c3a1d61c183ad2",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:04:43.511Z"
+        }
+      },
+      {
+        "index": 11,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#11",
+        "timeTo200Ms": 4840.7049579999875,
+        "txHash": "8cd18b9bc981ef07b0ea3d258f49247e9ab2cddafc507b477c6439af911d258f",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:05:27.633Z"
+        }
+      },
+      {
+        "index": 12,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#12",
+        "timeTo200Ms": 5825.5150419999845,
+        "txHash": "305d37961d6b723a293b95e8b0d55113eff7efed7189678a686321814bf79f93",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:06:30.174Z"
+        }
+      },
+      {
+        "index": 13,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#13",
+        "timeTo200Ms": 4653.942834000103,
+        "txHash": "0ae250af52e459756b9605c79a5df1c5f132c5a46f7977e6c7a0653459b102c9",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:07:48.492Z"
+        }
+      },
+      {
+        "index": 14,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#14",
+        "timeTo200Ms": 6192.902165999985,
+        "txHash": "c267115b04a66fa9e0b88c7880b786720ff657ab1419518e1ffd015ee4e9dc39",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:08:07.671Z"
+        }
+      },
+      {
+        "index": 15,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#15",
+        "timeTo200Ms": 5061.852667000028,
+        "txHash": "636997310e84825a557aea805d268a4ed4ae3eb91daa7d2056407f0541108fa3",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:10:07.463Z"
+        }
+      },
+      {
+        "index": 16,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#16",
+        "timeTo200Ms": 5395.399666999932,
+        "txHash": "ddca27a2d661393e6bd309de6a70161adf0f998ab8c007eb7ec47b42a119934e",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:10:34.693Z"
+        }
+      },
+      {
+        "index": 17,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#17",
+        "timeTo200Ms": 5740.196416999912,
+        "txHash": "b3904cf2f5035924e445d563bf167fd3de710e0fa25be08bb5500ff9bd201afb",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:11:05.971Z"
+        }
+      },
+      {
+        "index": 18,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#18",
+        "timeTo200Ms": 4319.868291999912,
+        "txHash": "f3946ebc11a4e726593fb9169779ca9ac2685615ee3774354677e5cde3aad05a",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:12:32.694Z"
+        }
+      },
+      {
+        "index": 19,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#19",
+        "timeTo200Ms": 6209.640417000046,
+        "txHash": "7a4b67bc967a80f84c81982017d236307aa3f8f1757ad92a5648096772270142",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:12:47.915Z"
+        }
+      }
+    ],
+    "instant": [
+      {
+        "index": 0,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#20",
+        "timeTo200Ms": 5873.180666000117,
+        "txHash": "68c39f209732fef4493993750d0867e2d6e733806c49bc496fe45cf52f1096bc",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:13:41.103Z"
+        }
+      },
+      {
+        "index": 1,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#21",
+        "timeTo200Ms": 5102.172541999957,
+        "txHash": "df2368932e6771de980c7450cc4aad61b1ef316f2017f2892689ef133725c86d",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:14:16.958Z"
+        }
+      },
+      {
+        "index": 2,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#22",
+        "timeTo200Ms": 5064.2480829998385,
+        "txHash": "e0be2bc8bf85a1b5982ab7361080c13687b3e8329d4572f459f3555ec46ef81a",
+        "confirmation": {
+          "confirmations": 2,
+          "checkedAt": "2026-10-06T12:14:52.573Z"
+        }
+      },
+      {
+        "index": 3,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#23",
+        "timeTo200Ms": 5765.566499999957,
+        "txHash": "65e21d3ec0617ff219cd1790bcca74e92e709cb1aa4593d2da780266d9162bfe",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:15:20.356Z"
+        }
+      },
+      {
+        "index": 4,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#24",
+        "timeTo200Ms": 5177.464999999851,
+        "txHash": "b8b9f75458bec513c30ec1c691e1964ff849575ba3a4a1019bde8232397ad570",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:16:31.091Z"
+        }
+      },
+      {
+        "index": 5,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#25",
+        "timeTo200Ms": 4658.103041999973,
+        "txHash": "0e73f2647b8f475ec45e184b28bf65d808f8886335d3dc048dffde9e31a13d25",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:17:42.915Z"
+        }
+      },
+      {
+        "index": 6,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#26",
+        "timeTo200Ms": 4877.845250000013,
+        "txHash": "e3091115f8cc48bf4dee1a864db0e9d95a60bc3b3a7ca811cd94e870946fb3c5",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:18:09.822Z"
+        }
+      },
+      {
+        "index": 7,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#27",
+        "timeTo200Ms": 5809.756624999922,
+        "txHash": "292c6ccb3d83e42051eabb8ff658c62a0d81512660f8ac81c8dc6fca8b317c13",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:19:55.858Z"
+        }
+      },
+      {
+        "index": 8,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#28",
+        "timeTo200Ms": 5548.548165999819,
+        "txHash": "9d27ad29403a93b83bab57bf13682b66be47714d1acf9fb57edf5ead6ce68634",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:20:06.099Z"
+        }
+      },
+      {
+        "index": 9,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#29",
+        "timeTo200Ms": 4747.115250000032,
+        "txHash": "1e87f11e5a0eb805099344bccded3f78d59f952ca285a99bd2d186e89b8a9a7a",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:21:46.604Z"
+        }
+      },
+      {
+        "index": 10,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#30",
+        "timeTo200Ms": 4878.336917000124,
+        "txHash": "689bea7377c45a45e83678a9629429e2e9dfd35c90ca60d937beee08b6fdf575",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:23:39.166Z"
+        }
+      },
+      {
+        "index": 11,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#31",
+        "timeTo200Ms": 6462.277749999892,
+        "txHash": "a7089ba79a71a8ad07b4c5cbb46c3fd1af6930336e7112eb096bb3ce8d2e95bd",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:24:24.405Z"
+        }
+      },
+      {
+        "index": 12,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#32",
+        "timeTo200Ms": 7408.205959000159,
+        "txHash": "6eefbf962ac4922a89de15f8d146012e94ae50a1066d5031164f6c69fdce90a0",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:25:07.778Z"
+        }
+      },
+      {
+        "index": 13,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#33",
+        "timeTo200Ms": 4994.932792000007,
+        "txHash": "f51435caa73cd297133bf0d58700fdf87a61316f46a3f753eabc13b56812a1eb",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:25:51.920Z"
+        }
+      },
+      {
+        "index": 14,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#34",
+        "timeTo200Ms": 4892.16087500006,
+        "txHash": "fc3f48bfce63d532cc5c442bc10e259971070a8460f4b8228029556fb50f1bd5",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:26:53.955Z"
+        }
+      },
+      {
+        "index": 15,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#35",
+        "timeTo200Ms": 4507.646249999991,
+        "txHash": "cf98b2427355309125fb468427c3c9db5f000fdfa3de2f20c85014f18e16428c",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:28:12.869Z"
+        }
+      },
+      {
+        "index": 16,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#36",
+        "timeTo200Ms": 6350.321332999971,
+        "txHash": "7479299e32357398171a547843af8b0cf2652c51fd96c98a15a95484645cf3d0",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:28:49.238Z"
+        }
+      },
+      {
+        "index": 17,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#37",
+        "timeTo200Ms": 4949.948375000153,
+        "txHash": "e901a3b983eef503c619d8a714e0cf60357d6590dcaa02044d307f4a6a84c326",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:29:03.185Z"
+        }
+      },
+      {
+        "index": 18,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#38",
+        "timeTo200Ms": 4664.6977499998175,
+        "txHash": "5fcc60c9df26ef30fcfc0b03d81b27020f1d7e9a0073954ca934c9c0c1f1a5a7",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:29:46.917Z"
+        }
+      },
+      {
+        "index": 19,
+        "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#39",
+        "timeTo200Ms": 4786.459625000134,
+        "txHash": "27581aaff41be21b5d23a75e77c9d5fbe5fbee49f8cb903f319cb0972bbad1ef",
+        "confirmation": {
+          "confirmations": 1,
+          "checkedAt": "2026-10-06T12:30:56.395Z"
+        }
+      }
+    ]
   },
   "doubleSpend": {
-    "status": "not-run"
-  },
-  "error": "settlement pending: exact_cardano_settlement_failed: Koios submittx returned 400: {\"contents\":{\"contents\":{\"contents\":{\"era\":\"ShelleyBasedEraConway\",\"error\":[\"ConwayMempoolFailure \\\"All inputs are spent. Transaction has probably already been included\\\"\"],\"kind\":\"ShelleyTxValidationError\"},\"tag\":\"TxValidationErrorInCardanoMode\"},\"tag\":\"TxCmdTxSubmitValidationError\"},\"tag\":\"TxSubmi"
+    "status": "refused",
+    "input": "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9#41",
+    "signedPaymentTxHash": "3f10686b3ba6f8835b5de7ae97fd5ff8983f354c43b77a3721aea649a7aa8f88",
+    "signedPaymentConfirmation": null,
+    "conflictingTxHash": "a14e45a50aa1dbb1fbf76b25433ecd4fb5e7e7a08239517867d361b93e7e6ab3",
+    "conflictingTxConfirmation": {
+      "confirmations": 1,
+      "checkedAt": "2026-10-06T12:34:01.605Z"
+    },
+    "response": {
+      "status": 400,
+      "error": "input already spent"
+    }
+  }
 }
