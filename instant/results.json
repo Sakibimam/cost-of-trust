@@ -1,13 +1,12 @@
 {
-  "generatedAt": "2026-10-06T10:48:07.326Z",
+  "generatedAt": "2026-10-06T11:38:21.274Z",
   "status": "blocked",
   "results": {
     "instant": [],
     "confirmed": []
   },
   "doubleSpend": {
-    "status": "not-run",
-    "reason": "benchmark could not reach the payment path"
+    "status": "not-run"
   },
-  "error": "Unable to connect. Is the computer able to access the url?"
+  "error": "settlement pending: exact_cardano_settlement_failed: Koios submittx returned 400: {\"contents\":{\"contents\":{\"contents\":{\"era\":\"ShelleyBasedEraConway\",\"error\":[\"ConwayMempoolFailure \\\"All inputs are spent. Transaction has probably already been included\\\"\"],\"kind\":\"ShelleyTxValidationError\"},\"tag\":\"TxValidationErrorInCardanoMode\"},\"tag\":\"TxCmdTxSubmitValidationError\"},\"tag\":\"TxSubmi"
 }

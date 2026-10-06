@@ -11,13 +11,13 @@ const router = process.env.ROUTER_URL ?? "http://127.0.0.1:8787";
 const koios = process.env.KOIOS_URL ?? "https://preprod.koios.rest/api/v1";
 const mode = process.env.INSTANT_MODE === "false" ? "confirmed" : "instant";
 const signer = toFacilitatorCardanoSigner({ network: "cardano:preprod", provider: { koios: { baseUrl: koios, token: process.env.KAIOS_KEY }, requestTimeoutMs: 120_000 }, awaitConfirmation: true });
-const mempoolSigner = { ...signer, async submitTransaction(signed: string, network: string) { void network; const response = await fetch(`${koios}/submittx`, { method: "POST", headers: { authorization: `Bearer ${process.env.KAIOS_KEY ?? ""}`, "content-type": "application/cbor" }, body: decodeCardanoTransactionBytes(signed) }); if (!response.ok) throw new Error(`Koios submittx returned ${response.status}: ${(await response.text()).slice(0, 300)}`); const body = await response.json() as Array<{ tx_hash?: string }> | { tx_hash?: string }; const hash = Array.isArray(body) ? body[0]?.tx_hash : body.tx_hash; if (!hash) throw new Error("Koios submittx omitted tx hash"); return { txHash: hash, status: "mempool" as const }; } };
+const mempoolSigner = { ...signer, async submitTransaction(signed: string, network: string) { void network; const response = await fetch(`${koios}/submittx`, { method: "POST", headers: { authorization: `Bearer ${process.env.KAIOS_KEY ?? ""}`, "content-type": "application/cbor" }, body: decodeCardanoTransactionBytes(signed) }); const raw = await response.text(); if (!response.ok) throw new Error(`Koios submittx returned ${response.status}: ${raw.slice(0, 300)}`); let body: unknown; try { body = JSON.parse(raw); } catch { body = raw; } const hash = Array.isArray(body) ? (body[0] as { tx_hash?: string })?.tx_hash : (body as { tx_hash?: string })?.tx_hash ?? (typeof body === "string" ? body.replaceAll('"', '').trim() : ""); if (!hash) throw new Error(`Koios submittx omitted tx hash: ${raw.slice(0, 300)}`); return { txHash: hash, status: "mempool" as const }; } };
 const facilitator = new x402Facilitator();
-facilitator.register("cardano:preprod", new ExactCardanoScheme(mempoolSigner, { acceptMempool: true, confirmationTimeoutMs: 2_000, confirmationPollMs: 500 }));
+facilitator.register("cardano:preprod", new ExactCardanoScheme(mempoolSigner, { acceptMempool: true, confirmationTimeoutMs: mode === "confirmed" ? 120_000 : 2_000, confirmationPollMs: 500 }));
 
-type Req = { amount: string; payTo: string; maxTimeoutSeconds: number; extra: Record<string, unknown> };
-const requirements = (taskId: string): Req => ({ amount: process.env.AMOUNT_LOVELACE ?? "1000000", payTo, maxTimeoutSeconds: 600, extra: { assetTransferMethod: "default", confirmationPolicy: { l1Confirmations: mode === "instant" ? -1 : 0 }, costOfTrust: { taskId } } });
-const json = (value: unknown, status = 200, headers: Record<string, string> = {}) => new Response(JSON.stringify(value), { status, headers: { "content-type": "application/json", ...headers } });
+type Req = { amount: string; asset: string; payTo: string; maxTimeoutSeconds: number; extra: Record<string, unknown> };
+const requirements = (taskId: string): Req => ({ amount: process.env.AMOUNT_LOVELACE ?? "1000000", asset: "lovelace", payTo, maxTimeoutSeconds: 600, extra: { assetTransferMethod: "default", confirmationPolicy: { l1Confirmations: mode === "instant" ? -1 : 0 }, costOfTrust: { taskId } } });
+const json = (value: unknown, status = 200, headers: Record<string, string> = {}) => new Response(JSON.stringify(value, (_, item) => typeof item === "bigint" ? item.toString() : item), { status, headers: { "content-type": "application/json", ...headers } });
 
 async function routerRisk(amountLovelace: bigint): Promise<number> {
   const response = await fetch(`${router}/best-route`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ task: "instant x402 settlement", serviceType: "cardano_x402_instant", deadline: new Date(Date.now() + 600_000).toISOString(), downstreamLossAda: Number(amountLovelace) / 1_000_000, candidateSellers: [process.env.ROUTER_SELLER ?? "seller-b"], riskAversion: 0, constraints: { allowRedundancy: false } }) });
@@ -45,7 +45,7 @@ async function settle(header: string, req: Req, taskId: string) {
   const price = priceInstantRisk({ payerTxCount: 1, priorConflicts: 0, inputConfirmations: 0, amountLovelace: BigInt(req.amount), inputUnspent: true, mempoolConflict: false, observedSuccesses: 0, observedFailures: 0, routerPLoss: quote, marginLovelace: BigInt(process.env.INSTANT_MARGIN_LOVELACE ?? "10000") });
   if (mode === "instant" && !price.serveInstant) return { fallback: true, price };
   const settled = await facilitator.settle(payment as never, { x402Version: 2, scheme: "exact", network: "cardano:preprod", amount: req.amount, asset: "lovelace", payTo: req.payTo, maxTimeoutSeconds: req.maxTimeoutSeconds, extra: req.extra } as never);
-  if (!settled.success) throw new Error(`settlement pending: ${settled.errorReason ?? "unknown"}`);
+  if (!settled.success) throw new Error(`settlement pending: ${settled.errorReason ?? "unknown"}: ${settled.errorMessage ?? ""}`);
   return { paymentTx: settled.transaction, price, mode, taskId };
 }
 
