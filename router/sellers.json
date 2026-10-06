@@ -5,8 +5,8 @@
     "name": "Seller A",
     "priceAda": 8,
     "provider": "koios-shared",
-    "payTo": "addr_test1seller_a",
-    "endpoint": "https://seller-a.example/quote",
+    "payTo": "addr_test1qqe0seqy6tvff79kw3md5qdspevu59344rcna6fjsut5npeg2wdkgff976cth4upph2h0g9394tl6n0arnwqs307dyaq5lhh68",
+    "endpoint": "http://127.0.0.1:4101/start_job",
     "successes": 0,
     "failures": 0,
     "evidence": []
@@ -17,12 +17,17 @@
     "name": "Seller B",
     "priceAda": 10,
     "provider": "own-node",
-    "payTo": "addr_test1seller_b",
-    "endpoint": "https://seller-b.example/quote",
+    "payTo": "addr_test1qq0zga2cthka4dl7u0earttxkuuqr73acwvqv9gzcykn6h54p6a88g8lnwv8vyy2vl9kraqk2yxdnhkwa2xe0lyjdh4q3c7zyq",
+    "endpoint": "http://127.0.0.1:4102/start_job",
     "successes": 18,
     "failures": 2,
     "bondDiscount": 0.033333,
-    "evidence": []
+    "evidence": [
+      "a55009e5c4b602ed4d18f798a5827f70b12d358fa2a0eaf85d41affdc5647392",
+      "9a699a6fa5bb7187f37c66d4741da6885f1f21ad075341ef1a78d378f490a170",
+      "4f864737c1556a3184c0446671f004d3bb35456d9c1a38716bdfe2f970b8447a",
+      "4afb027dfc182ac65b854bcdb4bee0eb07775fe194edf49cef1c7b98060a775f"
+    ]
   },
   {
     "id": "seller-c",
@@ -30,8 +35,8 @@
     "name": "Seller C",
     "priceAda": 8,
     "provider": "koios-shared",
-    "payTo": "addr_test1seller_c",
-    "endpoint": "https://seller-c.example/quote",
+    "payTo": "addr_test1qr3pmfx4lz85g9xvd45l2ev406upcr3u855r997antvwgremud68a5ykhq476hw6eljmuay49y2hghd6e8rzq27tud5s2k2scp",
+    "endpoint": "http://127.0.0.1:4103/start_job",
     "successes": 0,
     "failures": 0,
     "evidence": []

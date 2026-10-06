@@ -31,7 +31,7 @@ export function Sellers({ sellers }: { sellers: SellerRecord[] }) {
             {s.evidence.length ? (
               <ul className="m-0 mt-2 list-none p-0">
                 {s.evidence.map((h) => (
-                  <li key={h} className="py-1"><a href={cardanoscanTx(h)} target="_blank" rel="noreferrer" className="fig break-all !font-medium">{shortHash(h)}<span className="sr-only"> (opens preprod.cardanoscan.io)</span></a></li>
+                  <li key={h} className="py-1"><a href={h.endsWith(".json") ? `/evidence/${h}` : cardanoscanTx(h)} target="_blank" rel="noreferrer" className="fig break-all !font-medium">{h.endsWith(".json") ? "Measured probe JSON" : shortHash(h)}<span className="sr-only"> (opens preprod evidence)</span></a></li>
                 ))}
               </ul>
             ) : (

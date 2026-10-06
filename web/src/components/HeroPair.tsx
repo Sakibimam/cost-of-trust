@@ -27,8 +27,7 @@ function Card({ tone, label, r, names, note }: { tone: "ink" | "signal"; label: 
 export function HeroPair({ result, names }: { result: RouteResult; names: Record<string, string> }) {
   const rows = rankedRoutes(result);
   const selected = rows.find((r) => r.route === result.selectedRoute && r.sellers.join(",") === result.selectedSellers.join(","))!;
-  const minUpfront = Math.min(...rows.map(upfrontAda));
-  const cheapest = rows.find((r) => upfrontAda(r) === minUpfront)!;
+  const cheapest = rows.filter((r) => r.route === "single").sort((a, b) => upfrontAda(a) - upfrontAda(b))[0];
   const won = cheapest === selected;
   const note = (r: RouteQuote) => `${r.premiumAda > 0 ? `Plus ${fmt(r.premiumAda)} premium for cover. ` : ""}True cost adds the expected loss and the risk charge.`;
   return (
@@ -40,7 +39,7 @@ export function HeroPair({ result, names }: { result: RouteResult; names: Record
           <p className="m-0 mt-3 text-[17px] leading-snug">The cheapest quote is also the cheapest to trust for this buyer. Nothing cheaper was rejected.</p>
         </article>
       ) : (
-        <Card tone="signal" label="The cheapest quote, rejected" r={cheapest} names={names} note={note(cheapest)} />
+        <Card tone="signal" label="CHEAPEST QUOTE, REJECTED" r={cheapest} names={names} note={note(cheapest)} />
       )}
     </div>
   );

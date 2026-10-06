@@ -48,7 +48,7 @@ export async function readRuns(): Promise<{ runs: Run[]; error: string | null }>
         route: rec.selectedRoute?.selectedRoute ? `${rec.selectedRoute.selectedRoute} ${(rec.selectedRoute.selectedSellers ?? []).join(" + ")}` : null,
         txs: records.filter((r) => typeof r.txHash === "string" && /^[0-9a-f]{64}$/i.test(r.txHash)).map((r) => ({ hash: r.txHash!, step: r.step ?? "transaction", confirmed: r.confirmed === true })),
         problems: records.filter((r) => r.error).map((r) => ({ step: r.step ?? "step", error: r.error! })),
-        ingest: ingest?.status != null ? (ingest.status < 300 ? "recorded in the router" : `router answered HTTP ${ingest.status}`) : null,
+        ingest: ingest?.status != null ? (ingest.status < 300 ? "Recorded in the router" : "Outcome was not recorded in the router") : null,
       });
     } catch {
       return { runs, error: `${file} is not valid JSON` };

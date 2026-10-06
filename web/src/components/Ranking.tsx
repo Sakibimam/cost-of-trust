@@ -5,7 +5,7 @@ import { fmt } from "@/lib/format";
 import { type RouteQuote, type RouteResult, rankedRoutes, riskChargeAda, routeGloss, routeKey, routeNames, upfrontAda } from "@/lib/router";
 
 const niceMax = (v: number) => Math.max(10, Math.ceil(v / 10) * 10);
-const COLLAPSED_ROWS = 3;
+const COLLAPSED_ROWS = 4;
 
 export function Legend({ riskAversion }: { riskAversion: number }) {
   const items = [
@@ -76,14 +76,14 @@ export function Ranking({ result, riskAversion, names }: { result: RouteResult; 
         <span className="label text-right">True cost</span>
       </div>
       <ol id="route-list" className="m-0 mt-6 flex list-none flex-col p-0 md:mt-0" aria-label="Routes, best first. Each row states its rank.">
-        {result.routes.map((r) => {
+        {ranked.map((r) => {
           const key = routeKey(r);
           const rank = rankOf.get(key) ?? 0;
           const selected = key === selectedKey;
           const lowest = upfrontAda(r) === minUpfront;
           return (
             <li key={key} data-route={r.route} data-sellers={r.sellers.join("+")} data-selected={selected} data-rank={rank + 1} data-total={r.riskAdjustedCostAda.toFixed(2)} style={{ order: rank }}
-              className={`grid-cols-[2rem_minmax(0,1fr)_auto] gap-x-3 gap-y-2 border-b border-rule border-l-[6px] py-3 pl-2 md:grid-cols-[2.5rem_minmax(0,17rem)_minmax(0,1fr)_8rem] md:items-start md:gap-x-4 ${rank >= COLLAPSED_ROWS && !showAll ? "hidden sm:grid" : "grid"} ${selected ? "border-l-ink bg-paper-2" : "border-l-transparent"}`}>
+              className={`grid-cols-[2rem_minmax(0,1fr)_auto] gap-x-3 gap-y-2 border-b border-rule border-l-[6px] py-3 pl-2 md:grid-cols-[2.5rem_minmax(0,17rem)_minmax(0,1fr)_8rem] md:items-start md:gap-x-4 ${rank >= COLLAPSED_ROWS && !showAll ? "hidden" : "grid"} ${selected ? "border-l-ink bg-paper-2" : "border-l-transparent"}`}>
               <span className={`fig flex h-8 w-8 items-center justify-center ${selected ? "bg-ink text-paper" : "border border-ink"}`}><span className="sr-only">Rank </span>{rank + 1}</span>
               <div className="min-w-0">
                 <p className="m-0 text-[16px] font-extrabold leading-tight"><span className="text-muted">{r.route}</span> {routeNames(r, names)}</p>
@@ -99,8 +99,8 @@ export function Ranking({ result, riskAversion, names }: { result: RouteResult; 
           );
         })}
       </ol>
-      <button type="button" aria-expanded={showAll} aria-controls="route-list" onClick={() => setShowAll((v) => !v)} className="btn mt-4 w-full sm:hidden">
-        {showAll ? `Show the top ${COLLAPSED_ROWS} routes only` : `Show all ${ranked.length} routes`}
+      <button type="button" aria-expanded={showAll} aria-controls="route-list" onClick={() => setShowAll((v) => !v)} className="btn mt-4 w-full">
+        {showAll ? `Show the top ${COLLAPSED_ROWS} routes only` : `Show all ${ranked.length}`}
       </button>
       <p className="mt-3 text-[13px] text-muted">Bar length is true cost on one shared axis, 0 to {axis} ADA, gridlines every 10 ADA. True cost = price + premium + expected loss + risk charge.</p>
     </div>

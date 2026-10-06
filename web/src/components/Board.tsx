@@ -7,6 +7,7 @@ import { type Buyer, Controls, RISK_AVERSION } from "./Controls";
 import { Detail } from "./Detail";
 import { HeroPair } from "./HeroPair";
 import { Ranking } from "./Ranking";
+import { SelectionMap } from "./SelectionMap";
 import { Sellers } from "./Sellers";
 import { Verdict } from "./Verdict";
 
@@ -64,7 +65,9 @@ export function Board({ runs }: { runs: React.ReactNode }) {
     return () => ctl.abort();
   }, [nonce]);
 
-  const idKey = sellers.status === "ready" ? sellers.data.map((s) => s.id).join(",") : "";
+  const agents = sellers.status === "ready" ? sellers.data.filter((s) => s.type === "agent") : [];
+  const providers = sellers.status === "ready" ? sellers.data.filter((s) => s.type === "provider") : [];
+  const idKey = agents.map((s) => s.id).join(",");
   const names = useMemo(() => (sellers.status === "ready" ? Object.fromEntries(sellers.data.map((s) => [s.id, s.name])) : {}), [sellers]);
   useEffect(() => {
     if (!idKey) return;
@@ -98,7 +101,7 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         <div className="hero-rules" aria-hidden><div className="wrap h-full"><div className="rules" /></div></div>
         <div className="wrap relative z-10 grid grid-cols-1 gap-x-10 gap-y-6 py-6 md:py-8 lg:grid-cols-12 lg:gap-y-8">
           <div className="min-w-0 lg:col-span-7 lg:row-start-1">
-            <p className="m-0 max-w-[48ch] text-[14px] leading-snug text-muted">A keeper is an agent paid to submit a transaction before a deadline.</p>
+            <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">Your agent is about to pay someone to finish a job before a deadline. The cheapest one fails 1 in 5 times. We price that in, and Cardano enforces the backup.</p>
             <h1 id="top-h" className="display mt-3">Price is not the cost of execution.</h1>
           </div>
           <div className="min-w-0 lg:col-span-12 lg:row-start-3" data-testid="hero-pair">
@@ -110,6 +113,14 @@ export function Board({ runs }: { runs: React.ReactNode }) {
           <p className="m-0 max-w-[58ch] text-[18px] leading-[1.45] lg:col-span-7 lg:row-start-2">When keepers fail independently, Cardano makes a backup keeper safe: a UTxO can only be spent once. When they share infrastructure, backups fail together and coverage is cheaper.</p>
         </div>
       </section>
+
+      <section aria-labelledby="trust-check-h" className="border-y border-ink bg-paper-2 py-6 md:py-8">
+        <div className="wrap"><p className="label">Trust Check, a paid AI Coworker on Sokosumi</p><h2 id="trust-check-h" className="mt-2 text-[24px] font-extrabold">Due diligence on an agent before you pay it.</h2><p className="mt-2 max-w-[70ch] text-[15px] text-muted">Masumi escrow holds the paid task while Trust Check verifies the route and returns the result on Cardano preprod.</p><div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[14px]"><a href="https://preprod.cardanoscan.io/transaction/a6e3fbda65dd8a05b7252e1205f55ba34986b68df75f89e5430ab80818370e85">Escrow a6e3fbda</a><a href="https://preprod.cardanoscan.io/transaction/8c9db32499ec2bdb8c275627f5530eb6d89a5c0ab7642d909c82d3d9ff51afad">Result 8c9db324</a><a href="https://preprod.cardanoscan.io/transaction/9c560b70982fb56766919f21087e811a52133fe665e66ccfe1a5da012f4286a0">Seller collection 9c560b70</a><span className="fig !text-[14px]">Task 01a1103d-6e24-7332-adf1-32bb95c4a421</span></div></div>
+      </section>
+
+      <Section id="run" title="Confirmed preprod transactions" kicker="The paid path is visible before the ranking: lock, pay, claim, and settlement are confirmed on Cardano preprod.">
+        {runs}
+      </Section>
 
       <section id="ranking" aria-labelledby="ranking-h" className="scroll-mt-6 pb-12 md:pb-16">
         <div className="wrap">
@@ -130,18 +141,10 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         </div>
       </section>
 
-      {ready && (
-        <Section id="why" title="How the chosen route was priced" kicker="The router returns its arithmetic and the status of every input, so a buyer can check the number instead of trusting it.">
-          <Detail result={ready} />
-        </Section>
-      )}
+      {ready && <Section id="why" title="How the chosen route was priced" kicker="The router returns its arithmetic and the status of every input, so a buyer can check the number instead of trusting it."><details className="border-t-[6px] border-ink"><summary className="cursor-pointer py-4 text-[17px] font-extrabold">Inputs and method</summary><Detail result={ready} /></details><div className="mt-8"><p className="label">Live selection map from the router</p><p className="mt-2 text-[15px] text-muted">Same sellers, same 100 ADA downstream loss, four buyer and infrastructure combinations.</p><div className="mt-4"><SelectionMap sellers={agents.map((s) => s.id)} names={names} /></div></div></Section>}
 
       <Section id="sellers" title="Track records, with the starting assumption shown as one" kicker="A seller with no history is not scored as clean. The hatched block is the configured starting assumption; only the solid blocks are observed outcomes.">
-        {sellers.status === "loading" ? <Loading what={`Reading ${ROUTER_URL}/sellers.`} /> : sellers.status === "error" ? <Failure what="Seller records unavailable." message={sellers.message} onRetry={retry} /> : <Sellers sellers={sellers.data} />}
-      </Section>
-
-      <Section id="run" title="The latest run on Cardano preprod" kicker="Every transaction the buyer agent made, with its status and a link to the explorer.">
-        {runs}
+        {sellers.status === "loading" ? <Loading what={`Reading ${ROUTER_URL}/sellers.`} /> : sellers.status === "error" ? <Failure what="Seller records unavailable." message={sellers.message} onRetry={retry} /> : <><Sellers sellers={agents} /><h3 className="mt-12 text-[24px] font-extrabold">Measured RPC providers</h3><p className="mt-2 text-[15px] text-muted">Measured infrastructure stays visible for comparison, but it is excluded from the buyer-facing candidate set.</p><div className="mt-4"><Sellers sellers={providers} /></div></>}
       </Section>
 
       <footer className="border-t border-ink">

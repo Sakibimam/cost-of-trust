@@ -20,7 +20,7 @@ export function Controls({ buyer, onBuyer, shared, onShared, busy }: {
             <label key={b.id} className={`relative block min-h-[44px] cursor-pointer border-rule p-3 sm:p-4 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-blue ${i === 0 ? "border-r" : ""} ${buyer === b.id ? "bg-ink text-paper" : "bg-paper hover:bg-paper-2"}`}>
               <input type="radio" name="buyer" value={b.id} checked={buyer === b.id} onChange={() => onBuyer(b.id)} className="sr-only" />
               <span className="block text-[16px] font-extrabold leading-tight sm:text-[17px]">{b.name}</span>
-              <span className={`mt-1 block text-[12px] leading-snug ${buyer === b.id ? "text-paper/80" : "text-muted"}`}>{b.who}, riskAversion {RISK_AVERSION[b.id]}</span>
+              <span className={`mt-1 block text-[12px] leading-snug ${buyer === b.id ? "text-paper/80" : "text-muted"}`}>{b.who}</span>
               <span className={`mt-1 hidden text-[13px] leading-snug sm:block ${buyer === b.id ? "text-paper/80" : "text-muted"}`}>{b.note}</span>
             </label>
           ))}

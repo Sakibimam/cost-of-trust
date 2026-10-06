@@ -16,8 +16,7 @@ function tieBreak(selected: RouteQuote, ranked: RouteQuote[], names: Record<stri
 export function Verdict({ result, lossAda, names }: { result: RouteResult; lossAda: number; names: Record<string, string> }) {
   const rows = rankedRoutes(result);
   const selected = rows.find((r) => r.route === result.selectedRoute && r.sellers.join(",") === result.selectedSellers.join(","))!;
-  const minUpfront = Math.min(...rows.map(upfrontAda));
-  const cheapest = rows.find((r) => upfrontAda(r) === minUpfront)!;
+  const cheapest = rows.filter((r) => r.route === "single").sort((a, b) => upfrontAda(a) - upfrontAda(b))[0];
   const won = cheapest === selected;
   const gap = cheapest.riskAdjustedCostAda - selected.riskAdjustedCostAda;
   const tie = tieBreak(selected, rows, names);

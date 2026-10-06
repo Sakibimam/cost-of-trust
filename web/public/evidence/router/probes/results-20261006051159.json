@@ -1,0 +1,11 @@
+{
+  "startedAt": "2026-10-06T05:11:59.441Z",
+  "count": 60,
+  "source": "Cardano preprod provider probe",
+  "providers": [
+    { "id": "koios-preprod-authenticated", "url": "https://preprod.koios.rest/api/v1/tip", "method": "GET" },
+    { "id": "koios-preprod-public", "url": "https://preprod.koios.rest/api/v1/tip", "method": "GET" },
+    { "id": "tatum-cardano-preprod", "url": "https://cardano-preprod.gateway.tatum.io/network/status", "method": "POST" }
+  ],
+  "result": "60 spaced attempts per configured provider. The router counts every non-2xx response as a failure."
+}

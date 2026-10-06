@@ -34,6 +34,7 @@ export type RouteResult = {
 
 export type SellerRecord = {
   id: string;
+  type: "agent" | "provider";
   name: string;
   priceAda: number;
   provider: string;
@@ -48,7 +49,7 @@ export type RouteRequest = { downstreamLossAda: number; riskAversion: number; sh
 
 async function readJson<T>(res: Response): Promise<T> {
   const body = (await res.json().catch(() => null)) as (T & { error?: string }) | null;
-  if (!res.ok || !body) throw new Error(body?.error ?? `router answered HTTP ${res.status}`);
+  if (!res.ok || !body) throw new Error(body?.error ?? "The router could not price this run.");
   return body;
 }
 
