@@ -1,7 +1,8 @@
 import { spawn } from "node:child_process";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { env, loadEnv } from "./config.ts";
 import { createReport } from "./report.ts";
+import { createPayment, submitResult, waitForPayment } from "./payment.ts";
 loadEnv();
 
 const run = (args: string[]) => new Promise<string>((resolve, reject) => {
@@ -10,17 +11,36 @@ const run = (args: string[]) => new Promise<string>((resolve, reject) => {
   child.on("close", (code) => code === 0 ? resolve(out) : reject(new Error(err || `sokosumi exited ${code}`)));
 });
 
+const core = (path: string, init: RequestInit = {}) => fetch(`${env("SOKOSUMI_API_URL", "https://api.preprod.sokosumi.com/v1")}${path}`, {
+  ...init,
+  headers: { authorization: `Bearer ${env("SOKOSUMI_COWORKER_API_KEY")}`, "content-type": "application/json", ...(init.headers ?? {}) },
+  signal: AbortSignal.timeout(20_000),
+});
+
+async function taskEvent(taskId: string, body: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const response = await core(`/tasks/${encodeURIComponent(taskId)}/events`, { method: "POST", body: JSON.stringify(body) });
+  const payload = await response.json() as { data?: Record<string, unknown>; message?: string };
+  if (!response.ok || !payload.data) throw new Error(`Sokosumi event HTTP ${response.status}: ${payload.message ?? "invalid response"}`);
+  return payload.data;
+}
+
 async function once(): Promise<void> {
   const coworker = env("SOKOSUMI_COWORKER_ID"); if (!coworker) throw new Error("SOKOSUMI_COWORKER_ID is required");
   const raw = await run(["tasks", "list", "--personal"]);
   const parsed = JSON.parse(raw) as Array<Record<string, unknown>> | { tasks?: Array<Record<string, unknown>>; data?: Array<Record<string, unknown>> };
   const tasks = Array.isArray(parsed) ? parsed : parsed.tasks ?? parsed.data ?? [];
   for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker)) {
-    const id = String(task.id); await run(["runtime", "start", id, "--coworker-id", coworker, "--personal"]);
+    const id = String(task.id);
     const input = typeof task.description === "string" ? task.description : String(task.input ?? "");
+    const paid = env("ENABLE_MPS_PAYMENTS") === "true";
+    const payment = paid ? await createPayment(input) : null;
+    await taskEvent(id, { status: "RUNNING", ...(payment ? { masumiPayment: payment.data ?? payment } : {}) });
+    if (payment) await waitForPayment(payment);
     const report = await createReport(JSON.parse(input));
     const file = `result-${id}.txt`; await writeFile(file, JSON.stringify(report, null, 2));
-    await run(["runtime", "complete", id, "--coworker-id", coworker, "--personal", "--result-file", file]);
+    const result = await readFile(file, "utf8");
+    if (payment) await submitResult(payment, result);
+    await taskEvent(id, { status: "COMPLETED", comment: result });
   }
 }
 

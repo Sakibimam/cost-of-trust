@@ -1,4 +1,5 @@
 import { env, loadEnv } from "./config.ts";
+import { escrowHistory, registryFromChain } from "./koios.ts";
 import type { CheckInput, Evidence, TrustReport } from "./types.ts";
 
 loadEnv();
@@ -20,6 +21,7 @@ async function getJson(source: string, url: string, init?: RequestInit): Promise
 }
 
 async function registryEntry(identifier: string): Promise<Evidence> {
+  if (!env("REGISTRY_API_KEY")) return registryFromChain(identifier);
   const url = `${env("REGISTRY_URL")}/registry-entry/`;
   const registryKey = env("REGISTRY_API_KEY");
   return getJson("registry", url, {
@@ -68,7 +70,7 @@ async function gather(input: CheckInput): Promise<Evidence[]> {
   return [
     registryFact,
     ...endpointFacts,
-    await getJson("masumi_escrow_history", `${koios}${koiosPath(input.agentIdentifier)}`),
+    await escrowHistory(input.agentIdentifier),
     await getJson("router_quote", `${router}/quotes/${encodeURIComponent(seller)}`),
   ];
 }
