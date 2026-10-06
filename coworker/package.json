@@ -8,6 +8,9 @@
     "worker": "node --import tsx src/worker.ts"
   },
   "dependencies": {
+    "@harmoniclabs/bytestring": "1.0.0",
+    "@harmoniclabs/cbor": "1.3.0",
+    "@harmoniclabs/pair": "1.0.0",
     "@lucid-evolution/lucid": "0.6.5",
     "ai": "^7.0.128",
     "tsx": "^4.19.2"

@@ -19,7 +19,7 @@ The server exposes `POST /report`. Its JSON body is:
 {"agentIdentifier":"<Masumi identifier>","taskValueAtRiskAda":100,"task":"supplier delivery"}
 ```
 
-Run the Sokosumi worker separately with `npm run worker`. It polls the Personal Workspace, sends each assigned Task to the report engine, and completes the Task with the exact JSON result. Set `SOKOSUMI_COWORKER_ID` in server-side secret storage.
+Run the Sokosumi worker separately with `npm run worker`. It polls the Personal Workspace, sends each assigned Task to the report engine, and completes the Task with the exact JSON result. Set `SOKOSUMI_COWORKER_ID` in server-side secret storage. Registry lookup uses the managed Masumi registry `POST /registry-entry/` contract and needs a server-side `REGISTRY_API_KEY`.
 
 ## Payment path
 
@@ -27,4 +27,4 @@ The paid flow uses a fresh signed Masumi seller-term request, `masumiPayment` on
 
 ## Current verification
 
-The local report validation test and TypeScript check pass. MPS dependencies, Prisma generation, and migrations pass against the dedicated database. External account, model, Blockfrost, wallet funding, Coworker registration, Task execution, paid collection, and event approval require the private human actions listed in `SETUP-RECORD.md`.
+The local report validation test and TypeScript check pass. The OpenRouter primary and fallback path were smoke-tested against the live API. MPS is seeded on Preprod and its selling wallet was funded with a confirmed transaction. Vendor creation, Coworker registration, registry credentials, Task execution, paid collection, and event approval require the private human actions listed in `SETUP-RECORD.md`.

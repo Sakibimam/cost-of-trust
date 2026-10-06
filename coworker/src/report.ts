@@ -19,6 +19,30 @@ async function getJson(source: string, url: string, init?: RequestInit): Promise
   }
 }
 
+async function registryEntry(identifier: string): Promise<Evidence> {
+  const url = `${env("REGISTRY_URL")}/registry-entry/`;
+  const registryKey = env("REGISTRY_API_KEY");
+  return getJson("registry", url, {
+    method: "POST",
+    headers: { "content-type": "application/json", ...(registryKey ? { token: registryKey } : {}) },
+    body: JSON.stringify({ network: "Preprod", filter: { assetIdentifier: identifier }, limit: 1 }),
+  });
+}
+
+function advertisedUrl(data: unknown): string | null {
+  if (!data || typeof data !== "object") return null;
+  if (Array.isArray(data)) return data.map(advertisedUrl).find(Boolean) ?? null;
+  const record = data as Record<string, unknown>;
+  for (const key of ["apiBaseUrl", "apiUrl", "endpoint", "url"]) {
+    if (typeof record[key] === "string" && /^https?:\/\//.test(record[key])) return record[key].replace(/\/$/, "");
+  }
+  for (const value of Object.values(record)) {
+    const found = advertisedUrl(value);
+    if (found) return found;
+  }
+  return null;
+}
+
 function koiosPath(identifier: string): string {
   if (/^asset1[a-z0-9]+$/i.test(identifier)) return `/asset_txs?_asset_fingerprint=${encodeURIComponent(identifier)}`;
   if (/^[0-9a-f]{56}$/i.test(identifier)) return `/credential_txs?_payment_credentials=${encodeURIComponent(identifier)}`;
@@ -26,19 +50,27 @@ function koiosPath(identifier: string): string {
 }
 
 async function gather(input: CheckInput): Promise<Evidence[]> {
-  const id = encodeURIComponent(input.agentIdentifier);
   const registry = env("REGISTRY_URL");
   const koios = env("KOIOS_URL");
   const router = env("ROUTER_URL");
   const seller = input.sellerId ?? input.agentIdentifier;
-  const facts = await Promise.all([
-    getJson("registry", `${registry}/agents/${id}`),
-    getJson("masumi_escrow_history", `${koios}${koiosPath(input.agentIdentifier)}`),
-    getJson("agent_availability", `${registry}/agents/${id}/availability`),
-    getJson("agent_health", `${registry}/agents/${id}/health`),
-    getJson("router_quote", `${router}/quotes/${encodeURIComponent(seller)}`),
-  ]);
-  return facts;
+  const registryFact = await registryEntry(input.agentIdentifier);
+  const endpoint = advertisedUrl(registryFact.data);
+  const endpointFacts = endpoint
+    ? await Promise.all([
+      getJson("agent_availability", `${endpoint}/availability`),
+      getJson("agent_health", `${endpoint}/health`),
+    ])
+    : [
+      { source: "agent_availability", status: "unavailable", observedAt: now(), error: "registry did not advertise an API URL" } as Evidence,
+      { source: "agent_health", status: "unavailable", observedAt: now(), error: "registry did not advertise an API URL" } as Evidence,
+    ];
+  return [
+    registryFact,
+    ...endpointFacts,
+    await getJson("masumi_escrow_history", `${koios}${koiosPath(input.agentIdentifier)}`),
+    await getJson("router_quote", `${router}/quotes/${encodeURIComponent(seller)}`),
+  ];
 }
 
 function routeFromQuote(facts: Evidence[], atRisk: number): { recommendation: TrustReport["recommendation"]; expectedCostAda: number | null } {
@@ -55,22 +87,28 @@ function routeFromQuote(facts: Evidence[], atRisk: number): { recommendation: Tr
 }
 
 async function summarize(input: CheckInput, facts: Evidence[], decision: ReturnType<typeof routeFromQuote>): Promise<string> {
-  const key = env("ZAI_API_KEY") || env("OPENAI_API_KEY");
+  const key = env("OPENROUTER_API_KEY") || env("ZAI_API_KEY") || env("OPENAI_API_KEY") || env("ANTHROPIC_API_KEY");
   if (!key) return "Plain-language summary unavailable: no model credential is configured. The structured facts and recommendation are authoritative.";
-  const endpoint = env("ZAI_API_KEY") ? "https://api.z.ai/api/paas/v4/chat/completions" : "https://api.openai.com/v1/chat/completions";
+  const endpoint = env("OPENROUTER_API_KEY") ? `${env("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")}/chat/completions` : env("ZAI_API_KEY") ? "https://api.z.ai/api/paas/v4/chat/completions" : "https://api.openai.com/v1/chat/completions";
   const evidence = JSON.stringify({ input, decision, facts });
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
-    body: JSON.stringify({ model: env("MODEL", "glm-5.3-flash"), temperature: 0, messages: [
-      { role: "system", content: "Write one concise due-diligence summary. Use only the supplied facts. Cite facts inline as [source]. Never invent numbers or fill missing values." },
-      { role: "user", content: evidence },
-    ] }),
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!response.ok) throw new Error(`model HTTP ${response.status}`);
-  const body = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
-  return body.choices?.[0]?.message?.content?.trim() || "Model returned no summary.";
+  const models = [env("MODEL", "nvidia/nemotron-3-ultra-550b-a55b:free"), env("MODEL_FALLBACK", "nvidia/nemotron-3-super-120b-a12b:free")];
+  let lastError = "model returned no summary";
+  for (const model of [...new Set(models)]) {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
+      body: JSON.stringify({ model, temperature: 0, max_tokens: 800, messages: [
+        { role: "system", content: "Write one concise due-diligence summary. Use only the supplied facts. Cite facts inline as [source]. Never invent numbers or fill missing values." },
+        { role: "user", content: evidence },
+      ] }),
+      signal: AbortSignal.timeout(30_000),
+    });
+    const body = await response.json() as { choices?: Array<{ message?: { content?: string } }>; error?: { message?: string } };
+    const content = body.choices?.[0]?.message?.content?.trim();
+    if (response.ok && content) return content;
+    lastError = body.error?.message || `model HTTP ${response.status}`;
+  }
+  throw new Error(lastError);
 }
 
 export async function createReport(input: CheckInput): Promise<TrustReport> {

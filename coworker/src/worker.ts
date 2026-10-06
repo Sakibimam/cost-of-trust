@@ -13,7 +13,8 @@ const run = (args: string[]) => new Promise<string>((resolve, reject) => {
 async function once(): Promise<void> {
   const coworker = env("SOKOSUMI_COWORKER_ID"); if (!coworker) throw new Error("SOKOSUMI_COWORKER_ID is required");
   const raw = await run(["tasks", "list", "--personal"]);
-  const tasks = JSON.parse(raw) as Array<Record<string, unknown>>;
+  const parsed = JSON.parse(raw) as Array<Record<string, unknown>> | { tasks?: Array<Record<string, unknown>>; data?: Array<Record<string, unknown>> };
+  const tasks = Array.isArray(parsed) ? parsed : parsed.tasks ?? parsed.data ?? [];
   for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker)) {
     const id = String(task.id); await run(["runtime", "start", id, "--coworker-id", coworker, "--personal"]);
     const input = typeof task.description === "string" ? task.description : String(task.input ?? "");
