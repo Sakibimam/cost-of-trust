@@ -26,7 +26,7 @@ async function taskEvent(taskId: string, body: Record<string, unknown>): Promise
 
 async function once(): Promise<void> {
   const coworker = env("SOKOSUMI_COWORKER_ID"); if (!coworker) throw new Error("SOKOSUMI_COWORKER_ID is required");
-  const raw = await run(["tasks", "list", "--personal"]);
+  const raw = await run(["tasks", "list", "--scope", "owned"]);
   const parsed = JSON.parse(raw) as Array<Record<string, unknown>> | { tasks?: Array<Record<string, unknown>>; data?: Array<Record<string, unknown>> };
   const tasks = Array.isArray(parsed) ? parsed : parsed.tasks ?? parsed.data ?? [];
   for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker)) {
