@@ -1,0 +1,129 @@
+{
+  "startedAt": "2026-10-06T03:50:03.431Z",
+  "records": [
+    {
+      "step": "claim_vault_lock",
+      "txHash": "399ee82e693e598ef90c47bb74c2f05999e134fce47c891efcb1a2948d6f768e",
+      "confirmed": true
+    },
+    {
+      "step": "coverage_lock",
+      "txHash": "8b175f671aad445d7b11da567851feb16384fff0e91db242868d21af8e6a7ddd",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_payment",
+      "txHash": "dd2d7640293fb3dfddf878c083cb8812935b2caa670bf3a88b3b0d4633347533",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_claim",
+      "txHash": "4f864737c1556a3184c0446671f004d3bb35456d9c1a38716bdfe2f970b8447a",
+      "confirmed": true
+    },
+    {
+      "step": "keeper_results",
+      "detail": [
+        {
+          "seller": "seller-b",
+          "body": {
+            "accepted": true,
+            "seller": "seller-b",
+            "paymentTx": "dd2d7640293fb3dfddf878c083cb8812935b2caa670bf3a88b3b0d4633347533",
+            "claimTx": "4f864737c1556a3184c0446671f004d3bb35456d9c1a38716bdfe2f970b8447a",
+            "claimRef": "399ee82e693e598ef90c47bb74c2f05999e134fce47c891efcb1a2948d6f768e#0"
+          }
+        }
+      ]
+    },
+    {
+      "step": "wait_for_expiry_before_settle",
+      "detail": {
+        "ms": 255644
+      }
+    },
+    {
+      "step": "fatal",
+      "error": "{\"error\":\"\\\"failed script execution Spend[0] the validator crashed / exited prematurely\\\"\"}"
+    }
+  ],
+  "selectedRoute": {
+    "selectedRoute": "underwritten",
+    "selectedSellers": [
+      "seller-b"
+    ],
+    "reason": "coverage required by buyer; underwritten seller-b costs 13.20 ADA, the unconstrained best route (single seller-b) would cost 11.75 ADA",
+    "forcedByConstraints": true,
+    "routes": [
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      }
+    ],
+    "alternatives": [],
+    "assumptions": {
+      "sharedInfrastructure": {
+        "value": true,
+        "status": "buyer-supplied"
+      },
+      "riskAversion": {
+        "value": 0.25,
+        "status": "buyer-supplied"
+      },
+      "prior": {
+        "alpha0": 2,
+        "beta0": 8,
+        "status": "configured"
+      },
+      "sharedProviderCorrelation": {
+        "value": 0.5,
+        "status": "configured"
+      },
+      "coverageApplicabilityRate": {
+        "value": 0.8,
+        "status": "configured"
+      },
+      "penalties": "seller-specific values are configured; outcome counts are measured"
+    },
+    "quoteId": "fe5b4ea2-2808-4c0d-8d5f-49b22f8badea",
+    "termsHash": "303ed2cdf4ec6b6b3043fd56656ca1c82d0ff3bff13dea0bd9129342a024193d"
+  }
+}

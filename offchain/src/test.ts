@@ -20,3 +20,16 @@ test("Koios inline datum output carries no datum hash so scripts see the inline 
   const hashed = koiosOutputToUtxo({ tx_hash: "aa".repeat(32), tx_index: 1, payment_addr: { bech32: "addr_test1" }, value: "5000000", datum_hash: "bb".repeat(32), inline_datum: null });
   assert.equal(hashed.datumHash, "bb".repeat(32));
 });
+
+test("settle proof passes full 65-byte signatures with their recovered 64-byte public keys", async () => {
+  const { secp256k1 } = await import("@noble/curves/secp256k1.js");
+  const { keccak_256 } = await import("@noble/hashes/sha3.js");
+  const { settleProof } = await import("./index");
+  const raw = new Uint8Array(210).fill(7), context = new Uint8Array(64).fill(9);
+  const digest = keccak_256(new Uint8Array([...keccak_256(raw), ...context]));
+  const keys = [1, 2].map((n) => keccak_256(new Uint8Array([n])));
+  const sigs = keys.map((k) => { const s = secp256k1.sign(digest, k, { prehash: false, lowS: true, format: "recovered" }); return Buffer.from([...s.slice(1), s[0] + 27]).toString("hex"); });
+  const p = settleProof({ raw_report: Buffer.from(raw).toString("hex"), report_context: Buffer.from(context).toString("hex"), sigs }, 1n);
+  assert.deepEqual(p.sigs.map((x) => x.length / 2), [65, 65]);
+  assert.deepEqual(p.pubkeys, keys.map((k) => Buffer.from(secp256k1.getPublicKey(k, false).slice(1)).toString("hex")));
+});
