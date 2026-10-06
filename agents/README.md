@@ -55,3 +55,5 @@ FLIP_REPORT=true CANDIDATE_SELLERS=seller-b REQUIRE_COVERAGE=true BUYER_RISK_AVE
 ```
 
 Every buyer run writes `agents/runs/<timestamp>.json`. Each accepted transaction is polled through Koios `tx_status` before it is recorded. CRE simulation output and the report received by the relayer are written under `cre/evidence/`.
+
+The relayer runs `cre workflow simulate` from `cre/` for each adjudication and takes the decision body (terms hash, decision byte, coverage and task out-refs) from the workflow's own report. Settle then submits that body under the test DON that the preprod config NFT pins (`attest.ts`), with full 65-byte signatures and the recovered public keys, so the validator's allowlist, workflow identity and `don_config_digest` checks all run on the live chain. Each run record carries a `cre_report` step naming the source and the decision byte.
