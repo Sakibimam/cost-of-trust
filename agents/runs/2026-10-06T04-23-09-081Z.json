@@ -1,0 +1,137 @@
+{
+  "startedAt": "2026-10-06T04:23:09.081Z",
+  "records": [
+    {
+      "step": "claim_vault_lock",
+      "txHash": "3f65613f45d16aa23a6a623c9dbe2215b4f3f248f71fd4a41b3d377642f16d70",
+      "confirmed": true
+    },
+    {
+      "step": "coverage_lock",
+      "txHash": "5b09aaa7bda04b23bfbae28517a3897f6ba81a9bd1f4ab53c88bb9e86e110c9a",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_payment",
+      "txHash": "65b1c03f049f34cec7a2a12fd55e877f41b014524a9c31a82ea01fa146734c91",
+      "confirmed": true
+    },
+    {
+      "step": "keeper_results",
+      "detail": [
+        {
+          "seller": "seller-b",
+          "body": {
+            "accepted": true,
+            "stalled": true,
+            "paymentTx": "65b1c03f049f34cec7a2a12fd55e877f41b014524a9c31a82ea01fa146734c91"
+          }
+        }
+      ]
+    },
+    {
+      "step": "claim_vault_forfeit",
+      "txHash": "2ea81cf20fc0fb52f876a7eea0605b10add9b1743d62a7868a6993e7a1c98a6c",
+      "confirmed": true
+    },
+    {
+      "step": "cre_report",
+      "detail": {
+        "source": "cre-decision-wrapped-by-test-don",
+        "nativeIncompatibility": "report context is 96 bytes, the validator reads 64",
+        "decisionByte": 1
+      }
+    },
+    {
+      "step": "coverage_settle",
+      "txHash": "54c5eb596f9d351f4c73e74790e52ac30dc5fbe61b6d1a6bf6d9972b895af761",
+      "confirmed": true
+    },
+    {
+      "step": "router_ingest",
+      "detail": {
+        "status": 404,
+        "body": "{\"error\":\"not found\"}"
+      }
+    }
+  ],
+  "selectedRoute": {
+    "selectedRoute": "underwritten",
+    "selectedSellers": [
+      "seller-b"
+    ],
+    "reason": "coverage required by buyer; underwritten seller-b costs 13.20 ADA, the unconstrained best route (single seller-b) would cost 11.75 ADA",
+    "forcedByConstraints": true,
+    "routes": [
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      }
+    ],
+    "alternatives": [],
+    "assumptions": {
+      "sharedInfrastructure": {
+        "value": true,
+        "status": "buyer-supplied"
+      },
+      "riskAversion": {
+        "value": 0.25,
+        "status": "buyer-supplied"
+      },
+      "prior": {
+        "alpha0": 2,
+        "beta0": 8,
+        "status": "configured"
+      },
+      "sharedProviderCorrelation": {
+        "value": 0.5,
+        "status": "configured"
+      },
+      "coverageApplicabilityRate": {
+        "value": 0.8,
+        "status": "configured"
+      },
+      "penalties": "seller-specific values are configured; outcome counts are measured"
+    },
+    "quoteId": "7283da13-a17b-4a6c-8f87-6f6ca2def666",
+    "termsHash": "303ed2cdf4ec6b6b3043fd56656ca1c82d0ff3bff13dea0bd9129342a024193d"
+  }
+}
