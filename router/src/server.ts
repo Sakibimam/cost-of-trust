@@ -7,6 +7,7 @@ let sellerFile: string | URL = new URL("../sellers.json", import.meta.url);
 const sellers: Seller[] = structuredClone(sellersSeed as Seller[]);
 const underwriterConfig = underwriter as UnderwriterConfig;
 const quotes = new Map<string, { result: RouteResult; task: string; serviceType: string; deadline: string }>();
+const KOIOS_URL = "https://preprod.koios.rest/api/v1";
 
 function sortKeys(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(sortKeys);
@@ -22,12 +23,23 @@ export async function useSellersFile(path: string) {
   sellers.splice(0, sellers.length, ...(await Bun.file(path).json() as Seller[]));
 }
 
-export async function useSellersFile(path: string) {
-  sellerFile = path;
-  sellers.splice(0, sellers.length, ...(await Bun.file(path).json() as Seller[]));
-}
-
 async function persistSellers() { await Bun.write(sellerFile, `${JSON.stringify(sellers, null, 2)}\n`); }
+
+async function requireConfirmedTx(txHash: string): Promise<void> {
+  const key = Bun.env.KAIOS_KEY;
+  if (!key) throw new Error("KAIOS_KEY is not set");
+  if (!/^[0-9a-f]{64}$/i.test(txHash)) throw new Error("txHash must be a 64-character hex hash");
+  const response = await fetch(`${KOIOS_URL}/tx_status`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+    body: JSON.stringify({ _tx_hashes: [txHash] }),
+  });
+  if (!response.ok) throw new Error(`Koios tx_status returned ${response.status}`);
+  const rows = await response.json() as Array<{ num_confirmations?: number | null; status?: string; error?: string }>;
+  const row = rows[0];
+  if (row?.status && /fail|reject|invalid/i.test(row.status)) throw new Error(`transaction rejected: ${row.status}`);
+  if ((row?.num_confirmations ?? 0) < 1) throw new Error("txHash is not confirmed");
+}
 
 export async function ingestOutcome(sellerId: string, success: boolean, txHash: string): Promise<Seller> {
   if (!txHash || /\s/.test(txHash)) throw new Error("txHash is required");
@@ -61,6 +73,12 @@ export function startServer(port = 8787) {
           return json({ seller: seller.id, risk, coverageOffers: [{ underwriter: underwriterConfig.underwriter, premiumAda, coverageLimitAda, deductibleAda: underwriterConfig.deductibleAda, collateralRef: underwriterConfig.collateralRef, termsHash: termsHash({ seller: seller.id, coverageLimitAda, deductibleAda: underwriterConfig.deductibleAda }) }] });
         }
         return json({ ...saved, termsHash: termsHash(selectedTerms(saved.result)) });
+      }
+      if (request.method === "POST" && url.pathname === "/ingest") {
+        const body = await request.json() as { sellerId?: unknown; success?: unknown; txHash?: unknown };
+        if (typeof body.sellerId !== "string" || typeof body.success !== "boolean" || typeof body.txHash !== "string") return json({ error: "sellerId, success, and txHash are required" }, 400);
+        await requireConfirmedTx(body.txHash);
+        return json(await ingestOutcome(body.sellerId, body.success, body.txHash));
       }
       if (request.method === "POST" && url.pathname === "/best-route") {
         const body = await request.json() as { task: string; serviceType: string; deadline: string; downstreamLossAda: number; riskAversion?: number; sharedInfrastructure?: boolean; candidateSellers: string[]; constraints?: Parameters<typeof evaluateRoutes>[0]["constraints"] };

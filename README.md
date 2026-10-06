@@ -6,11 +6,30 @@ Cost of Trust is a Cardano preprod routing layer for deadline work. The router c
 
 ## Cardano mechanism
 
-The default protection is a staggered keeper schedule enforced by validity intervals. Keeper A has the first slot and keeper B has the late slot. One claim-vault UTxO means one spend and one winner. The chain pays the keeper whose slot lands, and the unused fee returns to the sponsor.
+The default protection is a staggered keeper schedule enforced by validity intervals.
+
+Keeper A has the first slot and keeper B has the late slot. One claim-vault UTxO means one spend and one winner. The chain pays the keeper whose slot lands, and the unused fee returns to the sponsor.
 
 Coverage collateral is released only by a CRE report that the Plutus V3 validator verifies itself. The validator binds the report to the coverage UTxO, task, terms, workflow metadata, DON digest, and validity window, then requires f+1 distinct allowlisted secp256k1 signatures. A flipped report byte is rejected by the validator test suite.
 
-Pre-screen: preprod contracts are the config lock, claim vault, and coverage addresses below; the 2x2 map is independent versus shared infrastructure across risk aversion 0, 0.25, 0.5, and 1; confirmed run evidence links the claim-vault transactions recorded by the buyer.
+Pre-screen: preprod contracts are the config lock, claim vault, and coverage addresses below; the 2x2 map is independent versus shared infrastructure across risk aversion 0, 0.25, 0.5, and 1; confirmed run evidence links the transactions recorded by the buyer.
+
+## Completed preprod runs
+
+Four completed runs exercise the underwritten and fallback paths. Each transaction is confirmed on Cardano preprod and linked for inspection.
+
+| Run | Path | Confirmed transactions |
+| --- | --- | --- |
+| 2026-10-06 04:12:36Z | underwritten seller-b claim and coverage settlement | [claim](https://preprod.cardanoscan.io/transaction/a55009e5c4b602ed4d18f798a5827f70b12d358fa2a0eaf85d41affdc5647392), [settlement](https://preprod.cardanoscan.io/transaction/5f44c119aba938848be23a20abd542f473cc4c6447b5e41e2450c032473d10ff) |
+| 2026-10-06 04:23:09Z | expired claim-vault forfeit and coverage settlement | [forfeit](https://preprod.cardanoscan.io/transaction/2ea81cf20fc0fb52f876a7eea0605b10add9b1743d62a7868a6993e7a1c98a6c), [settlement](https://preprod.cardanoscan.io/transaction/54c5eb596f9d351f4c73e74790e52ac30dc5fbe61b6d1a6bf6d9972b895af761) |
+| 2026-10-06 04:40:21Z | fallback seller-a claim | [claim](https://preprod.cardanoscan.io/transaction/4838b4c2cfa07a7c7198a7ced989214cb43bde74073cdb329fa506deece6bee0) |
+| 2026-10-06 04:45:57Z | underwritten seller-b claim and coverage settlement | [claim](https://preprod.cardanoscan.io/transaction/4afb027dfc182ac65b854bcdb4bee0eb07775fe194edf49cef1c7b98060a775f), [settlement](https://preprod.cardanoscan.io/transaction/3c20440b7419f5c8da18910af0c6fd2b8a40dae0b4d22cacccf8ef0fddf41abb) |
+
+The router ingests seller outcomes through `POST /ingest` only after Koios `tx_status` reports at least one confirmation. The measured provider table is in [`docs/GTM.md`](docs/GTM.md), and the Trust Check Coworker report path is in [`coworker/README.md`](coworker/README.md).
+
+## CRE report path
+
+The CRE workflow's decision body is signed by the config-pinned signer set in [`agents/attest.ts`](agents/attest.ts). The local simulator keys rotate per run, so the test path re-wraps the workflow decision with the signer set pinned by the preprod config NFT. The production path is a deployed DON with its signer set recorded in a fresh config NFT.
 
 ## Preprod deployment
 
