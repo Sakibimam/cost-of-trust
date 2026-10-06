@@ -9,10 +9,14 @@ export function installKoios(): void {
   globalThis.fetch = (async (input, init) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
     if (!url.startsWith(KOIOS_URL)) return original(input, init);
-    if (url.endsWith("/tx_info") && typeof init?.body === "string") {
-      const body = JSON.parse(init.body) as Record<string, unknown>;
-      body._bytecode = true;
-      init = { ...init, body: JSON.stringify(body) };
+    if (url.endsWith("/tx_info")) {
+      const source = typeof init?.body === "string" ? init.body : input instanceof Request ? await input.clone().text() : "";
+      if (source) {
+        const body = JSON.parse(source) as Record<string, unknown>;
+        body._bytecode = true;
+        if (input instanceof Request && init?.body === undefined) input = new Request(input, { body: JSON.stringify(body) });
+        else init = { ...init, body: JSON.stringify(body) };
+      }
     }
     const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
     headers.set("authorization", `Bearer ${key()}`);
