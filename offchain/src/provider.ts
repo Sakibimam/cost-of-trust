@@ -22,7 +22,12 @@ export function installKoios(): void {
     headers.set("authorization", `Bearer ${key()}`);
     for (let attempt = 0; ; attempt++) {
       const response = await original(input, { ...init, headers });
-      if (response.status !== 429 || attempt >= 5) return response;
+      if (response.status === 429 && attempt < 5) { /* retry below */ }
+      else {
+        // Lucid reduces a failed submit to "500 Something went wrong"; the ledger's reason is in the body.
+        if (url.endsWith("/submittx") && !response.ok) throw new Error(`Koios submittx ${response.status}: ${(await response.text()).slice(0, 4000)}`);
+        return response;
+      }
       const wait = Number(response.headers.get("retry-after") ?? 0) * 1000 || 250 * 2 ** attempt;
       await new Promise((resolve) => setTimeout(resolve, wait));
     }

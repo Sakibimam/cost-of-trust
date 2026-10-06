@@ -14,7 +14,7 @@ const signer = toFacilitatorCardanoSigner({ network: "cardano:preprod", provider
 const facilitator = new x402Facilitator();
 facilitator.register("cardano:preprod", new ExactCardanoScheme(signer));
 
-type Job = { id: string; ref: ReturnType<typeof parseRef>; beneficiary: string; expiry: bigint; result?: Record<string, unknown> };
+type Job = { id: string; ref: ReturnType<typeof parseRef>; beneficiary: string; expiry: bigint; paymentTx?: string; result?: Record<string, unknown>; error?: string };
 const jobs = new Map<string, Job>();
 const requirements = (body: Record<string, unknown>, jobId: string) => ({
   x402Version: 2,
@@ -73,7 +73,7 @@ Bun.serve({ port, async fetch(request) {
     if (request.method === "GET" && url.pathname === "/status") {
       const job = jobs.get(url.searchParams.get("job_id") ?? "");
       if (!job) return json({ error: "job not found" }, 404);
-      return json({ job_id: job.id, status: job.result ? "completed" : "awaiting_payment", result: job.result ?? null });
+      return json({ job_id: job.id, status: job.result ? "completed" : job.error ? "failed" : job.paymentTx ? "running" : "awaiting_payment", paymentTx: job.paymentTx ?? null, result: job.result ?? null, error: job.error ?? null });
     }
     if (request.method === "POST" && (url.pathname === "/start_job" || url.pathname === "/jobs")) {
       const body = await request.json() as Record<string, unknown>;
@@ -83,15 +83,17 @@ Bun.serve({ port, async fetch(request) {
       const job = existing ?? await createJob(input);
       const paymentHeader = request.headers.get("payment-signature");
       if (!paymentHeader) return new Response(JSON.stringify({ x402Version: 2, job_id: job.id, accepts: requirements(input, job.id).accepts }), { status: 402, headers: { "content-type": "application/json", "PAYMENT-REQUIRED": encodePaymentRequiredHeader(requirements(input, job.id) as never) } });
+      if (job.paymentTx) return json({ job_id: job.id, status: job.result ? "completed" : job.error ? "failed" : "running", paymentTx: job.paymentTx });
       const paymentTx = await settlePayment(paymentHeader, requirements(input, job.id).accepts[0]);
+      job.paymentTx = paymentTx;
       if (stall) {
         console.log(JSON.stringify({ seller: id, stall: true, jobId: job.id }));
         job.result = { accepted: true, stalled: true, paymentTx };
-        return json({ job_id: job.id, ...job.result });
+        return json({ job_id: job.id, status: "completed", ...job.result });
       }
-      const claimTx = await claim(lucid, d, job.ref, job.beneficiary, job.expiry);
-      job.result = { accepted: true, seller: id, paymentTx, claimTx, claimRef: refString(job.ref) };
-      return json({ job_id: job.id, ...job.result });
+      // The claim runs after the payment response so a buyer paying several keepers from one wallet is never blocked behind a claim confirmation.
+      claim(lucid, d, job.ref, job.beneficiary, job.expiry).then((claimTx) => { job.result = { accepted: true, seller: id, paymentTx, claimTx, claimRef: refString(job.ref) }; }, (error) => { job.error = error instanceof Error ? error.message : String(error); console.log(JSON.stringify({ seller: id, jobId: job.id, claimRejected: job.error })); });
+      return json({ job_id: job.id, status: "running", accepted: true, seller: id, paymentTx });
     }
     return json({ error: "not found" }, 404);
   } catch (error) {
