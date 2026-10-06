@@ -255,15 +255,16 @@ for i, (t, route, action, lock, settle) in enumerate(evidence):
 box(s, 0.72, 5.95, 11.78, 0.62, "On-chain suite: 78 checks passed. A flipped report byte is rejected by the validator test suite.", 18, CARD, True, BODY, PP_ALIGN.CENTER, NAVY, NAVY, 0.1, 0.18, MSO_ANCHOR.MIDDLE)
 box(s, 0.72, 6.72, 11.78, 0.25, "Full hashes and explorer links are recorded in docs/DECK.md.", 11, MUTED, False, MONO)
 
-# 10. Video placeholder / close
-s = slide(); title(s, "See the route before the payment.", 10, "demo")
+# 10. Close
+s = slide(); title(s, "Trust is a route choice.", 10, "measured close")
 box(s, 0.75, 1.8, 7.7, 4.35, "", fill=NAVY)
-box(s, 1.15, 2.15, 6.9, 2.45, "SCREEN RECORDING\nPLACEHOLDER", 29, RGBColor(0x9E, 0xE5, 0xD4), True, TITLE, PP_ALIGN.CENTER, NAVY, RGBColor(0x5A, 0x8C, 0x8A), 0.05, 0.16, MSO_ANCHOR.MIDDLE)
-box(s, 1.15, 4.95, 6.9, 0.55, "Insert video file: cost-of-trust/deck/demo.mp4", 14, CARD, True, MONO, PP_ALIGN.CENTER)
+box(s, 1.15, 2.15, 6.9, 0.42, "THE THESIS", 12, RGBColor(0x9E, 0xE5, 0xD4), True, MONO)
+box(s, 1.15, 2.95, 6.9, 1.55, "Price the counterparty.\nProtect the deadline.", 31, CARD, True, TITLE, PP_ALIGN.CENTER, NAVY, NAVY, 0.05, 0.16, MSO_ANCHOR.MIDDLE)
+box(s, 1.15, 4.95, 6.9, 0.55, "Instant mode: 20 confirmed requests, 4,995 ms p50, 6,462 ms p95.", 14, RGBColor(0xD8, 0xED, 0xE7), True, MONO, PP_ALIGN.CENTER)
 box(s, 8.85, 1.8, 3.7, 4.35, "", fill=CARD, line=LINE)
-box(s, 9.2, 2.15, 3.0, 0.42, "THE THESIS", 12, TEAL, True, MONO)
-box(s, 9.2, 2.8, 2.95, 1.45, "Trust is\na route choice.", 29, INK, True, TITLE)
-box(s, 9.2, 4.55, 2.9, 0.95, "Price the counterparty.\nProtect the deadline.\nLet Cardano enforce it.", 17, TEAL_DARK, True)
+box(s, 9.2, 2.15, 3.0, 0.42, "CARDANO", 12, TEAL, True, MONO)
+box(s, 9.2, 2.8, 2.95, 1.45, "One spend.\nOne winner.", 29, INK, True, TITLE)
+box(s, 9.2, 4.55, 2.9, 0.95, "Let the chain enforce the route.", 17, TEAL_DARK, True)
 box(s, 0.75, 6.55, 11.8, 0.45, "Cost of Trust  |  your AI agent prices who to trust before it spends.", 18, TEAL_DARK, True, BODY, PP_ALIGN.CENTER)
 
 prs.save(OUT)

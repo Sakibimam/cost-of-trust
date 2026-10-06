@@ -93,6 +93,8 @@ export function Board({ runs }: { runs: React.ReactNode }) {
             <a href="#ranking" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Routes</a>
             <a href="#sellers" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Sellers</a>
             <a href="#run" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Latest run</a>
+            <a href="/thesis" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Thesis</a>
+            <a href="/deck" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Deck</a>
           </nav>
         </div>
       </header>
