@@ -1,16 +1,9 @@
-import { spawn } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
 import { env, loadEnv } from "./config.ts";
 import { createReport } from "./report.ts";
 import { createPayment, submitResult, waitForPayment } from "./payment.ts";
 import { parseTaskInput, USAGE_RESULT } from "./task-input.ts";
 loadEnv();
-
-const run = (args: string[]) => new Promise<string>((resolve, reject) => {
-  const child = spawn("sokosumi", ["--preprod", ...args, "--json"], { env: process.env });
-  let out = "", err = ""; child.stdout.on("data", (x) => out += x); child.stderr.on("data", (x) => err += x);
-  child.on("close", (code) => code === 0 ? resolve(out) : reject(new Error(err || `sokosumi exited ${code}`)));
-});
 
 const core = (path: string, init: RequestInit = {}) => fetch(`${env("SOKOSUMI_API_URL", "https://api.preprod.sokosumi.com/v1")}${path}`, {
   ...init,
@@ -27,19 +20,20 @@ async function taskEvent(taskId: string, body: Record<string, unknown>): Promise
 
 async function once(): Promise<void> {
   const coworker = env("SOKOSUMI_COWORKER_ID"); if (!coworker) throw new Error("SOKOSUMI_COWORKER_ID is required");
-  const raw = await run(["tasks", "list", "--scope", "owned"]);
-  const parsed = JSON.parse(raw) as Array<Record<string, unknown>> | { tasks?: Array<Record<string, unknown>>; data?: Array<Record<string, unknown>> };
+  const response = await core("/tasks?scope=owned");
+  if (!response.ok) throw new Error(`Sokosumi task list HTTP ${response.status}`);
+  const parsed = await response.json() as Array<Record<string, unknown>> | { tasks?: Array<Record<string, unknown>>; data?: Array<Record<string, unknown>> };
   const tasks = Array.isArray(parsed) ? parsed : parsed.tasks ?? parsed.data ?? [];
   for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker)) {
     const id = String(task.id);
     const input = typeof task.description === "string" ? task.description : String(task.input ?? "");
     try {
-      await taskEvent(id, { status: "RUNNING" });
       const reportInput = parseTaskInput(input);
-      if (!reportInput) { await taskEvent(id, { status: "COMPLETED", comment: USAGE_RESULT }); continue; }
-      const paid = env("ENABLE_MPS_PAYMENTS") === "true";
-      const payment = paid ? await createPayment(input) : null;
-      if (payment) { await taskEvent(id, { status: "RUNNING", masumiPayment: payment.data ?? payment }); await waitForPayment(payment); }
+      if (!reportInput) { await taskEvent(id, { status: "RUNNING" }); await taskEvent(id, { status: "COMPLETED", comment: USAGE_RESULT }); continue; }
+      const payment = env("ENABLE_MPS_PAYMENTS") === "true" ? await createPayment(input) : null;
+      // Sokosumi rejects a second RUNNING event (422 same status), so the escrow terms ride on the first one.
+      await taskEvent(id, payment ? { status: "RUNNING", masumiPayment: payment.data ?? payment } : { status: "RUNNING" });
+      if (payment) await waitForPayment(payment);
       const report = await createReport(reportInput);
       const file = `result-${id}.txt`; await writeFile(file, JSON.stringify(report, null, 2));
       const result = await readFile(file, "utf8");
