@@ -1,0 +1,149 @@
+{
+  "startedAt": "2026-10-06T04:45:57.790Z",
+  "records": [
+    {
+      "step": "claim_vault_lock",
+      "txHash": "296257f15d00134b30b9c18360cd216acf3b445eb39df352d4e70e31d47da239",
+      "confirmed": true
+    },
+    {
+      "step": "coverage_lock",
+      "txHash": "0646c8af88359bb10b13fdddc67dcc4258f54efa59572ddd84564be69099bcf9",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_payment",
+      "txHash": "44df00ebd0ccd9f48a6341b3f9f35c5c9e5ce0d7be61020d971159067eaefe71",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_claim",
+      "txHash": "4afb027dfc182ac65b854bcdb4bee0eb07775fe194edf49cef1c7b98060a775f",
+      "confirmed": true
+    },
+    {
+      "step": "keeper_results",
+      "detail": [
+        {
+          "seller": "seller-b",
+          "body": {
+            "accepted": true,
+            "seller": "seller-b",
+            "paymentTx": "44df00ebd0ccd9f48a6341b3f9f35c5c9e5ce0d7be61020d971159067eaefe71",
+            "claimTx": "4afb027dfc182ac65b854bcdb4bee0eb07775fe194edf49cef1c7b98060a775f",
+            "claimRef": "296257f15d00134b30b9c18360cd216acf3b445eb39df352d4e70e31d47da239#0"
+          }
+        }
+      ]
+    },
+    {
+      "step": "wait_for_expiry_before_settle",
+      "detail": {
+        "ms": 251034
+      }
+    },
+    {
+      "step": "cre_report",
+      "detail": {
+        "source": "cre-decision-wrapped-by-test-don",
+        "nativeIncompatibility": "report context is 96 bytes, the validator reads 64",
+        "decisionByte": 0
+      }
+    },
+    {
+      "step": "flipped_report_rejected",
+      "error": "\"failed script execution Spend[0] the validator crashed / exited prematurely\""
+    },
+    {
+      "step": "coverage_settle",
+      "txHash": "3c20440b7419f5c8da18910af0c6fd2b8a40dae0b4d22cacccf8ef0fddf41abb",
+      "confirmed": true
+    },
+    {
+      "step": "router_ingest",
+      "detail": {
+        "status": 404,
+        "body": "{\"error\":\"not found\"}"
+      }
+    }
+  ],
+  "selectedRoute": {
+    "selectedRoute": "underwritten",
+    "selectedSellers": [
+      "seller-b"
+    ],
+    "reason": "coverage required by buyer; underwritten seller-b costs 13.20 ADA, the unconstrained best route (single seller-b) would cost 11.75 ADA",
+    "forcedByConstraints": true,
+    "routes": [
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      }
+    ],
+    "alternatives": [],
+    "assumptions": {
+      "sharedInfrastructure": {
+        "value": true,
+        "status": "buyer-supplied"
+      },
+      "riskAversion": {
+        "value": 0.25,
+        "status": "buyer-supplied"
+      },
+      "prior": {
+        "alpha0": 2,
+        "beta0": 8,
+        "status": "configured"
+      },
+      "sharedProviderCorrelation": {
+        "value": 0.5,
+        "status": "configured"
+      },
+      "coverageApplicabilityRate": {
+        "value": 0.8,
+        "status": "configured"
+      },
+      "penalties": "seller-specific values are configured; outcome counts are measured"
+    },
+    "quoteId": "01d5f59f-de26-47b2-8da7-e8c23e72a8f5",
+    "termsHash": "303ed2cdf4ec6b6b3043fd56656ca1c82d0ff3bff13dea0bd9129342a024193d"
+  }
+}

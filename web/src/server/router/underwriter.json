@@ -1,0 +1,13 @@
+{
+  "underwriter": "nori",
+  "coverageLimitAda": 80,
+  "deductibleAda": 0,
+  "collateralRef": "nori-reserve-1",
+  "capitalCostRate": 0.005,
+  "fraudRiskAda": 0.3,
+  "correlationRiskAda": 0.5,
+  "marginAda": 1,
+  "coverageApplicabilityRate": 0.8,
+  "sharedProviderCorrelation": 0.5,
+  "lateSlotPenalty": 0.05
+}

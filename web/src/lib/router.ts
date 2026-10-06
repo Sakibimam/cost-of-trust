@@ -1,4 +1,4 @@
-export const ROUTER_URL = (process.env.NEXT_PUBLIC_ROUTER_URL ?? "http://localhost:8787").replace(/\/$/, "");
+export const ROUTER_URL = (process.env.NEXT_PUBLIC_ROUTER_URL ?? "/api/router").replace(/\/$/, "");
 
 export type RouteId = "single" | "redundant" | "staggered" | "underwritten";
 

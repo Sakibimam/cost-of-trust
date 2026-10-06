@@ -1,0 +1,103 @@
+import { readFile, writeFile } from "node:fs/promises";
+import { blake2b } from "@noble/hashes/blake2.js";
+import sellersSeed from "../sellers.json" with { type: "json" };
+import underwriter from "../underwriter.json" with { type: "json" };
+import { evaluateRoutes, sellerRisk, type RouteResult, type Seller, type UnderwriterConfig } from "./routes.ts";
+
+let sellerFile: string | URL = new URL("../sellers.json", import.meta.url);
+const sellers: Seller[] = structuredClone(sellersSeed as Seller[]);
+const underwriterConfig = underwriter as UnderwriterConfig;
+const quotes = new Map<string, { result: RouteResult; task: string; serviceType: string; deadline: string }>();
+const KOIOS_URL = "https://preprod.koios.rest/api/v1";
+
+function sortKeys(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortKeys);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)).map(([key, item]) => [key, sortKeys(item)]));
+  return value;
+}
+
+export function canonicalJson(value: unknown): string { return JSON.stringify(sortKeys(value)); }
+export function termsHash(value: unknown): string { return Buffer.from(blake2b(new TextEncoder().encode(canonicalJson(value)), { dkLen: 32 })).toString("hex"); }
+
+export async function useSellersFile(path: string) {
+  sellerFile = path;
+  sellers.splice(0, sellers.length, ...(JSON.parse(await readFile(path, "utf8")) as Seller[]));
+}
+
+async function persistSellers(next: Seller[]) {
+  if (process.env.VERCEL) throw new Error("ingest is disabled on this deployment: sellers.json is read-only here, run the local router to record outcomes");
+  await writeFile(sellerFile, `${JSON.stringify(next, null, 2)}\n`);
+}
+
+async function requireConfirmedTx(txHash: string): Promise<void> {
+  const key = process.env.KAIOS_KEY;
+  if (!key) throw new Error("KAIOS_KEY is not set");
+  if (!/^[0-9a-f]{64}$/i.test(txHash)) throw new Error("txHash must be a 64-character hex hash");
+  const response = await fetch(`${KOIOS_URL}/tx_status`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+    body: JSON.stringify({ _tx_hashes: [txHash] }),
+  });
+  if (!response.ok) throw new Error(`Koios tx_status returned ${response.status}`);
+  const rows = await response.json() as Array<{ num_confirmations?: number | null; status?: string; error?: string }>;
+  const row = rows[0];
+  if (row?.status && /fail|reject|invalid/i.test(row.status)) throw new Error(`transaction rejected: ${row.status}`);
+  if ((row?.num_confirmations ?? 0) < 1) throw new Error("txHash is not confirmed");
+}
+
+export async function ingestOutcome(sellerId: string, success: boolean, txHash: string): Promise<Seller> {
+  if (!txHash || /\s/.test(txHash)) throw new Error("txHash is required");
+  const index = sellers.findIndex((item) => item.id === sellerId);
+  if (index < 0) throw new Error("seller not found");
+  const updated = structuredClone(sellers[index]);
+  if (success) updated.successes += 1; else updated.failures += 1;
+  updated.evidence.push(txHash);
+  const next = sellers.map((item, i) => (i === index ? updated : item));
+  await persistSellers(next);
+  sellers[index] = updated;
+  return structuredClone(updated);
+}
+
+function json(data: unknown, status = 200): Response { return new Response(data === null ? null : JSON.stringify(data), { status, headers: { "content-type": "application/json", "access-control-allow-origin": "*", "access-control-allow-methods": "GET,POST,OPTIONS", "access-control-allow-headers": "content-type" } }); }
+function selectedTerms(result: RouteResult) { const route = result.routes.find((item) => item.route === result.selectedRoute && item.sellers.join(",") === result.selectedSellers.join(",")); return { route: result.selectedRoute, sellers: result.selectedSellers, servicePriceAda: route?.servicePriceAda, premiumAda: route?.premiumAda, coverageAda: route?.coverageAda }; }
+
+export async function handle(request: Request, pathname = new URL(request.url).pathname): Promise<Response> {
+  if (request.method === "OPTIONS") return json(null, 204);
+  try {
+    if (request.method === "GET" && pathname === "/health") return json({ ok: true });
+    if (request.method === "GET" && pathname === "/sellers") return json(sellers.map((seller) => ({ ...seller, risk: sellerRisk(seller, underwriterConfig) })));
+    if (request.method === "GET" && pathname.startsWith("/quotes/")) {
+      const id = decodeURIComponent(pathname.slice("/quotes/".length));
+      const saved = quotes.get(id);
+      const seller = sellers.find((item) => item.id === id);
+      if (!saved && !seller) return json({ error: "quote not found" }, 404);
+      if (seller) {
+        const risk = sellerRisk(seller, underwriterConfig);
+        const coverageLimitAda = underwriterConfig.coverageLimitAda;
+        const premiumAda = risk.pClaim * coverageLimitAda + underwriterConfig.capitalCostRate * coverageLimitAda + underwriterConfig.fraudRiskAda + underwriterConfig.correlationRiskAda + underwriterConfig.marginAda;
+        return json({ seller: seller.id, risk, coverageOffers: [{ underwriter: underwriterConfig.underwriter, premiumAda, coverageLimitAda, deductibleAda: underwriterConfig.deductibleAda, collateralRef: underwriterConfig.collateralRef, termsHash: termsHash({ seller: seller.id, coverageLimitAda, deductibleAda: underwriterConfig.deductibleAda }) }] });
+      }
+      return json({ ...saved, termsHash: termsHash(selectedTerms(saved!.result)) });
+    }
+    if (request.method === "POST" && pathname === "/ingest") {
+      const body = await request.json() as { sellerId?: unknown; success?: unknown; txHash?: unknown };
+      if (typeof body.sellerId !== "string" || typeof body.success !== "boolean" || typeof body.txHash !== "string") return json({ error: "sellerId, success, and txHash are required" }, 400);
+      await requireConfirmedTx(body.txHash);
+      return json(await ingestOutcome(body.sellerId, body.success, body.txHash));
+    }
+    if (request.method === "POST" && pathname === "/best-route") {
+      const body = await request.json() as { task: string; serviceType: string; deadline: string; downstreamLossAda: number; riskAversion?: number; sharedInfrastructure?: boolean; candidateSellers: string[]; constraints?: Parameters<typeof evaluateRoutes>[0]["constraints"] };
+      const candidates = body.candidateSellers.flatMap((id) => {
+        const exact = sellers.find((seller) => seller.id === id);
+        return exact ? [exact] : sellers.filter((seller) => seller.provider === id);
+      });
+      if (candidates.some((seller) => !seller)) return json({ error: "unknown seller" }, 400);
+      if (candidates.length === 0) return json({ error: "unknown seller" }, 400);
+      const result = evaluateRoutes({ downstreamLossAda: body.downstreamLossAda, riskAversion: body.riskAversion, sharedInfrastructure: body.sharedInfrastructure, candidateSellers: candidates as Seller[], constraints: body.constraints, underwriter: underwriterConfig });
+      const quoteId = crypto.randomUUID();
+      quotes.set(quoteId, { result, task: body.task, serviceType: body.serviceType, deadline: body.deadline });
+      return json({ ...result, quoteId, termsHash: termsHash(selectedTerms(result)) });
+    }
+    return json({ error: "not found" }, 404);
+  } catch (error) { return json({ error: error instanceof Error ? error.message : "request failed" }, 400); }
+}

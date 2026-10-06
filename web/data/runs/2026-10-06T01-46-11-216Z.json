@@ -1,0 +1,92 @@
+{
+  "startedAt": "2026-10-06T01:46:11.216Z",
+  "records": [
+    {
+      "step": "claim_vault_lock",
+      "txHash": "e4a5e294b64502de656fee1900d9da425ec68ccc1c4fa929d18b754cabcba4b2",
+      "confirmed": true
+    },
+    {
+      "step": "fatal",
+      "error": "ParseError: ReadonlyArray<{ readonly tx_hash: string; readonly block_hash: string; readonly block_height: number; readonly epoch_no: number; readonly epoch_slot: number; readonly absolute_slot: number; readonly tx_timestamp: number; readonly tx_block_index: number; readonly tx_size: number; readonly total_output: string; readonly fee: string; readonly treasury_donation: string; readonly deposit: string; readonly invalid_before: string | null; readonly invalid_after: string | null; readonly collateral_inputs: ReadonlyArray<{ readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }> | null; readonly collateral_output: { readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> } | null; readonly reference_inputs: ReadonlyArray<{ readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }> | null; readonly inputs: ReadonlyArray<{ readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }>; readonly outputs: ReadonlyArray<{ readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }>; readonly withdrawals: ReadonlyArray<{ readonly amount: string; readonly stake_addr: string }> | null; readonly assets_minted: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> | null; readonly metadata: object | null; readonly certificates: ReadonlyArray<{ readonly index: number; readonly type: string; readonly info: object | null }> | null; readonly native_scripts: ReadonlyArray<{ readonly script_hash: string; readonly script_json: object }> | null; readonly plutus_contracts: ReadonlyArray<{ readonly address: string; readonly spends_input: { readonly tx_hash: string; readonly tx_index: number } | null; readonly script_hash: string; readonly bytecode: string; readonly size: number; readonly valid_contract: boolean; readonly input: { readonly redeemer: { readonly purpose: \"spend\" | \"mint\" | \"cert\" | \"reward\"; readonly fee: string; readonly unit: { readonly steps: string; readonly mem: string }; readonly datum: { readonly hash: string | null; readonly value: object | null } }; readonly datum: { readonly hash: string | null; readonly value: object | null } } }> | null; readonly voting_procedures: ReadonlyArray<object>; readonly proposal_procedures: object }>\n└─ [0]\n   └─ { readonly tx_hash: string; readonly block_hash: string; readonly block_height: number; readonly epoch_no: number; readonly epoch_slot: number; readonly absolute_slot: number; readonly tx_timestamp: number; readonly tx_block_index: number; readonly tx_size: number; readonly total_output: string; readonly fee: string; readonly treasury_donation: string; readonly deposit: string; readonly invalid_before: string | null; readonly invalid_after: string | null; readonly collateral_inputs: ReadonlyArray<{ readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }> | null; readonly collateral_output: { readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> } | null; readonly reference_inputs: ReadonlyArray<{ readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }> | null; readonly inputs: ReadonlyArray<{ readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }>; readonly outputs: ReadonlyArray<{ readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }>; readonly withdrawals: ReadonlyArray<{ readonly amount: string; readonly stake_addr: string }> | null; readonly assets_minted: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> | null; readonly metadata: object | null; readonly certificates: ReadonlyArray<{ readonly index: number; readonly type: string; readonly info: object | null }> | null; readonly native_scripts: ReadonlyArray<{ readonly script_hash: string; readonly script_json: object }> | null; readonly plutus_contracts: ReadonlyArray<{ readonly address: string; readonly spends_input: { readonly tx_hash: string; readonly tx_index: number } | null; readonly script_hash: string; readonly bytecode: string; readonly size: number; readonly valid_contract: boolean; readonly input: { readonly redeemer: { readonly purpose: \"spend\" | \"mint\" | \"cert\" | \"reward\"; readonly fee: string; readonly unit: { readonly steps: string; readonly mem: string }; readonly datum: { readonly hash: string | null; readonly value: object | null } }; readonly datum: { readonly hash: string | null; readonly value: object | null } } }> | null; readonly voting_procedures: ReadonlyArray<object>; readonly proposal_procedures: object }\n      └─ [\"outputs\"]\n         └─ ReadonlyArray<{ readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }>\n            └─ [1]\n               └─ { readonly payment_addr: { readonly bech32: string; readonly cred: string }; readonly stake_addr: string | null; readonly tx_hash: string; readonly tx_index: number; readonly value: string; readonly datum_hash: string | null; readonly inline_datum: { readonly bytes: string; readonly value: object } | null; readonly reference_script: { readonly hash: string | null; readonly size: number | null; readonly type: string | null; readonly bytes: string | null; readonly value: object | null } | null; readonly asset_list: ReadonlyArray<{ readonly policy_id: string; readonly asset_name: string | null; readonly fingerprint: string; readonly decimals: number; readonly quantity: string }> }\n                  └─ [\"inline_datum\"]\n                     └─ { readonly bytes: string; readonly value: object } | null\n                        ├─ { readonly bytes: string; readonly value: object }\n                        │  └─ [\"bytes\"]\n                        │     └─ Expected string, actual null\n                        └─ Expected null, actual {\"bytes\":null,\"value\":{\"fields\":[{\"bytes\":\"303ed2cdf4ec6b6b3043fd56656ca1c82d0ff3bff13dea0bd9129342a024193d\"},{\"fields\":[{\"fields\":[{\"bytes\":\"62da708164cc7e486adc9a10f14ebb063e8607ee3d7cc532d4449932\"}],\"constructor\":0},{\"fields\":[{\"fields\":[{\"fields\":[{\"bytes\":\"32c2c1505a1b134f43f68a0f64d593ef4a3564950ee981f2e76c9f91\"}],\"constructor\":0}],\"constructor\":0}],\"constructor\":0}],\"constructor\":0},{\"fields\":[{\"fields\":[{\"bytes\":\"28a4b36c1ac77d6b0d942b4a200fce91d1677bbc1219be4e3328c4c8\"}],\"constructor\":0},{\"fields\":[{\"fields\":[{\"fields\":[{\"bytes\":\"367b552364eaedede8f9d9b493c3c221148cae06a12fc9da5ee7871c\"}],\"constructor\":0}],\"constructor\":0}],\"constructor\":0}],\"constructor\":0},{\"int\":10000000},{\"fields\":[{\"bytes\":\"e4a5e294b64502de656fee1900d9da425ec68ccc1c4fa929d18b754cabcba4b2\"},{\"int\":0}],\"constructor\":0},{\"int\":1791251472000},{\"int\":1791253272000},{\"bytes\":\"4d54e7a53d33e1ccc9d869cb02e66359035c8355f271cca401c45e88e51627fe\"}],\"constructor\":0}}\n    at parseError (/Users/user/Desktop/canton/cost-of-trust/offchain/node_modules/effect/dist/esm/ParseResult.js:241:40)\n    at <anonymous> (/Users/user/Desktop/canton/cost-of-trust/offchain/node_modules/effect/dist/esm/Either.js:197:78)"
+    }
+  ],
+  "selectedRoute": {
+    "selectedRoute": "underwritten",
+    "selectedSellers": [
+      "seller-b"
+    ],
+    "reason": "sellers share infrastructure, so backups fail together; coverage caps the tail; risk-adjusted cost 13.20 ADA at riskAversion 0.25",
+    "routes": [
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      }
+    ],
+    "alternatives": [],
+    "assumptions": {
+      "sharedInfrastructure": {
+        "value": true,
+        "status": "buyer-supplied"
+      },
+      "riskAversion": {
+        "value": 0.25,
+        "status": "buyer-supplied"
+      },
+      "prior": {
+        "alpha0": 2,
+        "beta0": 8,
+        "status": "configured"
+      },
+      "sharedProviderCorrelation": {
+        "value": 0.5,
+        "status": "configured"
+      },
+      "coverageApplicabilityRate": {
+        "value": 0.8,
+        "status": "configured"
+      },
+      "penalties": "seller-specific values are configured; outcome counts are measured"
+    },
+    "quoteId": "693090a7-4553-4e23-9c16-04145b089a53",
+    "termsHash": "303ed2cdf4ec6b6b3043fd56656ca1c82d0ff3bff13dea0bd9129342a024193d"
+  }
+}

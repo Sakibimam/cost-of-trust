@@ -1,7 +1,7 @@
 import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
-const RUNS_DIR = process.env.RUNS_DIR ?? path.resolve(/*turbopackIgnore: true*/ process.cwd(), "../agents/runs");
+const RUNS_DIR = process.env.RUNS_DIR ?? path.resolve(/*turbopackIgnore: true*/ process.cwd(), "data/runs");
 const BUYER_FILE = path.resolve(/*turbopackIgnore: true*/ process.cwd(), "../agents/buyer.ts");
 export const RUN_COMMAND = "bun run agents/buyer.ts";
 

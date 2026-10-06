@@ -1,0 +1,84 @@
+[
+  {
+    "id": "seller-a",
+    "type": "agent",
+    "name": "Seller A",
+    "priceAda": 8,
+    "provider": "koios-shared",
+    "payTo": "addr_test1seller_a",
+    "endpoint": "https://seller-a.example/quote",
+    "successes": 0,
+    "failures": 0,
+    "evidence": []
+  },
+  {
+    "id": "seller-b",
+    "type": "agent",
+    "name": "Seller B",
+    "priceAda": 10,
+    "provider": "own-node",
+    "payTo": "addr_test1seller_b",
+    "endpoint": "https://seller-b.example/quote",
+    "successes": 18,
+    "failures": 2,
+    "bondDiscount": 0.033333,
+    "evidence": []
+  },
+  {
+    "id": "seller-c",
+    "type": "agent",
+    "name": "Seller C",
+    "priceAda": 8,
+    "provider": "koios-shared",
+    "payTo": "addr_test1seller_c",
+    "endpoint": "https://seller-c.example/quote",
+    "successes": 0,
+    "failures": 0,
+    "evidence": []
+  },
+  {
+    "id": "provider-koios-authenticated",
+    "type": "provider",
+    "name": "Koios preprod authenticated",
+    "priceAda": 0,
+    "provider": "koios-preprod",
+    "payTo": "configured-at-payment-time",
+    "endpoint": "https://preprod.koios.rest/api/v1/tip",
+    "successes": 60,
+    "failures": 0,
+    "evidence": [
+      "router/probes/results-20261006051159.json"
+    ],
+    "priceAssumption": "free tier = 0 ADA plus configured keeper submission fee"
+  },
+  {
+    "id": "provider-koios-public",
+    "type": "provider",
+    "name": "Koios preprod public",
+    "priceAda": 0,
+    "provider": "koios-preprod",
+    "payTo": "configured-at-payment-time",
+    "endpoint": "https://preprod.koios.rest/api/v1/tip",
+    "successes": 0,
+    "failures": 60,
+    "evidence": [
+      "router/probes/results-20261006051159.json"
+    ],
+    "priceAssumption": "free tier = 0 ADA plus configured keeper submission fee"
+  },
+  {
+    "id": "provider-tatum-preprod",
+    "type": "provider",
+    "name": "Tatum Cardano preprod Rosetta gateway",
+    "priceAda": 0,
+    "provider": "tatum-cardano-preprod",
+    "payTo": "configured-at-payment-time",
+    "endpoint": "https://cardano-preprod.gateway.tatum.io/network/status",
+    "successes": 60,
+    "failures": 0,
+    "evidence": [
+      "router/probes/results-20261006051159.json"
+    ],
+    "priceAssumption": "free tier = 0 ADA plus configured keeper submission fee"
+  }
+]

@@ -1,0 +1,130 @@
+{
+  "startedAt": "2026-10-06T03:07:22.160Z",
+  "records": [
+    {
+      "step": "claim_vault_lock",
+      "txHash": "4e2fc73b063321c12bf25e3302d1ed4194fe8efcd4a85bd431e3e428676e035b",
+      "confirmed": true
+    },
+    {
+      "step": "coverage_lock",
+      "txHash": "75d1c980dff9387ce49dcb96db2901adb332dfdbaade37f1f28b7d56dcb6700c",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_payment",
+      "txHash": "20282b7b45eca767db6eef4574e4f9a7e994488a52e8104531ab422e25e3e672",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_claim",
+      "txHash": "9a699a6fa5bb7187f37c66d4741da6885f1f21ad075341ef1a78d378f490a170",
+      "confirmed": true
+    },
+    {
+      "step": "keeper_results",
+      "detail": [
+        {
+          "seller": "seller-b",
+          "body": {
+            "job_id": "24d26cb4-819a-4559-852e-0874a97be0bf",
+            "accepted": true,
+            "seller": "seller-b",
+            "paymentTx": "20282b7b45eca767db6eef4574e4f9a7e994488a52e8104531ab422e25e3e672",
+            "claimTx": "9a699a6fa5bb7187f37c66d4741da6885f1f21ad075341ef1a78d378f490a170",
+            "claimRef": "4e2fc73b063321c12bf25e3302d1ed4194fe8efcd4a85bd431e3e428676e035b#0"
+          }
+        }
+      ]
+    },
+    {
+      "step": "wait_for_expiry_before_settle",
+      "detail": {
+        "ms": 420475
+      }
+    },
+    {
+      "step": "fatal",
+      "error": "{\"error\":\"CRE simulation did not deliver a report (exit 1)\"}"
+    }
+  ],
+  "selectedRoute": {
+    "selectedRoute": "underwritten",
+    "selectedSellers": [
+      "seller-b"
+    ],
+    "reason": "coverage required by buyer; underwritten seller-b costs 13.20 ADA, the unconstrained best route (single seller-b) would cost 11.75 ADA",
+    "forcedByConstraints": true,
+    "routes": [
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      }
+    ],
+    "alternatives": [],
+    "assumptions": {
+      "sharedInfrastructure": {
+        "value": true,
+        "status": "buyer-supplied"
+      },
+      "riskAversion": {
+        "value": 0.25,
+        "status": "buyer-supplied"
+      },
+      "prior": {
+        "alpha0": 2,
+        "beta0": 8,
+        "status": "configured"
+      },
+      "sharedProviderCorrelation": {
+        "value": 0.5,
+        "status": "configured"
+      },
+      "coverageApplicabilityRate": {
+        "value": 0.8,
+        "status": "configured"
+      },
+      "penalties": "seller-specific values are configured; outcome counts are measured"
+    },
+    "quoteId": "d6bdf25b-af64-4a9c-9b88-dd2aeef5d983",
+    "termsHash": "303ed2cdf4ec6b6b3043fd56656ca1c82d0ff3bff13dea0bd9129342a024193d"
+  }
+}

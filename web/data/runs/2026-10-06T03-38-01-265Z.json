@@ -1,0 +1,365 @@
+{
+  "startedAt": "2026-10-06T03:38:01.265Z",
+  "records": [
+    {
+      "step": "claim_vault_lock",
+      "txHash": "24982893a18dfcb9078e0d0b5f26cd3cd9e7fc7581883c051874b9f3c5dc23c1",
+      "confirmed": true
+    },
+    {
+      "step": "route_execution_fallback",
+      "detail": {
+        "selectedRoute": "staggered",
+        "executionRoute": "redundant"
+      }
+    },
+    {
+      "step": "seller-a_claim_rejected",
+      "error": "seller-a returned 400: {\"error\":\"payment settlement failed: exact_cardano_settlement_failed Koios submitTx failed\"}"
+    },
+    {
+      "step": "seller-b_payment",
+      "txHash": "d10001183bd214a14366146eb0959a914757f0c31308448269585e5e9943c318",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_claim",
+      "txHash": "ce3e3eaceb35c10f638f3b70768e8a174d877a3829a458f55f5a039c747d5e7b",
+      "confirmed": true
+    },
+    {
+      "step": "keeper_results",
+      "detail": [
+        {
+          "seller": "seller-a",
+          "error": "seller-a returned 400: {\"error\":\"payment settlement failed: exact_cardano_settlement_failed Koios submitTx failed\"}"
+        },
+        {
+          "seller": "seller-b",
+          "body": {
+            "job_id": "7cd979ea-6590-4519-8223-a66b16c09149",
+            "accepted": true,
+            "seller": "seller-b",
+            "paymentTx": "d10001183bd214a14366146eb0959a914757f0c31308448269585e5e9943c318",
+            "claimTx": "ce3e3eaceb35c10f638f3b70768e8a174d877a3829a458f55f5a039c747d5e7b",
+            "claimRef": "24982893a18dfcb9078e0d0b5f26cd3cd9e7fc7581883c051874b9f3c5dc23c1#0"
+          }
+        }
+      ]
+    },
+    {
+      "step": "router_ingest",
+      "detail": {
+        "status": 404,
+        "body": "{\"error\":\"not found\"}"
+      }
+    }
+  ],
+  "selectedRoute": {
+    "selectedRoute": "staggered",
+    "selectedSellers": [
+      "seller-a",
+      "seller-b"
+    ],
+    "reason": "sellers fail independently, so an escrowed schedule (seller-a first, seller-b as late backup) pays only the keeper that lands and caps the tail cheaper than coverage or parallel backups; risk-adjusted cost 8.83 ADA",
+    "forcedByConstraints": false,
+    "routes": [
+      {
+        "route": "single",
+        "sellers": [
+          "seller-a"
+        ],
+        "servicePriceAda": 8,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.2,
+        "pClaim": 0.16000000000000003,
+        "confidence": 10,
+        "expectedLossAda": 2,
+        "sdLossAda": 4,
+        "arithmetic": "8 + 0.2 * 10 + 0.25 * 4",
+        "expectedTotalCostAda": 10,
+        "riskAdjustedCostAda": 11
+      },
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "redundant",
+        "sellers": [
+          "seller-a",
+          "seller-b"
+        ],
+        "servicePriceAda": 18,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.020000066666666667,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.20000066666666666,
+        "sdLossAda": 1.400002285712261,
+        "jointFailureProbability": 0.020000066666666667,
+        "arithmetic": "8 + 10 + 0.020000066666666667 * 10 + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 18.200000666666668,
+        "riskAdjustedCostAda": 18.550001238094733
+      },
+      {
+        "route": "staggered",
+        "sellers": [
+          "seller-a",
+          "seller-b"
+        ],
+        "servicePriceAda": 8.099999333333333,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.030000066666666672,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.3000006666666667,
+        "sdLossAda": 1.7058740477146086,
+        "jointFailureProbability": 0.030000066666666672,
+        "arithmetic": "8 * 0.8 + 10 * 0.2 * 0.8499996666666667 + 0.030000066666666672 * 10 + 0.25 * 1.7058740477146086",
+        "expectedTotalCostAda": 8.4,
+        "riskAdjustedCostAda": 8.826468511928653
+      },
+      {
+        "route": "staggered",
+        "sellers": [
+          "seller-b",
+          "seller-a"
+        ],
+        "servicePriceAda": 9.599998666666666,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.025000083333333332,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.25000083333333334,
+        "sdLossAda": 1.5612520349597536,
+        "jointFailureProbability": 0.025000083333333332,
+        "arithmetic": "10 * 0.8999996666666666 + 8 * 0.10000033333333333 * 0.75 + 0.025000083333333332 * 10 + 0.25 * 1.5612520349597536",
+        "expectedTotalCostAda": 9.8499995,
+        "riskAdjustedCostAda": 10.240312508739937
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-a"
+        ],
+        "servicePriceAda": 8,
+        "premiumAda": 3.45,
+        "premiumBreakdown": {
+          "coveredClaim": 1.6000000000000003,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.2,
+        "pClaim": 0.16000000000000003,
+        "confidence": 10,
+        "expectedLossAda": 0.3999999999999998,
+        "sdLossAda": 1.9595917942265422,
+        "arithmetic": "8 + 3.45 + (0.2 * 10 - 0.16000000000000003 * 10) + 0.25 * 1.9595917942265422",
+        "expectedTotalCostAda": 11.85,
+        "riskAdjustedCostAda": 12.339897948556635
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      }
+    ],
+    "alternatives": [
+      {
+        "route": "staggered",
+        "sellers": [
+          "seller-b",
+          "seller-a"
+        ],
+        "servicePriceAda": 9.599998666666666,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.025000083333333332,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.25000083333333334,
+        "sdLossAda": 1.5612520349597536,
+        "jointFailureProbability": 0.025000083333333332,
+        "arithmetic": "10 * 0.8999996666666666 + 8 * 0.10000033333333333 * 0.75 + 0.025000083333333332 * 10 + 0.25 * 1.5612520349597536",
+        "expectedTotalCostAda": 9.8499995,
+        "riskAdjustedCostAda": 10.240312508739937
+      },
+      {
+        "route": "single",
+        "sellers": [
+          "seller-a"
+        ],
+        "servicePriceAda": 8,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.2,
+        "pClaim": 0.16000000000000003,
+        "confidence": 10,
+        "expectedLossAda": 2,
+        "sdLossAda": 4,
+        "arithmetic": "8 + 0.2 * 10 + 0.25 * 4",
+        "expectedTotalCostAda": 10,
+        "riskAdjustedCostAda": 11
+      },
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-a"
+        ],
+        "servicePriceAda": 8,
+        "premiumAda": 3.45,
+        "premiumBreakdown": {
+          "coveredClaim": 1.6000000000000003,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.2,
+        "pClaim": 0.16000000000000003,
+        "confidence": 10,
+        "expectedLossAda": 0.3999999999999998,
+        "sdLossAda": 1.9595917942265422,
+        "arithmetic": "8 + 3.45 + (0.2 * 10 - 0.16000000000000003 * 10) + 0.25 * 1.9595917942265422",
+        "expectedTotalCostAda": 11.85,
+        "riskAdjustedCostAda": 12.339897948556635
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      },
+      {
+        "route": "redundant",
+        "sellers": [
+          "seller-a",
+          "seller-b"
+        ],
+        "servicePriceAda": 18,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.020000066666666667,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.20000066666666666,
+        "sdLossAda": 1.400002285712261,
+        "jointFailureProbability": 0.020000066666666667,
+        "arithmetic": "8 + 10 + 0.020000066666666667 * 10 + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 18.200000666666668,
+        "riskAdjustedCostAda": 18.550001238094733
+      }
+    ],
+    "assumptions": {
+      "sharedInfrastructure": {
+        "value": false,
+        "status": "buyer-supplied"
+      },
+      "riskAversion": {
+        "value": 0.25,
+        "status": "buyer-supplied"
+      },
+      "prior": {
+        "alpha0": 2,
+        "beta0": 8,
+        "status": "configured"
+      },
+      "sharedProviderCorrelation": {
+        "value": 0.5,
+        "status": "configured"
+      },
+      "coverageApplicabilityRate": {
+        "value": 0.8,
+        "status": "configured"
+      },
+      "penalties": "seller-specific values are configured; outcome counts are measured"
+    },
+    "quoteId": "9011fd26-7ac4-4e7f-8764-19e59fcad7eb",
+    "termsHash": "5889e256a349551e64986a36e613512c5018630cdaa0f32424fc5b3a8ad59f06"
+  }
+}

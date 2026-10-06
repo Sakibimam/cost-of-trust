@@ -1,0 +1,369 @@
+{
+  "startedAt": "2026-10-06T04:44:21.919Z",
+  "records": [
+    {
+      "step": "claim_vault_lock",
+      "txHash": "c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814",
+      "confirmed": true
+    },
+    {
+      "step": "route_execution_fallback",
+      "detail": {
+        "selectedRoute": "staggered",
+        "executionRoute": "redundant"
+      }
+    },
+    {
+      "step": "seller-a_payment",
+      "txHash": "e458925a99e85fe742b0f0a2a1dbf1dfc8ece3724752a8862227e27c89309cac",
+      "confirmed": true
+    },
+    {
+      "step": "seller-a_claim",
+      "txHash": "43b27058c91abc30ff560251cc7997a0ca0343df4432319c265b4f140163de9b",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_payment",
+      "txHash": "aa40b41742f98be7520e3003fc49e11266cab049dcabdafa59677a6042b9354a",
+      "confirmed": true
+    },
+    {
+      "step": "seller-b_claim_rejected",
+      "error": "seller-b claim rejected: claim rejected at submission: Koios submittx 400: {\"contents\":{\"contents\":{\"contents\":{\"era\":\"ShelleyBasedEraConway\",\"error\":[\"ConwayUtxowFailure (UtxoFailure (BadInputsUTxO (NonEmptySet (fromList [TxIn (TxId {unTxId = SafeHash \\\"c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814\\\"}) (TxIx {unTxIx = 0})]))))\",\"ConwayUtxowFailure (UtxoFailure (ValueNotConservedUTxO Mismatch (RelEQ) {supplied: MaryValue (Coin 262994233) (MultiAsset (fromList [(PolicyID {policyID = ScriptHash \\\"67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b\\\"},fromList [(\\\"1015288d6ed38e23ee865b796722978b1309edf20077522165d4c694cd000000\\\",1),(\\\"1085a38f25d6999e15e9827f7e4bf3f73c7b70a37ca0f5cdb1a3d299bd000000\\\",1)]),(PolicyID {policyID = ScriptHash \\\"e675b46e4d2242c991a8932a99db3044e80515ae14b4c4ccf6b3f4c9\\\"},fromList [(\\\"0014df10745553444d\\\",500000)])])), expected: MaryValue (Coin 272994233) (MultiAsset (fromList [(PolicyID {policyID = ScriptHash \\\"67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b\\\"},fromList [(\\\"1015288d6ed38e23ee865b796722978b1309edf20077522165d4c694cd000000\\\",1),(\\\"1085a38f25d6999e15e9827f7e4bf3f73c7b70a37ca0f5cdb1a3d299bd000000\\\",1)]),(PolicyID {policyID = ScriptHash \\\"e675b46e4d2242c991a8932a99db3044e80515ae14b4c4ccf6b3f4c9\\\"},fromList [(\\\"0014df10745553444d\\\",500000)])]))}))\",\"ConwayUtxowFailure (ScriptIntegrityHashMismatch Mismatch (RelEQ) {supplied: SJust (SafeHash \\\"aa0a807aad935f543e84c0ac3991d8951932ed2b527fe848c448a7dd9371c271\\\"), expected: SJust (SafeHash \\\"54a14ee71a11e9eebf63ae95bee088abb5bf3dd6fb6c6e579faaf2e095f6b003\\\")} (SJust \\\"\\\\129\\\\132\\\\NUL\\\\SOH\\\\216y\\\\128\\\\130\\\\SUB\\\\NUL\\\\SOH\\\\235\\\\156\\\\SUB\\\\STX\\\\255y\\\\r\\\\160\\\"))\",\"ConwayUtxowFailure (ExtraRedeemers (ConwaySpending (AsIx {unAsIx = 1}) :| []))\",\"ConwayUtxowFailure (ExtraneousScriptWitnessesUTXOW (NonEmptySet (fromList [ScriptHash \\\"584e049ca0f1fc528c3ca3551145a6f074e9cdc5635ece1df4b5563b\\\"])))\"],\"kind\":\"ShelleyTxValidationError\"},\"tag\":\"TxValidationErrorInCardanoMode\"},\"tag\":\"TxCmdTxSubmitValidationError\"},\"tag\":\"TxSubmitFail\"} ((FiberFailure) KoiosError: ResponseError: StatusCode: non 2xx status code : {\"contents\":{\"contents\":{\"contents\":{\"era\":\"ShelleyBasedEraConway\",\"error\":[\"ConwayUtxowFailure (UtxoFailure (BadInputsUTxO (NonEmptySet (fromList [TxIn (TxId {unTxId = SafeHash \\\"c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814\\\"}) (TxIx {unTxIx = 0})]))))\",\"ConwayUtxowFailure (UtxoFailure (ValueNotConservedUTxO Mismatch (RelEQ) {supplied: MaryValue (Coin 262994233) (MultiAsset (fromList [(PolicyID {policyID = ScriptHash \\\"67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b\\\"},fromList [(\\\"1015288d6ed38e23ee865b796722978b1309edf20077522165d4c694cd000000\\\",1),(\\\"1085a38f25d6999e15e9827f7e4bf3f73c7b70a37ca0f5cdb1a3d299bd000000\\\",1)]),(PolicyID {policyID = ScriptHash \\\"e675b46e4d2242c991a8932a99db3044e80515ae14b4c4ccf6b3f4c9\\\"},fromList [(\\\"0014df10745553444d\\\",500000)])])), expected: MaryValue (Coin 272994233) (MultiAsset (fromList [(PolicyID {policyID = ScriptHash \\\"67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b\\\"},fromList [(\\\"1015288d6ed38e23ee865b796722978b1309edf20077522165d4c694cd000000\\\",1),(\\\"1085a38f25d6999e15e9827f7e4bf3f73c7b70a37ca0f5cdb1a3d299bd000000\\\",1)]),(PolicyID {policyID = ScriptHash \\\"e675b46e4d2242c991a8932a99db3044e80515ae14b4c4ccf6b3f4c9\\\"},fromList [(\\\"0014df10745553444d\\\",500000)])]))}))\",\"ConwayUtxowFailure (ScriptIntegrityHashMismatch Mismatch (RelEQ) {supplied: SJust (SafeHash \\\"aa0a807aad935f543e84c0ac3991d8951932ed2b527fe848c448a7dd9371c271\\\"), expected: SJust (SafeHash \\\"54a14ee71a11e9eebf63ae95bee088abb5bf3dd6fb6c6e579faaf2e095f6b003\\\")} (SJust \\\"\\\\129\\\\132\\\\NUL\\\\SOH\\\\216y\\\\128\\\\130\\\\SUB\\\\NUL\\\\SOH\\\\235\\\\156\\\\SUB\\\\STX\\\\255y\\\\r\\\\160\\\"))\",\"ConwayUtxowFailure (ExtraRedeemers (ConwaySpending (AsIx {unAsIx = 1}) :| []))\",\"ConwayUtxowFailure (ExtraneousScriptWitnessesUTXOW (NonEmptySet (fromList [ScriptHash \\\"584e049ca0f1fc528c3ca3551145a6f074e9cdc5635ece1df4b5563b\\\"])))\"],\"kind\":\"ShelleyTxValidationError\"},\"tag\":\"TxValidationErrorInCardanoMode\"},\"tag\":\"TxCmdTxSubmitValidationError\"},\"tag\":\"TxSubmitFail\"} (400 POST https://preprod.koios.rest/api/v1/submittx))"
+    },
+    {
+      "step": "keeper_results",
+      "detail": [
+        {
+          "seller": "seller-a",
+          "body": {
+            "accepted": true,
+            "seller": "seller-a",
+            "paymentTx": "e458925a99e85fe742b0f0a2a1dbf1dfc8ece3724752a8862227e27c89309cac",
+            "claimTx": "43b27058c91abc30ff560251cc7997a0ca0343df4432319c265b4f140163de9b",
+            "claimRef": "c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814#0"
+          }
+        },
+        {
+          "seller": "seller-b",
+          "error": "seller-b claim rejected: claim rejected at submission: Koios submittx 400: {\"contents\":{\"contents\":{\"contents\":{\"era\":\"ShelleyBasedEraConway\",\"error\":[\"ConwayUtxowFailure (UtxoFailure (BadInputsUTxO (NonEmptySet (fromList [TxIn (TxId {unTxId = SafeHash \\\"c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814\\\"}) (TxIx {unTxIx = 0})]))))\",\"ConwayUtxowFailure (UtxoFailure (ValueNotConservedUTxO Mismatch (RelEQ) {supplied: MaryValue (Coin 262994233) (MultiAsset (fromList [(PolicyID {policyID = ScriptHash \\\"67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b\\\"},fromList [(\\\"1015288d6ed38e23ee865b796722978b1309edf20077522165d4c694cd000000\\\",1),(\\\"1085a38f25d6999e15e9827f7e4bf3f73c7b70a37ca0f5cdb1a3d299bd000000\\\",1)]),(PolicyID {policyID = ScriptHash \\\"e675b46e4d2242c991a8932a99db3044e80515ae14b4c4ccf6b3f4c9\\\"},fromList [(\\\"0014df10745553444d\\\",500000)])])), expected: MaryValue (Coin 272994233) (MultiAsset (fromList [(PolicyID {policyID = ScriptHash \\\"67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b\\\"},fromList [(\\\"1015288d6ed38e23ee865b796722978b1309edf20077522165d4c694cd000000\\\",1),(\\\"1085a38f25d6999e15e9827f7e4bf3f73c7b70a37ca0f5cdb1a3d299bd000000\\\",1)]),(PolicyID {policyID = ScriptHash \\\"e675b46e4d2242c991a8932a99db3044e80515ae14b4c4ccf6b3f4c9\\\"},fromList [(\\\"0014df10745553444d\\\",500000)])]))}))\",\"ConwayUtxowFailure (ScriptIntegrityHashMismatch Mismatch (RelEQ) {supplied: SJust (SafeHash \\\"aa0a807aad935f543e84c0ac3991d8951932ed2b527fe848c448a7dd9371c271\\\"), expected: SJust (SafeHash \\\"54a14ee71a11e9eebf63ae95bee088abb5bf3dd6fb6c6e579faaf2e095f6b003\\\")} (SJust \\\"\\\\129\\\\132\\\\NUL\\\\SOH\\\\216y\\\\128\\\\130\\\\SUB\\\\NUL\\\\SOH\\\\235\\\\156\\\\SUB\\\\STX\\\\255y\\\\r\\\\160\\\"))\",\"ConwayUtxowFailure (ExtraRedeemers (ConwaySpending (AsIx {unAsIx = 1}) :| []))\",\"ConwayUtxowFailure (ExtraneousScriptWitnessesUTXOW (NonEmptySet (fromList [ScriptHash \\\"584e049ca0f1fc528c3ca3551145a6f074e9cdc5635ece1df4b5563b\\\"])))\"],\"kind\":\"ShelleyTxValidationError\"},\"tag\":\"TxValidationErrorInCardanoMode\"},\"tag\":\"TxCmdTxSubmitValidationError\"},\"tag\":\"TxSubmitFail\"} ((FiberFailure) KoiosError: ResponseError: StatusCode: non 2xx status code : {\"contents\":{\"contents\":{\"contents\":{\"era\":\"ShelleyBasedEraConway\",\"error\":[\"ConwayUtxowFailure (UtxoFailure (BadInputsUTxO (NonEmptySet (fromList [TxIn (TxId {unTxId = SafeHash \\\"c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814\\\"}) (TxIx {unTxIx = 0})]))))\",\"ConwayUtxowFailure (UtxoFailure (ValueNotConservedUTxO Mismatch (RelEQ) {supplied: MaryValue (Coin 262994233) (MultiAsset (fromList [(PolicyID {policyID = ScriptHash \\\"67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b\\\"},fromList [(\\\"1015288d6ed38e23ee865b796722978b1309edf20077522165d4c694cd000000\\\",1),(\\\"1085a38f25d6999e15e9827f7e4bf3f73c7b70a37ca0f5cdb1a3d299bd000000\\\",1)]),(PolicyID {policyID = ScriptHash \\\"e675b46e4d2242c991a8932a99db3044e80515ae14b4c4ccf6b3f4c9\\\"},fromList [(\\\"0014df10745553444d\\\",500000)])])), expected: MaryValue (Coin 272994233) (MultiAsset (fromList [(PolicyID {policyID = ScriptHash \\\"67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b\\\"},fromList [(\\\"1015288d6ed38e23ee865b796722978b1309edf20077522165d4c694cd000000\\\",1),(\\\"1085a38f25d6999e15e9827f7e4bf3f73c7b70a37ca0f5cdb1a3d299bd000000\\\",1)]),(PolicyID {policyID = ScriptHash \\\"e675b46e4d2242c991a8932a99db3044e80515ae14b4c4ccf6b3f4c9\\\"},fromList [(\\\"0014df10745553444d\\\",500000)])]))}))\",\"ConwayUtxowFailure (ScriptIntegrityHashMismatch Mismatch (RelEQ) {supplied: SJust (SafeHash \\\"aa0a807aad935f543e84c0ac3991d8951932ed2b527fe848c448a7dd9371c271\\\"), expected: SJust (SafeHash \\\"54a14ee71a11e9eebf63ae95bee088abb5bf3dd6fb6c6e579faaf2e095f6b003\\\")} (SJust \\\"\\\\129\\\\132\\\\NUL\\\\SOH\\\\216y\\\\128\\\\130\\\\SUB\\\\NUL\\\\SOH\\\\235\\\\156\\\\SUB\\\\STX\\\\255y\\\\r\\\\160\\\"))\",\"ConwayUtxowFailure (ExtraRedeemers (ConwaySpending (AsIx {unAsIx = 1}) :| []))\",\"ConwayUtxowFailure (ExtraneousScriptWitnessesUTXOW (NonEmptySet (fromList [ScriptHash \\\"584e049ca0f1fc528c3ca3551145a6f074e9cdc5635ece1df4b5563b\\\"])))\"],\"kind\":\"ShelleyTxValidationError\"},\"tag\":\"TxValidationErrorInCardanoMode\"},\"tag\":\"TxCmdTxSubmitValidationError\"},\"tag\":\"TxSubmitFail\"} (400 POST https://preprod.koios.rest/api/v1/submittx))"
+        }
+      ]
+    },
+    {
+      "step": "router_ingest",
+      "detail": {
+        "status": 404,
+        "body": "{\"error\":\"not found\"}"
+      }
+    }
+  ],
+  "selectedRoute": {
+    "selectedRoute": "staggered",
+    "selectedSellers": [
+      "seller-a",
+      "seller-b"
+    ],
+    "reason": "sellers fail independently, so an escrowed schedule (seller-a first, seller-b as late backup) pays only the keeper that lands and caps the tail cheaper than coverage or parallel backups; risk-adjusted cost 8.83 ADA",
+    "forcedByConstraints": false,
+    "routes": [
+      {
+        "route": "single",
+        "sellers": [
+          "seller-a"
+        ],
+        "servicePriceAda": 8,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.2,
+        "pClaim": 0.16000000000000003,
+        "confidence": 10,
+        "expectedLossAda": 2,
+        "sdLossAda": 4,
+        "arithmetic": "8 + 0.2 * 10 + 0.25 * 4",
+        "expectedTotalCostAda": 10,
+        "riskAdjustedCostAda": 11
+      },
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "redundant",
+        "sellers": [
+          "seller-a",
+          "seller-b"
+        ],
+        "servicePriceAda": 18,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.020000066666666667,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.20000066666666666,
+        "sdLossAda": 1.400002285712261,
+        "jointFailureProbability": 0.020000066666666667,
+        "arithmetic": "8 + 10 + 0.020000066666666667 * 10 + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 18.200000666666668,
+        "riskAdjustedCostAda": 18.550001238094733
+      },
+      {
+        "route": "staggered",
+        "sellers": [
+          "seller-a",
+          "seller-b"
+        ],
+        "servicePriceAda": 8.099999333333333,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.030000066666666672,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.3000006666666667,
+        "sdLossAda": 1.7058740477146086,
+        "jointFailureProbability": 0.030000066666666672,
+        "arithmetic": "8 * 0.8 + 10 * 0.2 * 0.8499996666666667 + 0.030000066666666672 * 10 + 0.25 * 1.7058740477146086",
+        "expectedTotalCostAda": 8.4,
+        "riskAdjustedCostAda": 8.826468511928653
+      },
+      {
+        "route": "staggered",
+        "sellers": [
+          "seller-b",
+          "seller-a"
+        ],
+        "servicePriceAda": 9.599998666666666,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.025000083333333332,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.25000083333333334,
+        "sdLossAda": 1.5612520349597536,
+        "jointFailureProbability": 0.025000083333333332,
+        "arithmetic": "10 * 0.8999996666666666 + 8 * 0.10000033333333333 * 0.75 + 0.025000083333333332 * 10 + 0.25 * 1.5612520349597536",
+        "expectedTotalCostAda": 9.8499995,
+        "riskAdjustedCostAda": 10.240312508739937
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-a"
+        ],
+        "servicePriceAda": 8,
+        "premiumAda": 3.45,
+        "premiumBreakdown": {
+          "coveredClaim": 1.6000000000000003,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.2,
+        "pClaim": 0.16000000000000003,
+        "confidence": 10,
+        "expectedLossAda": 0.3999999999999998,
+        "sdLossAda": 1.9595917942265422,
+        "arithmetic": "8 + 3.45 + (0.2 * 10 - 0.16000000000000003 * 10) + 0.25 * 1.9595917942265422",
+        "expectedTotalCostAda": 11.85,
+        "riskAdjustedCostAda": 12.339897948556635
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      }
+    ],
+    "alternatives": [
+      {
+        "route": "staggered",
+        "sellers": [
+          "seller-b",
+          "seller-a"
+        ],
+        "servicePriceAda": 9.599998666666666,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.025000083333333332,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.25000083333333334,
+        "sdLossAda": 1.5612520349597536,
+        "jointFailureProbability": 0.025000083333333332,
+        "arithmetic": "10 * 0.8999996666666666 + 8 * 0.10000033333333333 * 0.75 + 0.025000083333333332 * 10 + 0.25 * 1.5612520349597536",
+        "expectedTotalCostAda": 9.8499995,
+        "riskAdjustedCostAda": 10.240312508739937
+      },
+      {
+        "route": "single",
+        "sellers": [
+          "seller-a"
+        ],
+        "servicePriceAda": 8,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.2,
+        "pClaim": 0.16000000000000003,
+        "confidence": 10,
+        "expectedLossAda": 2,
+        "sdLossAda": 4,
+        "arithmetic": "8 + 0.2 * 10 + 0.25 * 4",
+        "expectedTotalCostAda": 10,
+        "riskAdjustedCostAda": 11
+      },
+      {
+        "route": "single",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 1.0000033333333334,
+        "sdLossAda": 3.0000044444393,
+        "arithmetic": "10 + 0.10000033333333333 * 10 + 0.25 * 3.0000044444393",
+        "expectedTotalCostAda": 11.000003333333334,
+        "riskAdjustedCostAda": 11.750004444443158
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-a"
+        ],
+        "servicePriceAda": 8,
+        "premiumAda": 3.45,
+        "premiumBreakdown": {
+          "coveredClaim": 1.6000000000000003,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.2,
+        "pClaim": 0.16000000000000003,
+        "confidence": 10,
+        "expectedLossAda": 0.3999999999999998,
+        "sdLossAda": 1.9595917942265422,
+        "arithmetic": "8 + 3.45 + (0.2 * 10 - 0.16000000000000003 * 10) + 0.25 * 1.9595917942265422",
+        "expectedTotalCostAda": 11.85,
+        "riskAdjustedCostAda": 12.339897948556635
+      },
+      {
+        "route": "underwritten",
+        "sellers": [
+          "seller-b"
+        ],
+        "servicePriceAda": 10,
+        "premiumAda": 2.6500026666666665,
+        "premiumBreakdown": {
+          "coveredClaim": 0.8000026666666666,
+          "capitalCost": 0.05,
+          "fraudRisk": 0.3,
+          "correlationRisk": 0.5,
+          "margin": 1
+        },
+        "coverageAda": 10,
+        "pLoss": 0.10000033333333333,
+        "pClaim": 0.08000026666666667,
+        "confidence": 30,
+        "expectedLossAda": 0.20000066666666663,
+        "sdLossAda": 1.400002285712261,
+        "arithmetic": "10 + 2.6500026666666665 + (0.10000033333333333 * 10 - 0.08000026666666667 * 10) + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 12.850003333333332,
+        "riskAdjustedCostAda": 13.200003904761397
+      },
+      {
+        "route": "redundant",
+        "sellers": [
+          "seller-a",
+          "seller-b"
+        ],
+        "servicePriceAda": 18,
+        "premiumAda": 0,
+        "premiumBreakdown": {},
+        "coverageAda": 0,
+        "pLoss": 0.020000066666666667,
+        "pClaim": 0,
+        "confidence": 40,
+        "expectedLossAda": 0.20000066666666666,
+        "sdLossAda": 1.400002285712261,
+        "jointFailureProbability": 0.020000066666666667,
+        "arithmetic": "8 + 10 + 0.020000066666666667 * 10 + 0.25 * 1.400002285712261",
+        "expectedTotalCostAda": 18.200000666666668,
+        "riskAdjustedCostAda": 18.550001238094733
+      }
+    ],
+    "assumptions": {
+      "sharedInfrastructure": {
+        "value": false,
+        "status": "buyer-supplied"
+      },
+      "riskAversion": {
+        "value": 0.25,
+        "status": "buyer-supplied"
+      },
+      "prior": {
+        "alpha0": 2,
+        "beta0": 8,
+        "status": "configured"
+      },
+      "sharedProviderCorrelation": {
+        "value": 0.5,
+        "status": "configured"
+      },
+      "coverageApplicabilityRate": {
+        "value": 0.8,
+        "status": "configured"
+      },
+      "penalties": "seller-specific values are configured; outcome counts are measured"
+    },
+    "quoteId": "ae0345e6-6293-4a0f-a02e-202d4b2eeec0",
+    "termsHash": "5889e256a349551e64986a36e613512c5018630cdaa0f32424fc5b3a8ad59f06"
+  }
+}
