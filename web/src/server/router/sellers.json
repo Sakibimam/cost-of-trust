@@ -6,7 +6,7 @@
     "priceAda": 8,
     "provider": "koios-shared",
     "payTo": "addr_test1qqe0seqy6tvff79kw3md5qdspevu59344rcna6fjsut5npeg2wdkgff976cth4upph2h0g9394tl6n0arnwqs307dyaq5lhh68",
-    "endpoint": "http://127.0.0.1:4101/start_job",
+    "endpoint": "preprod keeper (run locally): registry seller-a; payout addr_test1qqe0seqy6tvff79kw3md5qdspevu59344rcna6fjsut5npeg2wdkgff976cth4upph2h0g9394tl6n0arnwqs307dyaq5lhh68",
     "successes": 0,
     "failures": 0,
     "evidence": []
@@ -18,7 +18,7 @@
     "priceAda": 10,
     "provider": "own-node",
     "payTo": "addr_test1qq0zga2cthka4dl7u0earttxkuuqr73acwvqv9gzcykn6h54p6a88g8lnwv8vyy2vl9kraqk2yxdnhkwa2xe0lyjdh4q3c7zyq",
-    "endpoint": "http://127.0.0.1:4102/start_job",
+    "endpoint": "preprod keeper (run locally): registry seller-b; payout addr_test1qq0zga2cthka4dl7u0earttxkuuqr73acwvqv9gzcykn6h54p6a88g8lnwv8vyy2vl9kraqk2yxdnhkwa2xe0lyjdh4q3c7zyq",
     "successes": 18,
     "failures": 2,
     "bondDiscount": 0.033333,
@@ -36,7 +36,7 @@
     "priceAda": 8,
     "provider": "koios-shared",
     "payTo": "addr_test1qr3pmfx4lz85g9xvd45l2ev406upcr3u855r997antvwgremud68a5ykhq476hw6eljmuay49y2hghd6e8rzq27tud5s2k2scp",
-    "endpoint": "http://127.0.0.1:4103/start_job",
+    "endpoint": "preprod keeper (run locally): registry seller-c; payout addr_test1qr3pmfx4lz85g9xvd45l2ev406upcr3u855r997antvwgremud68a5ykhq476hw6eljmuay49y2hghd6e8rzq27tud5s2k2scp",
     "successes": 0,
     "failures": 0,
     "evidence": []
