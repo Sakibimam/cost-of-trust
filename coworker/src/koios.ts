@@ -22,12 +22,18 @@ const contracts = (network: Network) => network === "Mainnet"
 
 const koiosBase = (network: Network) => env(network === "Mainnet" ? "KOIOS_URL_MAINNET" : "KOIOS_URL_PREPROD", network === "Mainnet" ? "https://api.koios.rest/api/v1" : "https://preprod.koios.rest/api/v1");
 
-const request = async (path: string, init: RequestInit = {}, network: Network = "Preprod"): Promise<unknown> => {
+export const request = async (path: string, init: RequestInit = {}, network: Network = "Preprod", attempt = 0): Promise<unknown> => {
+  const key = env("KAIOS_KEY");
   const response = await fetch(`${koiosBase(network)}${path}`, {
     ...init,
-    headers: { accept: "application/json", "content-type": "application/json", ...(init.headers ?? {}) },
+    headers: { accept: "application/json", "content-type": "application/json", ...(key ? { authorization: `Bearer ${key}` } : {}), ...(init.headers ?? {}) },
     signal: AbortSignal.timeout(20_000),
   });
+  if (response.status === 429 && attempt < 4) {
+    const wait = Number(response.headers.get("retry-after")) * 1000 || 2_000 * 2 ** attempt;
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    return request(path, init, network, attempt + 1);
+  }
   if (!response.ok) throw new Error(`Koios HTTP ${response.status} on ${path.split("?")[0]}`);
   return response.json();
 };
