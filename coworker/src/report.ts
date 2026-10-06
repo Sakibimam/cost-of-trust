@@ -1,5 +1,6 @@
 import { env, loadEnv } from "./config.ts";
-import { escrowHistory, registryFromChain } from "./koios.ts";
+import { betaBinomialRisk } from "../../router/src/risk.ts";
+import { deliveryHistory, detectNetwork, registryFromChain, type Network } from "./koios.ts";
 import type { CheckInput, Evidence, TrustReport } from "./types.ts";
 
 loadEnv();
@@ -20,23 +21,6 @@ async function getJson(source: string, url: string, init?: RequestInit): Promise
   }
 }
 
-async function routerQuote(base: string, input: CheckInput): Promise<Evidence> {
-  try {
-    const sellers = await fetch(`${base}/sellers`, { signal: AbortSignal.timeout(15_000) });
-    const sellerData = await sellers.json() as Array<Record<string, unknown>>;
-    const candidateSellers = input.sellerId
-      ? [input.sellerId]
-      : sellerData.map((seller) => String(seller.id ?? "")).filter(Boolean);
-    return await getJson("router_quote", `${base}/best-route`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ task: input.task ?? "due diligence", serviceType: "agent execution", deadline: new Date(Date.now() + 45 * 60_000).toISOString(), downstreamLossAda: input.taskValueAtRiskAda, riskAversion: 0.5, sharedInfrastructure: true, candidateSellers, constraints: { allowRedundancy: true } }),
-    });
-  } catch (error) {
-    return { source: "router_quote", status: "unavailable", observedAt: now(), error: error instanceof Error ? error.message : "router request failed" };
-  }
-}
-
 async function registryEntry(identifier: string): Promise<Evidence> {
   if (!env("REGISTRY_API_KEY")) return registryFromChain(identifier);
   const url = `${env("REGISTRY_URL")}/registry-entry/`;
@@ -48,12 +32,14 @@ async function registryEntry(identifier: string): Promise<Evidence> {
   });
 }
 
+// Masumi CIP-25 metadata stores api_base_url as a list of <=64 byte chunks.
 function advertisedUrl(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
   if (Array.isArray(data)) return data.map(advertisedUrl).find(Boolean) ?? null;
   const record = data as Record<string, unknown>;
-  for (const key of ["apiBaseUrl", "apiUrl", "endpoint", "url"]) {
-    if (typeof record[key] === "string" && /^https?:\/\//.test(record[key])) return record[key].replace(/\/$/, "");
+  for (const key of ["api_base_url", "apiBaseUrl", "apiUrl", "endpoint", "url"]) {
+    const value = Array.isArray(record[key]) && record[key].every((part) => typeof part === "string") ? record[key].join("") : record[key];
+    if (typeof value === "string" && /^https?:\/\//.test(value)) return value.replace(/\/$/, "");
   }
   for (const value of Object.values(record)) {
     const found = advertisedUrl(value);
@@ -62,48 +48,38 @@ function advertisedUrl(data: unknown): string | null {
   return null;
 }
 
+const privateHost = (url: string) => /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.0\.0\.0|\[?::1\]?$)/.test(new URL(url).hostname);
+
 async function gather(input: CheckInput): Promise<Evidence[]> {
-  const network = input.network ?? "Preprod";
-  const router = env("ROUTER_URL");
+  const network: Network = input.network ?? await detectNetwork(input.agentIdentifier);
   const registryFact = env("REGISTRY_API_KEY") ? await registryEntry(input.agentIdentifier) : await registryFromChain(input.agentIdentifier, network);
   const endpoint = advertisedUrl(registryFact.data);
-  const endpointFacts = endpoint
-    ? await Promise.all([
-      getJson("agent_availability", `${endpoint}/availability`),
-      getJson("agent_health", `${endpoint}/health`),
-    ])
-    : [
-      { source: "agent_availability", status: "unavailable", observedAt: now(), error: "registry did not advertise an API URL" } as Evidence,
-      { source: "agent_health", status: "unavailable", observedAt: now(), error: "registry did not advertise an API URL" } as Evidence,
-    ];
-  return [
-    registryFact,
-    ...endpointFacts,
-    await escrowHistory(input.agentIdentifier, network),
-    await routerQuote(router, input),
-  ];
+  const unreachable = (error: string) => ["agent_availability", "agent_health"].map((source) => ({ source, status: "unavailable", observedAt: now(), error } as Evidence));
+  const endpointFacts = !endpoint
+    ? unreachable("registry did not advertise an API URL")
+    : privateHost(endpoint)
+      ? unreachable(`registry advertises a private API URL (${endpoint}) that buyers cannot reach`)
+      : await Promise.all([getJson("agent_availability", `${endpoint}/availability`), getJson("agent_health", `${endpoint}/health`)]);
+  return [registryFact, ...endpointFacts, await deliveryHistory(input.agentIdentifier, network)];
 }
 
-function routeFromQuote(facts: Evidence[], atRisk: number): { recommendation: TrustReport["recommendation"]; expectedCostAda: number | null } {
-  const quote = facts.find((fact) => fact.source === "router_quote");
-  const data = quote?.status === "ok" ? quote.data as Record<string, unknown> : undefined;
-  const selectedRoute = String(data?.selectedRoute ?? data?.route ?? "");
-  const selected = Array.isArray(data?.routes)
-    ? data.routes.find((item) => {
-      const row = item as Record<string, unknown>;
-      return row.route === selectedRoute && JSON.stringify(row.sellers) === JSON.stringify(data?.selectedSellers);
-    }) as Record<string, unknown> | undefined
-    : undefined;
-  const route = selected?.riskAdjustedCostAda ?? selected?.expectedTotalCostAda ?? data?.riskAdjustedCostAda ?? data?.expectedTotalCostAda;
-  const expectedCostAda = typeof route === "number" && Number.isFinite(route) ? route : null;
-  if (expectedCostAda === null) return { recommendation: "insufficient_data", expectedCostAda: null };
-  if (expectedCostAda > atRisk) return { recommendation: "do_not_hire", expectedCostAda };
-  if (selectedRoute.includes("underwritten")) return { recommendation: "require_coverage", expectedCostAda };
-  if (selectedRoute.includes("redundant") || selectedRoute.includes("staggered")) return { recommendation: "hire_with_backup_keeper", expectedCostAda };
+type Delivery = { paid: number; refunded: number; disputed: number };
+
+// ponytail: fixed policy bands on the router's Beta(2,8) posterior; tune once buyers report their own loss tolerance.
+export function decide(facts: Evidence[], atRisk: number): { recommendation: TrustReport["recommendation"]; expectedCostAda: number | null } {
+  const delivery = facts.find((fact) => fact.source === "masumi_delivery_history");
+  const record = delivery?.status === "ok" ? delivery.data as Delivery : undefined;
+  if (!record || record.paid + record.refunded + record.disputed === 0) return { recommendation: "insufficient_data", expectedCostAda: null };
+  const { pLoss } = betaBinomialRisk(record.paid, record.refunded + record.disputed);
+  const expectedCostAda = Math.round(pLoss * atRisk * 100) / 100;
+  const endpointDown = facts.some((fact) => fact.source === "agent_health" && fact.status !== "ok" && fact.error !== "registry did not advertise an API URL");
+  if (endpointDown || pLoss >= 0.5) return { recommendation: "do_not_hire", expectedCostAda };
+  if (pLoss >= 0.2) return { recommendation: "hire_with_backup_keeper", expectedCostAda };
+  if (pLoss >= 0.1) return { recommendation: "require_coverage", expectedCostAda };
   return { recommendation: "hire_as_is", expectedCostAda };
 }
 
-async function summarize(input: CheckInput, facts: Evidence[], decision: ReturnType<typeof routeFromQuote>): Promise<string> {
+async function summarize(input: CheckInput, facts: Evidence[], decision: ReturnType<typeof decide>): Promise<string> {
   const key = env("OPENROUTER_API_KEY") || env("ZAI_API_KEY") || env("OPENAI_API_KEY") || env("ANTHROPIC_API_KEY");
   if (!key) return "Plain-language summary unavailable: no model credential is configured. The structured facts and recommendation are authoritative.";
   const endpoint = env("OPENROUTER_API_KEY") ? `${env("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")}/chat/completions` : env("ZAI_API_KEY") ? "https://api.z.ai/api/paas/v4/chat/completions" : "https://api.openai.com/v1/chat/completions";
@@ -131,7 +107,7 @@ async function summarize(input: CheckInput, facts: Evidence[], decision: ReturnT
 export async function createReport(input: CheckInput): Promise<TrustReport> {
   if (!input.agentIdentifier || !Number.isFinite(input.taskValueAtRiskAda) || input.taskValueAtRiskAda < 0) throw new Error("agentIdentifier and non-negative taskValueAtRiskAda are required");
   const facts = await gather(input);
-  const decision = routeFromQuote(facts, input.taskValueAtRiskAda);
+  const decision = decide(facts, input.taskValueAtRiskAda);
   let summary: string;
   try { summary = await summarize(input, facts, decision); } catch (error) { summary = `Plain-language summary unavailable because the configured model failed: ${error instanceof Error ? error.message : "request failed"}. Structured facts remain authoritative.`; }
   return { input, ...decision, facts, summary, generatedAt: now() };

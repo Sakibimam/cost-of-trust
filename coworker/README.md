@@ -2,7 +2,7 @@
 
 Trust Check is a Sokosumi Coworker for operations and procurement teams hiring AI agents. It accepts a Masumi agent identifier, registry asset, or seller key plus the task value at risk and returns a due-diligence report.
 
-The report gathers live registry metadata, Masumi escrow history from Koios, endpoint availability and health, and the Cost-of-Trust router quote. It recommends hiring as is, hiring with a backup keeper, requiring coverage, or not hiring. Missing upstream data stays marked unavailable. The model only writes the cited plain-language summary from the gathered facts.
+The report reads the agent's own delivery record from chain. It reads the Masumi escrows where the agent is the seller (V1 and V2 contracts, newest transactions since its registration block) and classifies each spend by its redeemer: escrow opened, result submitted, paid out, refunded, or disputed. Paid and refunded outcomes feed the Cost-of-Trust Beta(2,8) risk model, so the expected loss is priced from what this agent actually delivered. Registry metadata supplies the advertised `api_base_url`; a private or loopback URL is reported as unreachable and never probed. The recommendation is hire as is, hire with a backup keeper, require coverage, or do not hire. The model only writes the cited plain-language summary from the gathered facts.
 
 ## Local run
 
@@ -19,7 +19,7 @@ The server exposes `POST /report`. Its JSON body is:
 {"agentIdentifier":"<Masumi identifier>","taskValueAtRiskAda":100,"task":"supplier delivery"}
 ```
 
-Run the Sokosumi worker separately with `npm run worker`. It polls the Personal Workspace, sends each assigned Task to the report engine, and completes the Task with the exact JSON result. Set `SOKOSUMI_COWORKER_ID` and `SOKOSUMI_COWORKER_API_KEY` in server-side secret storage. Registry metadata is read directly from Koios using the Preprod V1 and V2 policy IDs from MPS. A managed `REGISTRY_API_KEY` is optional, not required.
+Run the Sokosumi worker separately with `npm run worker`. It polls the Personal Workspace, sends each assigned Task to the report engine, and completes the Task with the exact JSON result. Set `SOKOSUMI_COWORKER_ID` and `SOKOSUMI_COWORKER_API_KEY` in server-side secret storage. Registry metadata is read directly from Koios using the V1 and V2 policy IDs from MPS. A task without a `network` field is resolved on Preprod first, then Mainnet. A managed `REGISTRY_API_KEY` is optional, not required.
 
 ## Payment path
 
@@ -31,12 +31,8 @@ The local report validation test and TypeScript check pass. The OpenRouter prima
 
 ## Evidence snapshot
 
+- Trust Check registration: confirmed on the Preprod MPS V2 source. [Registration transaction](https://preprod.cardanoscan.io/transaction/90dedd393ceb5e51f413867aa0e6e3a040306f2e8c1ea8e7e3cdb38f2671f7b2).
 - Personal Preprod credits: 3,250 spendable. No real card was used.
-- Trust Check registration: confirmed on the local Preprod MPS V2 source. [Registration transaction](https://preprod.cardanoscan.io/transaction/90dedd393ceb5e51f413867aa0e6e3a040306f2e8c1ea8e7e3cdb38f2671f7b2).
-- Paid Task: `01a1102c-8866-753d-a715-f1d8fadd85d0`, charged 100 credits and currently RUNNING while escrow funding is pending.
-- Seller input: Deepfake Knight V1 registry asset `asset1h6lypyuwtgjqjf9wd4wmg53pgk7gtv08nk40pn`.
-- Escrow, result-hash, and collection transactions: no confirmed hashes yet.
-- TOKEN2049 access: membership required. The access request returned the account membership error, and the workspace seat check returned HTTP 403.
 
 ## Paid Task evidence (Cardano preprod)
 
@@ -48,12 +44,12 @@ Task `01a1103d-6e24-7332-adf1-32bb95c4a421` on Sokosumi, paid through Masumi esc
 | Trust Check submits its result hash on chain | [8c9db324...afad](https://preprod.cardanoscan.io/transaction/8c9db32499ec2bdb8c275627f5530eb6d89a5c0ab7642d909c82d3d9ff51afad) |
 | Seller collects 1 tUSDM to its wallet | [9c560b70...86a0](https://preprod.cardanoscan.io/transaction/9c560b70982fb56766919f21087e811a52133fe665e66ccfe1a5da012f4286a0) |
 
-## Fix 8 live verification
+## Live delivery check
 
-The corrected report path was run locally against the Trust Check V2 registry unit and the live router at `https://cost-of-trust.vercel.app/api/router`.
+Deepfake Knight (`asset1h6lypyuwtgjqjf9wd4wmg53pgk7gtv08nk40pn`), checked on 2026-10-06 with no network given. Trust Check resolved it to the Mainnet V1 registry policy, found a healthy endpoint, and read the newest 1,000 V1 escrow contract transactions since its registration block:
 
-- Registry evidence: Koios Preprod `POST /asset_info` with the 56-byte policy and 32-byte asset name returned the Trust Check registration NFT.
-- Escrow evidence: Koios Preprod `POST /address_txs` and `POST /asset_txs` returned HTTP 200.
-- Router evidence: live `POST /best-route` returned a quote; the report recommendation was `hire_with_backup_keeper` at `7.485609059528937` ADA expected cost.
-- Sokosumi Task `01a11093-0aa3-711f-a80d-2376a5eec78e` was created with value at risk 100 and the 20/45/60/75 minute MPS windows. The worker accepted it and it reached `RUNNING`; its MPS request had not yet produced an escrow or result transaction when this evidence was recorded.
-- The prior completed Task remains the source of confirmed settlement transactions above. The new report's structured recommendation is real; its optional model summary timed out and the structured facts remain authoritative.
+| Escrows opened | Results submitted | Paid out | Refunded |
+| --- | --- | --- | --- |
+| 17 | 0 | 0 | 17 |
+
+Recommendation `do_not_hire`, expected loss 70.37 ADA on 100 ADA at risk. A healthy `/health` endpoint alone would have passed this agent. One refund, verified on chain: [ab38dcf5...72e2](https://cardanoscan.io/transaction/ab38dcf55d69b690a60befab61878f46995020387881bacf07914d3e836b72e2) spends a V1 escrow whose datum names this seller, still in `FundsLocked` with an empty result hash, under redeemer `WithdrawRefund`.
