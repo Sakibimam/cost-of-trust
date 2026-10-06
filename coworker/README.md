@@ -37,3 +37,13 @@ The local report validation test and TypeScript check pass. The OpenRouter prima
 - Seller input: Deepfake Knight V1 registry asset `asset1h6lypyuwtgjqjf9wd4wmg53pgk7gtv08nk40pn`.
 - Escrow, result-hash, and collection transactions: no confirmed hashes yet.
 - TOKEN2049 access: membership required. The access request returned the account membership error, and the workspace seat check returned HTTP 403.
+
+## Paid Task evidence (Cardano preprod)
+
+Task `01a1103d-6e24-7332-adf1-32bb95c4a421` on Sokosumi, paid through Masumi escrow, settled end to end:
+
+| Step | Transaction |
+| --- | --- |
+| Buyer funds escrow (1 tUSDM) | [a6e3fbda...0e85](https://preprod.cardanoscan.io/transaction/a6e3fbda65dd8a05b7252e1205f55ba34986b68df75f89e5430ab80818370e85) |
+| Trust Check submits its result hash on chain | [8c9db324...afad](https://preprod.cardanoscan.io/transaction/8c9db32499ec2bdb8c275627f5530eb6d89a5c0ab7642d909c82d3d9ff51afad) |
+| Seller collects 1 tUSDM to its wallet | [9c560b70...86a0](https://preprod.cardanoscan.io/transaction/9c560b70982fb56766919f21087e811a52133fe665e66ccfe1a5da012f4286a0) |
