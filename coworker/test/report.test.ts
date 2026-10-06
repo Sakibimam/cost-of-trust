@@ -46,7 +46,7 @@ test("escrow history resolves the unit before POST asset_txs", async () => {
   try {
     const evidence = await escrowHistory("67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b101b443d8a410f64eb02369ab743ce57e0dcafc68a4c64ded88bab415e000000");
     assert.equal(evidence.status, "ok");
-    assert.deepEqual(calls.map((call) => `${call.method} ${call.path}`), ["GET /api/v1/address_txs", "POST /api/v1/asset_txs"]);
+    assert.deepEqual(calls.map((call) => `${call.method} ${call.path}`), ["POST /api/v1/address_txs", "POST /api/v1/asset_txs"]);
   } finally {
     globalThis.fetch = originalFetch;
   }

@@ -94,7 +94,7 @@ export async function registryFromChain(identifier: string, network: Network = "
 export async function escrowHistory(identifier: string, network: Network = "Preprod"): Promise<Evidence> {
   try {
     const paymentAddress = env("MASUMI_PAYMENT_ADDRESS_V2_PREPROD", "addr_test1wzs4e6wc95hkwezlccjw9mdvq0r0rsgx6zk34avptga3ftgn37w4g");
-    const txs = await request(`/address_txs?_address=${encodeURIComponent(paymentAddress)}&offset=0&limit=1000`, {}, network);
+    const txs = await post("/address_txs?offset=0&limit=1000", { _addresses: [paymentAddress] }, network);
     const asset = await resolveAsset(identifier, network);
     const assetRows = asset ? await post("/asset_txs", { _asset_policy: asset.policy, _asset_name: asset.name }, network) : [];
     return { source: "masumi_escrow_history", status: "ok", observedAt: new Date().toISOString(), data: { paymentAddress, identifier, contractTransactions: txs, identifierTransactions: assetRows, interpretation: "Koios contract and identifier transaction evidence; V2 action decoding follows the returned on-chain transaction data." } };
