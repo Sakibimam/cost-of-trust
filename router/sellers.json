@@ -18,7 +18,7 @@
     "priceAda": 10,
     "provider": "own-node",
     "payTo": "addr_test1qq0zga2cthka4dl7u0earttxkuuqr73acwvqv9gzcykn6h54p6a88g8lnwv8vyy2vl9kraqk2yxdnhkwa2xe0lyjdh4q3c7zyq",
-    "endpoint": "preprod keeper (run locally): registry seller-b; payout addr_test1qqe0zga2cthka4dl7u0earttxkuuqr73acwvqv9gzcykn6h54p6a88g8lnwv8vyy2vl9kraqk2yxdnhkwa2xe0lyjdh4q3c7zyq",
+    "endpoint": "preprod keeper (run locally): registry seller-b; payout addr_test1qq0zga2cthka4dl7u0earttxkuuqr73acwvqv9gzcykn6h54p6a88g8lnwv8vyy2vl9kraqk2yxdnhkwa2xe0lyjdh4q3c7zyq",
     "successes": 18,
     "failures": 2,
     "bondDiscount": 0.033333,
