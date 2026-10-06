@@ -64,3 +64,10 @@ Trust Check HTTP server is running on port 8788; MPS is running on port 3012 wit
 - Requested event workspace access was not created because the authenticated account is not a member of the target organization. No access id exists.
 - Exact registry action: none required. The report reads the V1 and V2 registry policies directly from Koios. A managed `REGISTRY_API_KEY` may be added privately only if the participant elects to use the managed registry path.
 - Commit: `965c20a` (`Build Trust Check coworker report path`), tracked files only under `coworker/`.
+
+## Paid task completion (2026-10-06)
+
+- MPS registration `cmuwa7esz0004rdr4piebssps` reached `RegistrationConfirmed` at 07:09 UTC (registry tx `90dedd393ceb5e51f413867aa0e6e3a040306f2e8c1ea8e7e3cdb38f2671f7b2`, V2 payment source policy `67ab0c92...`); `MPS_AGENT_IDENTIFIER` in `.env.local` is that V2 identifier. The 404 came from the V1 Deepfake Knight asset, not the Trust Check agent.
+- Task `01a1103d-6e24-7332-adf1-32bb95c4a421` COMPLETED. Escrow `a6e3fbda65dd8a05b7252e1205f55ba34986b68df75f89e5430ab80818370e85` (FundsLocked, Koios 50 confirmations). Result `8c9db32499ec2bdb8c275627f5530eb6d89a5c0ab7642d909c82d3d9ff51afad` (ResultSubmitted, Koios 26 confirmations).
+- Seller collection is available after unlockTime 2026-10-06 09:03:47 UTC.
+- Payment windows widened to 20/45/60/75 minutes: MPS submit-result keeps 5 minutes of slack off submitResultTime, so the earlier 10/20/40/55 minute windows expired before the batch job ran. The worker now waits for ResultSubmitted before COMPLETED.

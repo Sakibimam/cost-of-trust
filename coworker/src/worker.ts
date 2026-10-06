@@ -39,7 +39,7 @@ async function once(): Promise<void> {
     const report = await createReport(JSON.parse(input));
     const file = `result-${id}.txt`; await writeFile(file, JSON.stringify(report, null, 2));
     const result = await readFile(file, "utf8");
-    if (payment) await submitResult(payment, result);
+    if (payment) { await submitResult(payment, result); await waitForPayment(payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]); }
     await taskEvent(id, { status: "COMPLETED", comment: result });
   }
 }

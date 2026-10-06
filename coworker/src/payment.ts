@@ -29,10 +29,10 @@ export async function createPayment(input: string): Promise<Payment> {
     inputHash: sha256(input),
     identifierFromPurchaser,
     RequestedFunds: [{ amount: env("MPS_TASK_AMOUNT", "1000000"), unit: env("MPS_TASK_UNIT", "16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d") }],
-    payByTime: new Date(now + 10 * 60_000).toISOString(),
-    submitResultTime: new Date(now + 20 * 60_000).toISOString(),
-    unlockTime: new Date(now + 40 * 60_000).toISOString(),
-    externalDisputeUnlockTime: new Date(now + 55 * 60_000).toISOString(),
+    payByTime: new Date(now + 20 * 60_000).toISOString(),
+    submitResultTime: new Date(now + 45 * 60_000).toISOString(),
+    unlockTime: new Date(now + 60 * 60_000).toISOString(),
+    externalDisputeUnlockTime: new Date(now + 75 * 60_000).toISOString(),
   }) });
   const data = payment.data && typeof payment.data === "object" ? payment.data as Payment : payment;
   const funds = Array.isArray(data.RequestedFunds) ? data.RequestedFunds : [];
@@ -58,13 +58,13 @@ export async function submitResult(payment: Payment, result: string): Promise<Pa
   return mpsJson("/payment/submit-result", { method: "POST", body: JSON.stringify({ network: "Preprod", blockchainIdentifier: identifier(payment), submitResultHash: sha256(result) }) });
 }
 
-export async function waitForPayment(payment: Payment, timeoutMs = 10 * 60_000): Promise<Payment> {
+export async function waitForPayment(payment: Payment, timeoutMs = 20 * 60_000, states = ["FundsLocked", "ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]): Promise<Payment> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     const current = await mpsJson("/payment/resolve-blockchain-identifier", { method: "POST", body: JSON.stringify({ network: "Preprod", blockchainIdentifier: identifier(payment), includeHistory: "true" }) });
     const data = (current.data ?? current) as Payment;
     const state = String(data.onChainState ?? "");
-    if (["FundsLocked", "ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"].includes(state)) return current;
+    if (states.includes(state)) return current;
     if (["RefundWithdrawn", "FundsOrDatumInvalid"].includes(state)) throw new Error(`MPS payment terminal state ${state}`);
     await new Promise((resolve) => setTimeout(resolve, 10_000));
   }
