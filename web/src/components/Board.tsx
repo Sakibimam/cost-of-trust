@@ -8,6 +8,7 @@ import { Detail } from "./Detail";
 import { HeroPair } from "./HeroPair";
 import { Ranking } from "./Ranking";
 import { SelectionMap } from "./SelectionMap";
+import { Proof } from "./Proof";
 import { Sellers } from "./Sellers";
 import { Verdict } from "./Verdict";
 
@@ -103,8 +104,8 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         <div className="hero-rules" aria-hidden><div className="wrap h-full"><div className="rules" /></div></div>
         <div className="wrap relative z-10 grid grid-cols-1 gap-x-10 gap-y-6 py-6 md:py-8 lg:grid-cols-12 lg:gap-y-8">
           <div className="min-w-0 lg:col-span-7 lg:row-start-1">
-            <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">Your agent is about to pay someone to finish a job before a deadline. The cheapest one fails 1 in 5 times. We price that in, and Cardano enforces the backup.</p>
-            <h1 id="top-h" className="display mt-3">Price is not the cost of execution.</h1>
+            <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">Your agent pays someone to finish a job before a deadline. The cheapest keeper fails 1 time in 5. Cost of Trust prices that risk, buys a backup keeper, and lets the Cardano ledger decide who gets paid.</p>
+            <h1 id="top-h" className="display mt-3">Insurance for agent work that has a deadline.</h1>
           </div>
           <div className="min-w-0 lg:col-span-12 lg:row-start-3" data-testid="hero-pair">
             {ready ? <HeroPair result={ready} names={names} /> : failed ? <p className="m-0 text-[15px] text-muted">The numbers appear once the router answers.</p> : <Loading what={`Pricing every route at ${ROUTER_URL}.`} />}
@@ -116,13 +117,8 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         </div>
       </section>
 
-      <section aria-labelledby="trust-check-h" className="border-y border-ink bg-paper-2 py-6 md:py-8">
-        <div className="wrap"><p className="label">Trust Check, a paid AI Coworker on Sokosumi</p><h2 id="trust-check-h" className="mt-2 text-[24px] font-extrabold">Due diligence on an agent before you pay it.</h2><p className="mt-2 max-w-[70ch] text-[15px] text-muted">Masumi escrow holds the paid task while Trust Check verifies the route and returns the result on Cardano preprod.</p><div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[14px]"><a href="https://preprod.cardanoscan.io/transaction/be70aa09631cb3a7bda74bd09b91fa5d837e9408e2f889c80a71ce0bb7f08892">Escrow be70aa09</a><a href="https://preprod.cardanoscan.io/transaction/0be9fa229a864ddbaa8847afa84657d535d93d4a26fdbab506e2a2ebde573f91">Result 0be9fa22</a><a href="https://preprod.cardanoscan.io/transaction/6b8bab2e1f143467ba52001d928eade55ee71b9540b768d5870e9aaa18108630">Seller collection 6b8bab2e</a><span className="fig !text-[14px]">Task 01a11153-9886-710b-9d63-75375d11c749</span></div></div>
-      </section>
+      <Proof />
 
-      <Section id="run" title="Confirmed preprod transactions" kicker="The paid path is visible before the ranking: lock, pay, claim, and settlement are confirmed on Cardano preprod.">
-        {runs}
-      </Section>
 
       <section id="ranking" aria-labelledby="ranking-h" className="scroll-mt-6 pb-12 md:pb-16">
         <div className="wrap">
@@ -143,6 +139,9 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         </div>
       </section>
 
+      <Section id="run" title="Every agent run, newest first" kicker="Read straight from agents/runs: each lock, payment, claim and settlement, checked against Koios.">
+        {runs}
+      </Section>
       {ready && <Section id="why" title="How the chosen route was priced" kicker="The router returns its arithmetic and the status of every input, so a buyer can check the number instead of trusting it."><details className="border-t-[6px] border-ink"><summary className="cursor-pointer py-4 text-[17px] font-extrabold">Inputs and method</summary><Detail result={ready} /></details><div className="mt-8"><p className="label">Live selection map from the router</p><p className="mt-2 text-[15px] text-muted">Same sellers, same 100 ADA downstream loss, four buyer and infrastructure combinations.</p><div className="mt-4"><SelectionMap sellers={agents.map((s) => s.id)} names={names} /></div></div></Section>}
 
       <Section id="sellers" title="Track records, with the starting assumption shown as one" kicker="A seller with no history is not scored as clean. The hatched block is the configured starting assumption; only the solid blocks are observed outcomes.">
