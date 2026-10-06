@@ -94,7 +94,7 @@ test("termsHash is key-order independent blake2b-256", () => {
 
 test("measured provider histories drive provider selection", async () => {
   server = startServer(0);
-  const probe = JSON.parse(readFileSync(new URL("../probes/results-20261006043545.json", import.meta.url), "utf8"));
+  const probe = JSON.parse(readFileSync(new URL("../probes/results-20261006051159.json", import.meta.url), "utf8"));
   const measured = new Map<string, { successes: number; failures: number }>();
   for (const record of probe.records) {
     if (!measured.has(record.provider)) measured.set(record.provider, { successes: 0, failures: 0 });

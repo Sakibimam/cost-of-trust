@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-10-06T04:35:45.647Z",
+  "startedAt": "2026-10-06T05:11:59.441Z",
   "count": 60,
   "spacingMs": 1000,
   "timeoutMs": 8000,
@@ -21,6 +21,7 @@
       "id": "tatum-cardano-preprod",
       "url": "https://cardano-preprod.gateway.tatum.io/network/status",
       "method": "POST",
+      "body": "{\"network_identifier\":{\"blockchain\":\"cardano\",\"network\":\"preprod\"}}",
       "enabled": true,
       "exclusionReason": "TATUM_API_KEY is not set"
     }
@@ -31,1260 +32,1260 @@
       "attempt": 1,
       "ok": true,
       "status": 200,
-      "latencyMs": 840
+      "latencyMs": 590
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 2,
       "ok": true,
       "status": 200,
-      "latencyMs": 470
+      "latencyMs": 399
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 3,
       "ok": true,
       "status": 200,
-      "latencyMs": 202
+      "latencyMs": 480
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 4,
       "ok": true,
       "status": 200,
-      "latencyMs": 467
+      "latencyMs": 397
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 5,
       "ok": true,
       "status": 200,
-      "latencyMs": 203
+      "latencyMs": 410
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 6,
       "ok": true,
       "status": 200,
-      "latencyMs": 203
+      "latencyMs": 402
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 7,
       "ok": true,
       "status": 200,
-      "latencyMs": 390
+      "latencyMs": 211
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 8,
       "ok": true,
       "status": 200,
-      "latencyMs": 218
+      "latencyMs": 395
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 9,
       "ok": true,
       "status": 200,
-      "latencyMs": 387
+      "latencyMs": 396
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 10,
       "ok": true,
       "status": 200,
-      "latencyMs": 388
+      "latencyMs": 484
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 11,
       "ok": true,
       "status": 200,
-      "latencyMs": 203
+      "latencyMs": 214
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 12,
       "ok": true,
       "status": 200,
-      "latencyMs": 394
+      "latencyMs": 395
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 13,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 398
+    },
+    {
+      "provider": "koios-preprod-authenticated",
+      "attempt": 14,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 480
+    },
+    {
+      "provider": "koios-preprod-authenticated",
+      "attempt": 15,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 482
+    },
+    {
+      "provider": "koios-preprod-authenticated",
+      "attempt": 16,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 227
+    },
+    {
+      "provider": "koios-preprod-authenticated",
+      "attempt": 17,
       "ok": true,
       "status": 200,
       "latencyMs": 215
     },
     {
       "provider": "koios-preprod-authenticated",
-      "attempt": 14,
-      "ok": true,
-      "status": 200,
-      "latencyMs": 203
-    },
-    {
-      "provider": "koios-preprod-authenticated",
-      "attempt": 15,
-      "ok": true,
-      "status": 200,
-      "latencyMs": 390
-    },
-    {
-      "provider": "koios-preprod-authenticated",
-      "attempt": 16,
-      "ok": true,
-      "status": 200,
-      "latencyMs": 217
-    },
-    {
-      "provider": "koios-preprod-authenticated",
-      "attempt": 17,
-      "ok": true,
-      "status": 200,
-      "latencyMs": 465
-    },
-    {
-      "provider": "koios-preprod-authenticated",
       "attempt": 18,
       "ok": true,
       "status": 200,
-      "latencyMs": 201
+      "latencyMs": 212
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 19,
       "ok": true,
       "status": 200,
-      "latencyMs": 382
+      "latencyMs": 231
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 20,
       "ok": true,
       "status": 200,
-      "latencyMs": 465
+      "latencyMs": 230
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 21,
       "ok": true,
       "status": 200,
-      "latencyMs": 219
+      "latencyMs": 227
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 22,
       "ok": true,
       "status": 200,
-      "latencyMs": 470
+      "latencyMs": 210
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 23,
       "ok": true,
       "status": 200,
-      "latencyMs": 221
+      "latencyMs": 210
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 24,
       "ok": true,
       "status": 200,
-      "latencyMs": 217
+      "latencyMs": 225
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 25,
       "ok": true,
       "status": 200,
-      "latencyMs": 468
+      "latencyMs": 227
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 26,
       "ok": true,
       "status": 200,
-      "latencyMs": 471
+      "latencyMs": 212
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 27,
       "ok": true,
       "status": 200,
-      "latencyMs": 216
+      "latencyMs": 481
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 28,
       "ok": true,
       "status": 200,
-      "latencyMs": 381
+      "latencyMs": 217
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 29,
       "ok": true,
       "status": 200,
-      "latencyMs": 382
+      "latencyMs": 478
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 30,
       "ok": true,
       "status": 200,
-      "latencyMs": 386
+      "latencyMs": 480
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 31,
       "ok": true,
       "status": 200,
-      "latencyMs": 216
+      "latencyMs": 406
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 32,
-      "ok": true,
-      "status": 200,
-      "latencyMs": 385
-    },
-    {
-      "provider": "koios-preprod-authenticated",
-      "attempt": 33,
       "ok": true,
       "status": 200,
       "latencyMs": 477
     },
     {
       "provider": "koios-preprod-authenticated",
+      "attempt": 33,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 212
+    },
+    {
+      "provider": "koios-preprod-authenticated",
       "attempt": 34,
       "ok": true,
       "status": 200,
-      "latencyMs": 205
+      "latencyMs": 210
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 35,
       "ok": true,
       "status": 200,
-      "latencyMs": 216
+      "latencyMs": 228
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 36,
       "ok": true,
       "status": 200,
-      "latencyMs": 206
+      "latencyMs": 230
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 37,
       "ok": true,
       "status": 200,
-      "latencyMs": 203
+      "latencyMs": 210
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 38,
       "ok": true,
       "status": 200,
-      "latencyMs": 380
+      "latencyMs": 479
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 39,
       "ok": true,
       "status": 200,
-      "latencyMs": 199
+      "latencyMs": 214
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 40,
       "ok": true,
       "status": 200,
-      "latencyMs": 472
+      "latencyMs": 394
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 41,
       "ok": true,
       "status": 200,
-      "latencyMs": 203
+      "latencyMs": 394
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 42,
       "ok": true,
       "status": 200,
-      "latencyMs": 219
+      "latencyMs": 214
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 43,
       "ok": true,
       "status": 200,
-      "latencyMs": 471
+      "latencyMs": 480
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 44,
       "ok": true,
       "status": 200,
-      "latencyMs": 469
+      "latencyMs": 482
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 45,
       "ok": true,
       "status": 200,
-      "latencyMs": 199
+      "latencyMs": 228
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 46,
       "ok": true,
       "status": 200,
-      "latencyMs": 385
+      "latencyMs": 501
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 47,
       "ok": true,
       "status": 200,
-      "latencyMs": 202
+      "latencyMs": 485
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 48,
       "ok": true,
       "status": 200,
-      "latencyMs": 380
+      "latencyMs": 215
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 49,
       "ok": true,
       "status": 200,
-      "latencyMs": 216
+      "latencyMs": 477
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 50,
       "ok": true,
       "status": 200,
-      "latencyMs": 198
+      "latencyMs": 212
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 51,
-      "ok": true,
-      "status": 200,
-      "latencyMs": 199
-    },
-    {
-      "provider": "koios-preprod-authenticated",
-      "attempt": 52,
-      "ok": true,
-      "status": 200,
-      "latencyMs": 199
-    },
-    {
-      "provider": "koios-preprod-authenticated",
-      "attempt": 53,
-      "ok": true,
-      "status": 200,
-      "latencyMs": 472
-    },
-    {
-      "provider": "koios-preprod-authenticated",
-      "attempt": 54,
       "ok": true,
       "status": 200,
       "latencyMs": 220
     },
     {
       "provider": "koios-preprod-authenticated",
+      "attempt": 52,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 228
+    },
+    {
+      "provider": "koios-preprod-authenticated",
+      "attempt": 53,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 218
+    },
+    {
+      "provider": "koios-preprod-authenticated",
+      "attempt": 54,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 395
+    },
+    {
+      "provider": "koios-preprod-authenticated",
       "attempt": 55,
       "ok": true,
       "status": 200,
-      "latencyMs": 468
+      "latencyMs": 228
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 56,
       "ok": true,
       "status": 200,
-      "latencyMs": 384
+      "latencyMs": 215
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 57,
       "ok": true,
       "status": 200,
-      "latencyMs": 384
+      "latencyMs": 227
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 58,
       "ok": true,
       "status": 200,
-      "latencyMs": 468
+      "latencyMs": 480
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 59,
       "ok": true,
       "status": 200,
-      "latencyMs": 393
+      "latencyMs": 482
     },
     {
       "provider": "koios-preprod-authenticated",
       "attempt": 60,
       "ok": true,
       "status": 200,
-      "latencyMs": 387
+      "latencyMs": 397
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 1,
       "ok": false,
       "status": 429,
-      "latencyMs": 172
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 2,
       "ok": false,
       "status": 429,
-      "latencyMs": 173
+      "latencyMs": 182
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 3,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 4,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 5,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 185
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 6,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 183
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 7,
       "ok": false,
       "status": 429,
-      "latencyMs": 173
+      "latencyMs": 185
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 8,
       "ok": false,
       "status": 429,
-      "latencyMs": 173
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 9,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 10,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 185
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 11,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 185
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 12,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 185
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 13,
       "ok": false,
       "status": 429,
-      "latencyMs": 171
+      "latencyMs": 183
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 14,
       "ok": false,
       "status": 429,
-      "latencyMs": 173
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 15,
       "ok": false,
       "status": 429,
-      "latencyMs": 174
+      "latencyMs": 185
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 16,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 17,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 182
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 18,
       "ok": false,
       "status": 429,
-      "latencyMs": 172
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 19,
       "ok": false,
       "status": 429,
-      "latencyMs": 173
+      "latencyMs": 184
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 20,
       "ok": false,
       "status": 429,
-      "latencyMs": 173
+      "latencyMs": 185
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 21,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 22,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 184
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 23,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 24,
       "ok": false,
       "status": 429,
-      "latencyMs": 176
+      "latencyMs": 184
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 25,
       "ok": false,
       "status": 429,
-      "latencyMs": 171
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 26,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 188
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 27,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 28,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 29,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 30,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 31,
       "ok": false,
       "status": 429,
-      "latencyMs": 172
+      "latencyMs": 182
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 32,
       "ok": false,
       "status": 429,
-      "latencyMs": 174
+      "latencyMs": 184
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 33,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 34,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 35,
       "ok": false,
       "status": 429,
-      "latencyMs": 173
+      "latencyMs": 182
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 36,
       "ok": false,
       "status": 429,
-      "latencyMs": 174
+      "latencyMs": 184
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 37,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 38,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 39,
       "ok": false,
       "status": 429,
-      "latencyMs": 174
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 40,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 41,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 42,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 43,
       "ok": false,
       "status": 429,
-      "latencyMs": 171
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 44,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 182
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 45,
       "ok": false,
       "status": 429,
-      "latencyMs": 174
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 46,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 185
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 47,
       "ok": false,
       "status": 429,
-      "latencyMs": 173
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 48,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 186
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 49,
       "ok": false,
       "status": 429,
-      "latencyMs": 178
+      "latencyMs": 183
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 50,
       "ok": false,
       "status": 429,
-      "latencyMs": 174
+      "latencyMs": 180
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 51,
       "ok": false,
       "status": 429,
-      "latencyMs": 174
+      "latencyMs": 183
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 52,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 185
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 53,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 54,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 55,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 56,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 187
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 57,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 58,
       "ok": false,
       "status": 429,
-      "latencyMs": 174
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 59,
       "ok": false,
       "status": 429,
-      "latencyMs": 170
+      "latencyMs": 181
     },
     {
       "provider": "koios-preprod-public",
       "attempt": 60,
       "ok": false,
       "status": 429,
-      "latencyMs": 169
+      "latencyMs": 181
     },
     {
       "provider": "tatum-cardano-preprod",
       "attempt": 1,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 261
+      "ok": true,
+      "status": 200,
+      "latencyMs": 805
     },
     {
       "provider": "tatum-cardano-preprod",
       "attempt": 2,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 252
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 3,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 248
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 4,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 250
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 5,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 248
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 6,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 309
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 7,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 677
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 8,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 316
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 9,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 288
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 10,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 329
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 11,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 248
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 12,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 314
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 13,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 245
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 14,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 328
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 15,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 249
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 16,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 661
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 17,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 276
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 18,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 329
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 19,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 660
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 20,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 524
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 21,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 256
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 22,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 315
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 23,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 241
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 24,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 314
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 25,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 244
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 26,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 321
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 27,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 252
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 28,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 322
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 29,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 253
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 30,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 315
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 31,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 245
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 32,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 318
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 33,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 246
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 34,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 318
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 35,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 252
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 36,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 313
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 37,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 248
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 38,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 952
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 39,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 575
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 40,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 571
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 41,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 380
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 42,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 359
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 43,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 256
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 44,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 361
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 45,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 260
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 46,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 357
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 47,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 262
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 48,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 364
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 49,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 254
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 50,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 370
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 51,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 257
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 52,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 358
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 53,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 254
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 54,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 364
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 55,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 254
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 56,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 370
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 57,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 250
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 58,
-      "ok": false,
-      "status": 400,
-      "latencyMs": 359
-    },
-    {
-      "provider": "tatum-cardano-preprod",
-      "attempt": 59,
-      "ok": false,
-      "status": 400,
+      "ok": true,
+      "status": 200,
       "latencyMs": 566
     },
     {
       "provider": "tatum-cardano-preprod",
-      "attempt": 60,
-      "ok": false,
-      "status": 400,
+      "attempt": 3,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 249
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 4,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 660
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 5,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 480
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 6,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 320
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 7,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 247
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 8,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 319
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 9,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 257
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 10,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 319
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 11,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 257
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 12,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 324
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 13,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 252
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 14,
+      "ok": true,
+      "status": 200,
       "latencyMs": 322
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 15,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 253
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 16,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 324
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 17,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 256
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 18,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 315
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 19,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 247
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 20,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 566
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 21,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 252
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 22,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 316
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 23,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 247
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 24,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 320
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 25,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 712
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 26,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 330
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 27,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 251
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 28,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 318
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 29,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 245
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 30,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 313
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 31,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 249
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 32,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 367
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 33,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 252
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 34,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 329
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 35,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 253
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 36,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 330
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 37,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 258
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 38,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 314
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 39,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 248
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 40,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 877
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 41,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 253
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 42,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 323
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 43,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 750
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 44,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 694
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 45,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 261
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 46,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 318
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 47,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 248
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 48,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 319
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 49,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 255
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 50,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 318
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 51,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 248
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 52,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 323
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 53,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 445
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 54,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 389
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 55,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 244
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 56,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 315
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 57,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 440
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 58,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 320
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 59,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 263
+    },
+    {
+      "provider": "tatum-cardano-preprod",
+      "attempt": 60,
+      "ok": true,
+      "status": 200,
+      "latencyMs": 316
     },
     {
       "provider": "nownodes-cardano",
@@ -1292,7 +1293,8 @@
       "attempt": 1,
       "ok": false,
       "status": 404,
-      "latencyMs": 742
+      "latencyMs": 741,
+      "error": "Cardano endpoint is not available on the tested NOWNodes hostname; excluded as mainnet-only"
     },
     {
       "provider": "nownodes-cardano",
@@ -1300,7 +1302,8 @@
       "attempt": 1,
       "ok": false,
       "status": 404,
-      "latencyMs": 625
+      "latencyMs": 700,
+      "error": "Cardano endpoint is not available on the tested NOWNodes hostname; excluded as mainnet-only"
     }
   ]
 }

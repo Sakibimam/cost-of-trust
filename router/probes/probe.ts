@@ -22,11 +22,11 @@ const kaios = Bun.env.KAIOS_KEY;
 const tatum = Bun.env.TATUM_API_KEY ?? valueFromZshrc("TATUM_API_KEY");
 const nownodes = Bun.env.NOWNODES_KEY ?? valueFromZshrc("NOWNODES_KEY");
 
-type Probe = { id: string; url: string; method: "GET" | "POST"; headers?: Record<string, string>; enabled: boolean; exclusionReason?: string };
+type Probe = { id: string; url: string; method: "GET" | "POST"; body?: string; headers?: Record<string, string>; enabled: boolean; exclusionReason?: string };
 const probes: Probe[] = [
   { id: "koios-preprod-authenticated", url: "https://preprod.koios.rest/api/v1/tip", method: "GET", headers: kaios ? { Authorization: `Bearer ${kaios}` } : undefined, enabled: Boolean(kaios), exclusionReason: "KAIOS_KEY is not set" },
   { id: "koios-preprod-public", url: "https://preprod.koios.rest/api/v1/tip", method: "GET", enabled: true },
-  { id: "tatum-cardano-preprod", url: "https://cardano-preprod.gateway.tatum.io/network/status", method: "POST", headers: tatum ? { "x-api-key": tatum, "content-type": "application/json" } : undefined, enabled: Boolean(tatum), exclusionReason: "TATUM_API_KEY is not set" },
+  { id: "tatum-cardano-preprod", url: "https://cardano-preprod.gateway.tatum.io/network/status", method: "POST", body: JSON.stringify({ network_identifier: { blockchain: "cardano", network: "preprod" } }), headers: tatum ? { "x-api-key": tatum, "content-type": "application/json" } : undefined, enabled: Boolean(tatum), exclusionReason: "TATUM_API_KEY is not set" },
 ];
 
 const nownodesUrls = ["https://cardano-preprod.nownodes.io/api/v0/tip", "https://cardano.nownodes.io/api/v0/tip"];
@@ -41,7 +41,7 @@ async function call(probe: Probe, attempt: number) {
   const started = performance.now();
   let status: number | null = null;
   try {
-    const response = await fetch(probe.url, { method: probe.method, headers: probe.headers, body: probe.method === "POST" ? "{}" : undefined, signal: AbortSignal.timeout(timeoutMs) });
+    const response = await fetch(probe.url, { method: probe.method, headers: probe.headers, body: probe.body, signal: AbortSignal.timeout(timeoutMs) });
     status = response.status;
     await response.arrayBuffer();
     records.push({ provider: probe.id, attempt, ok: response.ok, status, latencyMs: Math.round(performance.now() - started) });
