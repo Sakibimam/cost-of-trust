@@ -62,8 +62,11 @@ Bun.serve({ port, async fetch(request) {
         payload._bytecode = true;
         body = JSON.stringify(payload);
       }
-      const upstream = await fetch(`https://preprod.koios.rest/api/v1${path}${url.search}`, { method: request.method, headers: { authorization: `Bearer ${process.env.KAIOS_KEY}`, "content-type": request.headers.get("content-type") ?? "application/json" }, body: request.method === "GET" ? undefined : body });
-      return new Response(await upstream.arrayBuffer(), { status: upstream.status, headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" } });
+      for (let attempt = 0; ; attempt++) {
+        const upstream = await fetch(`https://preprod.koios.rest/api/v1${path}${url.search}`, { method: request.method, headers: { authorization: `Bearer ${process.env.KAIOS_KEY}`, "content-type": request.headers.get("content-type") ?? "application/json" }, body: request.method === "GET" ? undefined : body });
+        if (upstream.status !== 429 || attempt >= 5) return new Response(await upstream.arrayBuffer(), { status: upstream.status, headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" } });
+        await new Promise((resolve) => setTimeout(resolve, Number(upstream.headers.get("retry-after") ?? 0) * 1000 || 250 * 2 ** attempt));
+      }
     }
     if (request.method === "GET" && url.pathname === "/availability") return json({ available: true, seller: id, network: "cardano:preprod" });
     if (request.method === "GET" && url.pathname === "/input_schema") return json({ input_data: [{ id: "taskId", type: "string", required: true }, { id: "claimVault", type: "string", required: true }, { id: "beneficiary", type: "string", required: true }, { id: "expiry", type: "string", required: true }, { id: "priceLovelace", type: "integer", required: false }, { id: "termsHash", type: "string", required: false }] });
