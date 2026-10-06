@@ -1,0 +1,8 @@
+{
+  "selectedRoute": "underwritten",
+  "selectedSellers": ["seller-b"],
+  "reason": "coverage caps the loss",
+  "routes": [
+    { "route": "underwritten", "sellers": ["seller-b"], "riskAdjustedCostAda": 29.6 }
+  ]
+}
