@@ -14,3 +14,43 @@ export const decodePlutusData = (hex: string) => { const r = new Reader(hexBytes
 export const bytes = (d: PlutusData, name: string) => { if (d.kind !== "bytes") throw new Error(`${name} is not bytes`); return d.value; };
 export const integer = (d: PlutusData, name: string) => { if (d.kind !== "int") throw new Error(`${name} is not an integer`); return d.value; };
 export const hex = (d: PlutusData, name: string) => Buffer.from(bytes(d, name)).toString("hex");
+
+const skip = (r: Reader): void => {
+  const h = r.read(); const major = h >> 5; const info = h & 31;
+  if (major <= 1 || major === 7) { if (info >= 24 && info <= 27) arg(r, info); return; }
+  if (major === 6) { arg(r, info); skip(r); return; }
+  if (info === 31) { while (r.bytes[r.pos] !== 255) { skip(r); if (major === 5) skip(r); } r.pos++; return; }
+  const n = arg(r, info);
+  if (major === 2 || major === 3) { r.take(n); return; }
+  for (let i = 0; i < n * (major === 5 ? 2 : 1); i++) skip(r);
+};
+
+// Required signers (transaction body key 14) of a full Cardano transaction, as hex key hashes.
+// Walks the body map and skips every value it does not need; no ledger decoder.
+export const requiredSigners = (txHex: string): string[] => {
+  const r = new Reader(hexBytes(txHex));
+  if (r.read() >> 5 !== 4) throw new Error("transaction is not a cbor array");
+  const head = r.read(); if (head >> 5 !== 5) throw new Error("transaction body is not a map");
+  const indefinite = (head & 31) === 31; const n = indefinite ? 0 : arg(r, head & 31);
+  for (let i = 0; indefinite ? r.bytes[r.pos] !== 255 : i < n; i++) {
+    const key = read(r);
+    if (key.kind === "int" && key.value === 14) {
+      let h = r.read(); if (h >> 5 === 6) { arg(r, h & 31); h = r.read(); }
+      if (h >> 5 !== 4) throw new Error("required_signers is not a list");
+      const count = (h & 31) === 31 ? -1 : arg(r, h & 31); const out: string[] = [];
+      for (let j = 0; count < 0 ? r.bytes[r.pos] !== 255 : j < count; j++) out.push(hex(read(r), "required signer"));
+      return out;
+    }
+    skip(r);
+  }
+  return [];
+};
+
+// Koios renders inline datums as JSON ({constructor, fields} | {int} | {bytes} | {list}) and omits the cbor for some.
+export const plutusFromJson = (v: any): PlutusData => {
+  if (v && typeof v.int === "number") return { kind: "int", value: v.int };
+  if (v && typeof v.bytes === "string") return { kind: "bytes", value: hexBytes(v.bytes) };
+  if (v && Array.isArray(v.list)) return { kind: "list", value: v.list.map(plutusFromJson) };
+  if (v && typeof v.constructor === "number" && Array.isArray(v.fields)) return { kind: "constr", index: v.constructor, fields: v.fields.map(plutusFromJson) };
+  throw new Error("unsupported koios datum json");
+};
