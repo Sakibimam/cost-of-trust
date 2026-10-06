@@ -11,7 +11,7 @@
 - Instant x402 code: instant/ with pricing + verify gate tests (mutation proven).
 - Worker fix 3: free-text Masumi asset/policy extraction, usage completion, per-task FAILED handling; tests pass and mutation test went red then green.
 - Stuck Sokosumi tasks cleared: 01a110f9 completed with help, 01a11089 and 01a1102c failed explicitly.
-- Report server detached on PID 61598 at :8788; patched worker foreground PID 78345 is currently waiting on the fresh payment request.
+- Report server detached on PID 18678 at :8788; patched worker detached on PID 18679. The fresh payment request remains externally funded on chain but the Task has no terminal result yet.
 - Fixes 2 and 5 deployed: forged-report settlement copy now names the on-chain rejection and settlement tx context; seller endpoints now expose preprod keeper labels, registry ids, and payout addresses rather than loopback URLs.
 
 ## Broken / blocked
