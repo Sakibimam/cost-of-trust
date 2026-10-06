@@ -105,3 +105,10 @@ The web route board runs from `web/`. Keeper services expose the MIP-003 availab
 ```
 
 The on-chain suite reports 78 checks passed, and the router and CRE suites cover route arithmetic, report construction, and decision rules.
+
+## Verify it yourself
+
+```sh
+bash scripts/judge-demo.sh
+```
+
