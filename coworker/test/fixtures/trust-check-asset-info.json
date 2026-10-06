@@ -1,0 +1,17 @@
+[
+  {
+    "policy_id": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b",
+    "asset_name": "101b443d8a410f64eb02369ab743ce57e0dcafc68a4c64ded88bab415e000000",
+    "fingerprint": "asset14v0e44cknqy68agkwhq5cr5tg6plvnrtyzktxg",
+    "minting_tx_hash": "90dedd393ceb5e51f413867aa0e6e3a040306f2e8c1ea8e7e3cdb38f2671f7b2",
+    "total_supply": "1",
+    "mint_cnt": 1,
+    "burn_cnt": 0,
+    "creation_time": 1791270524,
+    "minting_tx_metadata": {
+      "674": { "msg": ["Masumi", "RegisterAgent"] },
+      "721": { "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b": { "101b443d8a410f64eb02369ab743ce57e0dcafc68a4c64ded88bab415e000000": { "name": ["Trust Check"], "api_base_url": ["http://127.0.0.1:8788"], "description": ["Live Masumi due diligence for AI agent hiring decisions."] } } }
+    },
+    "token_registry_metadata": null
+  }
+]

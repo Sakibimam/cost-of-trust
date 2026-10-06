@@ -20,6 +20,23 @@ async function getJson(source: string, url: string, init?: RequestInit): Promise
   }
 }
 
+async function routerQuote(base: string, input: CheckInput): Promise<Evidence> {
+  try {
+    const sellers = await fetch(`${base}/sellers`, { signal: AbortSignal.timeout(15_000) });
+    const sellerData = await sellers.json() as Array<Record<string, unknown>>;
+    const candidateSellers = input.sellerId
+      ? [input.sellerId]
+      : sellerData.map((seller) => String(seller.id ?? "")).filter(Boolean);
+    return await getJson("router_quote", `${base}/best-route`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ task: input.task ?? "due diligence", serviceType: "agent execution", deadline: new Date(Date.now() + 45 * 60_000).toISOString(), downstreamLossAda: input.taskValueAtRiskAda, riskAversion: 0.5, sharedInfrastructure: true, candidateSellers, constraints: { allowRedundancy: true } }),
+    });
+  } catch (error) {
+    return { source: "router_quote", status: "unavailable", observedAt: now(), error: error instanceof Error ? error.message : "router request failed" };
+  }
+}
+
 async function registryEntry(identifier: string): Promise<Evidence> {
   if (!env("REGISTRY_API_KEY")) return registryFromChain(identifier);
   const url = `${env("REGISTRY_URL")}/registry-entry/`;
@@ -45,18 +62,10 @@ function advertisedUrl(data: unknown): string | null {
   return null;
 }
 
-function koiosPath(identifier: string): string {
-  if (/^asset1[a-z0-9]+$/i.test(identifier)) return `/asset_txs?_asset_fingerprint=${encodeURIComponent(identifier)}`;
-  if (/^[0-9a-f]{56}$/i.test(identifier)) return `/credential_txs?_payment_credentials=${encodeURIComponent(identifier)}`;
-  return `/asset_txs?_asset_policy=${encodeURIComponent(identifier.slice(0, 56))}`;
-}
-
 async function gather(input: CheckInput): Promise<Evidence[]> {
-  const registry = env("REGISTRY_URL");
-  const koios = env("KOIOS_URL");
+  const network = input.network ?? "Preprod";
   const router = env("ROUTER_URL");
-  const seller = input.sellerId ?? input.agentIdentifier;
-  const registryFact = await registryEntry(input.agentIdentifier);
+  const registryFact = env("REGISTRY_API_KEY") ? await registryEntry(input.agentIdentifier) : await registryFromChain(input.agentIdentifier, network);
   const endpoint = advertisedUrl(registryFact.data);
   const endpointFacts = endpoint
     ? await Promise.all([
@@ -70,21 +79,27 @@ async function gather(input: CheckInput): Promise<Evidence[]> {
   return [
     registryFact,
     ...endpointFacts,
-    await escrowHistory(input.agentIdentifier),
-    await getJson("router_quote", `${router}/quotes/${encodeURIComponent(seller)}`),
+    await escrowHistory(input.agentIdentifier, network),
+    await routerQuote(router, input),
   ];
 }
 
 function routeFromQuote(facts: Evidence[], atRisk: number): { recommendation: TrustReport["recommendation"]; expectedCostAda: number | null } {
   const quote = facts.find((fact) => fact.source === "router_quote");
   const data = quote?.status === "ok" ? quote.data as Record<string, unknown> : undefined;
-  const route = data?.riskAdjustedCostAda ?? data?.expectedTotalCostAda;
+  const selectedRoute = String(data?.selectedRoute ?? data?.route ?? "");
+  const selected = Array.isArray(data?.routes)
+    ? data.routes.find((item) => {
+      const row = item as Record<string, unknown>;
+      return row.route === selectedRoute && JSON.stringify(row.sellers) === JSON.stringify(data?.selectedSellers);
+    }) as Record<string, unknown> | undefined
+    : undefined;
+  const route = selected?.riskAdjustedCostAda ?? selected?.expectedTotalCostAda ?? data?.riskAdjustedCostAda ?? data?.expectedTotalCostAda;
   const expectedCostAda = typeof route === "number" && Number.isFinite(route) ? route : null;
   if (expectedCostAda === null) return { recommendation: "insufficient_data", expectedCostAda: null };
   if (expectedCostAda > atRisk) return { recommendation: "do_not_hire", expectedCostAda };
-  const selected = String(data?.selectedRoute ?? data?.route ?? "");
-  if (selected.includes("underwritten")) return { recommendation: "require_coverage", expectedCostAda };
-  if (selected.includes("redundant") || selected.includes("staggered")) return { recommendation: "hire_with_backup_keeper", expectedCostAda };
+  if (selectedRoute.includes("underwritten")) return { recommendation: "require_coverage", expectedCostAda };
+  if (selectedRoute.includes("redundant") || selectedRoute.includes("staggered")) return { recommendation: "hire_with_backup_keeper", expectedCostAda };
   return { recommendation: "hire_as_is", expectedCostAda };
 }
 

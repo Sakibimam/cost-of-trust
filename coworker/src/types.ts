@@ -3,6 +3,7 @@ export type CheckInput = {
   taskValueAtRiskAda: number;
   task?: string;
   sellerId?: string;
+  network?: "Preprod" | "Mainnet";
 };
 
 export type Evidence = {
