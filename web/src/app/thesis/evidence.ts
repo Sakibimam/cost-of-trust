@@ -16,11 +16,11 @@ export const instant = {
   split: "6a95f5f961678456c6f83b3e9edbaf0d169c96acd03af555f3d3031ce2a4f5d9",
 } as const;
 
-// Source: coworker/README.md, Paid Task evidence.
+// Source: local MPS PaymentRequest tx history for Sokosumi Task 01a11153-9886 (delivered report sha256 923cdcd5..., 4/4 facts ok), each tx confirmed by Koios preprod tx_status on 2026-10-06.
 export const coworker = [
-  ["Buyer funds escrow", "a6e3fbda65dd8a05b7252e1205f55ba34986b68df75f89e5430ab80818370e85"],
-  ["Trust Check submits result", "8c9db32499ec2bdb8c275627f5530eb6d89a5c0ab7642d909c82d3d9ff51afad"],
-  ["Seller collects", "9c560b70982fb56766919f21087e811a52133fe665e66ccfe1a5da012f4286a0"],
+  ["Buyer funds escrow", "be70aa09631cb3a7bda74bd09b91fa5d837e9408e2f889c80a71ce0bb7f08892"],
+  ["Trust Check submits result", "0be9fa229a864ddbaa8847afa84657d535d93d4a26fdbab506e2a2ebde573f91"],
+  ["Seller collects", "6b8bab2e1f143467ba52001d928eade55ee71b9540b768d5870e9aaa18108630"],
 ] as const;
 
 export const quotes = [

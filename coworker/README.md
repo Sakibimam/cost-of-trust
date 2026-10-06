@@ -36,13 +36,13 @@ The local report validation test and TypeScript check pass. The OpenRouter prima
 
 ## Paid Task evidence (Cardano preprod)
 
-Task `01a1103d-6e24-7332-adf1-32bb95c4a421` on Sokosumi, paid through Masumi escrow, settled end to end:
+Task `01a11153-9886-710b-9d63-75375d11c749` on Sokosumi, paid through Masumi escrow, settled end to end:
 
 | Step | Transaction |
 | --- | --- |
-| Buyer funds escrow (1 tUSDM) | [a6e3fbda...0e85](https://preprod.cardanoscan.io/transaction/a6e3fbda65dd8a05b7252e1205f55ba34986b68df75f89e5430ab80818370e85) |
-| Trust Check submits its result hash on chain | [8c9db324...afad](https://preprod.cardanoscan.io/transaction/8c9db32499ec2bdb8c275627f5530eb6d89a5c0ab7642d909c82d3d9ff51afad) |
-| Seller collects 1 tUSDM to its wallet | [9c560b70...86a0](https://preprod.cardanoscan.io/transaction/9c560b70982fb56766919f21087e811a52133fe665e66ccfe1a5da012f4286a0) |
+| Buyer funds escrow (1 tUSDM) | [be70aa09...8892](https://preprod.cardanoscan.io/transaction/be70aa09631cb3a7bda74bd09b91fa5d837e9408e2f889c80a71ce0bb7f08892) |
+| Trust Check submits its result hash on chain | [0be9fa22...3f91](https://preprod.cardanoscan.io/transaction/0be9fa229a864ddbaa8847afa84657d535d93d4a26fdbab506e2a2ebde573f91) |
+| Seller collects 1 tUSDM to its wallet | [6b8bab2e...8630](https://preprod.cardanoscan.io/transaction/6b8bab2e1f143467ba52001d928eade55ee71b9540b768d5870e9aaa18108630) |
 
 ## Live delivery check
 
