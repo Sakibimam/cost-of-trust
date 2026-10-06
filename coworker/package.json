@@ -1,0 +1,18 @@
+{
+  "name": "trust-check-coworker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --import tsx --test test/*.test.ts",
+    "dev": "node --import tsx src/server.ts",
+    "worker": "node --import tsx src/worker.ts"
+  },
+  "dependencies": {
+    "@lucid-evolution/lucid": "0.6.5",
+    "ai": "^7.0.128",
+    "tsx": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4"
+  }
+}

@@ -1,0 +1,6 @@
+.env.local
+SETUP-RECORD.md
+*.log
+*.pid
+result.txt
+node_modules/
