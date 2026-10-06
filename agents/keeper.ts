@@ -55,14 +55,14 @@ Bun.serve({ port, async fetch(request) {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/koios/")) {
       const path = url.pathname.slice("/koios".length);
-      const raw = await request.text();
-      let body = raw;
+      const raw = path === "/submittx" ? "" : await request.text();
+      let body: BodyInit | undefined = path === "/submittx" ? await request.arrayBuffer() : raw;
       if (path === "/tx_info" && raw) {
         const payload = JSON.parse(raw) as Record<string, unknown>;
         payload._bytecode = true;
         body = JSON.stringify(payload);
       }
-      const upstream = await fetch(`https://preprod.koios.rest/api/v1${path}${url.search}`, { method: request.method, headers: { authorization: `Bearer ${process.env.KAIOS_KEY}`, "content-type": "application/json" }, body: request.method === "GET" ? undefined : body });
+      const upstream = await fetch(`https://preprod.koios.rest/api/v1${path}${url.search}`, { method: request.method, headers: { authorization: `Bearer ${process.env.KAIOS_KEY}`, "content-type": request.headers.get("content-type") ?? "application/json" }, body: request.method === "GET" ? undefined : body });
       return new Response(await upstream.arrayBuffer(), { status: upstream.status, headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" } });
     }
     if (request.method === "GET" && url.pathname === "/availability") return json({ available: true, seller: id, network: "cardano:preprod" });
