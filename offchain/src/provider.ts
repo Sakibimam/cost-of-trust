@@ -1,4 +1,4 @@
-import { Koios, Lucid, type LucidEvolution, type Network, type Provider } from "@lucid-evolution/lucid";
+import { Koios, Lucid, type LucidEvolution, type Network, type Provider, type UTxO } from "@lucid-evolution/lucid";
 
 export const KOIOS_URL = "https://preprod.koios.rest/api/v1";
 const key = () => process.env.KAIOS_KEY ?? process.env.KOIOS_API_KEY ?? (() => { throw new Error("KAIOS_KEY is not set"); })();
@@ -31,7 +31,24 @@ export function installKoios(): void {
 }
 export async function makeLucid(): Promise<LucidEvolution> {
   installKoios();
-  return Lucid(new Koios(KOIOS_URL) as Provider, "Preprod" as Network);
+  const koios = new Koios(KOIOS_URL);
+  const provider = Object.assign(Object.create(koios) as Provider, {
+    getUtxosByOutRef: async (refs: Array<{ txHash: string; outputIndex: number }>): Promise<UTxO[]> => {
+      const response = await fetch(`${KOIOS_URL}/tx_info`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ _tx_hashes: [...new Set(refs.map((ref) => ref.txHash))], _assets: true, _scripts: true, _bytecode: true }) });
+      if (!response.ok) throw new Error(`Koios tx_info returned ${response.status}`);
+      const rows = await response.json() as Array<{ block_height: number; outputs: Array<any> }>;
+      return rows.flatMap((row) => row.outputs.map((output) => ({
+        txHash: output.tx_hash,
+        outputIndex: output.tx_index,
+        address: output.payment_addr.bech32,
+        assets: { lovelace: BigInt(output.value), ...Object.fromEntries((output.asset_list ?? []).map((asset: any) => [`${asset.policy_id}${asset.asset_name ?? ""}`, BigInt(asset.quantity)])) },
+        datum: output.inline_datum?.bytes ?? undefined,
+        datumHash: output.datum_hash ?? undefined,
+        scriptRef: undefined,
+      }))).filter((utxo) => refs.some((ref) => ref.txHash === utxo.txHash && ref.outputIndex === utxo.outputIndex)) as UTxO[];
+    },
+  });
+  return Lucid(provider, "Preprod" as Network);
 }
 export async function waitForTx(txHash: string, timeoutMs = 240_000): Promise<{ txHash: string; confirmations: number }> {
   installKoios();
