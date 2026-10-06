@@ -1,0 +1,17 @@
+{
+  "name": "sdk",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": { "test": "bun test" },
+  "devDependencies": {
+    "@types/bun": "^1.4.2"
+  },
+  "peerDependencies": {
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@x402/cardano": "2.28.0",
+    "@x402/core": "2.28.0"
+  }
+}
