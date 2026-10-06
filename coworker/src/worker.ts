@@ -18,14 +18,18 @@ async function taskEvent(taskId: string, body: Record<string, unknown>): Promise
   return payload.data;
 }
 
+// Polls overlap while a paid task waits on escrow; a READY listing can lag the RUNNING event, so a task is taken once per process.
+const inFlight = new Set<string>();
+
 async function once(): Promise<void> {
   const coworker = env("SOKOSUMI_COWORKER_ID"); if (!coworker) throw new Error("SOKOSUMI_COWORKER_ID is required");
   const response = await core("/tasks?scope=owned");
   if (!response.ok) throw new Error(`Sokosumi task list HTTP ${response.status}`);
   const parsed = await response.json() as Array<Record<string, unknown>> | { tasks?: Array<Record<string, unknown>>; data?: Array<Record<string, unknown>> };
   const tasks = Array.isArray(parsed) ? parsed : parsed.tasks ?? parsed.data ?? [];
-  for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker)) {
+  for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker && !inFlight.has(String(item.id)))) {
     const id = String(task.id);
+    inFlight.add(id);
     const input = typeof task.description === "string" ? task.description : String(task.input ?? "");
     try {
       const reportInput = parseTaskInput(input);
