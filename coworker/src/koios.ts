@@ -30,7 +30,7 @@ export const request = async (path: string, init: RequestInit = {}, network: Net
     headers: { accept: "application/json", "content-type": "application/json", ...(key ? { authorization: `Bearer ${key}` } : {}), ...(init.headers ?? {}) },
     signal: AbortSignal.timeout(20_000),
   });
-  if (response.status === 429 && attempt < 8) {
+  if (response.status === 429 && attempt < 4) {
     const wait = Number(response.headers.get("retry-after")) * 1000 || 2_000 * 2 ** attempt;
     await new Promise((resolve) => setTimeout(resolve, wait));
     return request(path, init, network, attempt + 1);
