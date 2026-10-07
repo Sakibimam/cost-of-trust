@@ -29,6 +29,7 @@ fn good() -> ConfigDatum {
     workflow_name: vectors.name,
     workflow_cid: vectors.cid,
     don_config_digest: vectors.don_config_digest,
+    claim_vault_hash: vectors.claim_vault_hash,
   }
 }
 

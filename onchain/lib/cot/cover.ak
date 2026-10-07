@@ -4,6 +4,7 @@
 //// Settle is open from task_expiry to decide_by and only SUCCESS or FAILURE settle; Expire opens at decide_by.
 
 use aiken/collection/list
+use cardano/address.{Script}
 use cardano/assets.{PolicyId}
 use cardano/transaction.{InlineDatum, OutputReference, Transaction}
 use cot/cre
@@ -23,6 +24,17 @@ fn config_from(tx: Transaction, policy: PolicyId) -> ConfigDatum {
   expect InlineDatum(raw) = input.output.datum
   expect cfg: ConfigDatum = raw
   cfg
+}
+
+fn task_is_claim_vault(tx: Transaction, task_ref: OutputReference, vault_hash: ByteArray) -> Bool {
+  list.any(tx.inputs, fn(i) {
+    i.output_reference == task_ref
+      && i.output.address.payment_credential == Script(vault_hash)
+  })
+    || list.any(tx.reference_inputs, fn(i) {
+      i.output_reference == task_ref
+        && i.output.address.payment_credential == Script(vault_hash)
+    })
 }
 
 /// Lovelace of collateral a FAILURE payout must leave behind.
@@ -56,6 +68,7 @@ pub fn validate(
         lower_bound_from(tx, d.task_expiry),
         upper_bound_at_most(tx, d.decide_by),
         d.config_digest == config_digest(cfg),
+        task_is_claim_vault(tx, d.task_ref, cfg.claim_vault_hash),
         cre.context_config_digest(report_context) == cfg.don_config_digest,
         cre.verify_report(
           raw_report,

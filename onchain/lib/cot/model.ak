@@ -50,6 +50,8 @@ pub type ConfigDatum {
   workflow_cid: ByteArray,
   /// 32-byte DON config digest: the first 32 bytes of every Settle report_context.
   don_config_digest: ByteArray,
+  /// Payment credential of every claim-vault task referenced by coverage.
+  claim_vault_hash: ByteArray,
 }
 
 pub type CoverageRedeemer {
@@ -188,10 +190,11 @@ pub fn config_ok(c: ConfigDatum) -> Bool {
     length_of_bytearray(c.workflow_name) == 10,
     length_of_bytearray(c.workflow_cid) == 32,
     length_of_bytearray(c.don_config_digest) == 32,
+    length_of_bytearray(c.claim_vault_hash) == 28,
   }
 }
 
-/// Digest the coverage datum pins: blake2b_256(f(1) | owner(20) | name(10) | cid(32) | don_config_digest(32) | n(1) | signers(20 each)).
+/// Digest the coverage datum pins: blake2b_256(f(1) | owner(20) | name(10) | cid(32) | don_config_digest(32) | claim_vault_hash(28) | n(1) | signers(20 each)).
 pub fn config_digest(c: ConfigDatum) -> ByteArray {
   let head =
     integer_to_bytearray(True, 1, c.f)
@@ -199,6 +202,7 @@ pub fn config_digest(c: ConfigDatum) -> ByteArray {
       |> append_bytearray(c.workflow_name)
       |> append_bytearray(c.workflow_cid)
       |> append_bytearray(c.don_config_digest)
+      |> append_bytearray(c.claim_vault_hash)
       |> append_bytearray(integer_to_bytearray(True, 1, list.length(c.signers)))
   blake2b_256(
     list.foldl(c.signers, head, fn(s, acc) { append_bytearray(acc, s) }),

@@ -33,10 +33,11 @@ const TASK_INDEX = 1;
 const signers = privs.map((p) => addr20(pub64(p)));
 
 const donConfigDigest = keccak_256(ascii('cost-of-trust ocr config digest'));
+const claimVaultHash = Uint8Array.from(Buffer.from('584e049ca0f1fc528c3ca3551145a6f074e9cdc5635ece1df4b5563b', 'hex'));
 
 // config digest, mirrored by lib/cot/model.ak config_digest
 const digest = Buffer.from(
-  blake2b(cat(Uint8Array.of(F), owner, name, cid, donConfigDigest, Uint8Array.of(signers.length), ...signers), { dkLen: 32 }),
+  blake2b(cat(Uint8Array.of(F), owner, name, cid, donConfigDigest, claimVaultHash, Uint8Array.of(signers.length), ...signers), { dkLen: 32 }),
 );
 
 const header = (wfName) =>
@@ -93,6 +94,8 @@ pub const task_tx: ByteArray = ${hex(taskTx)}
 pub const task_index: Int = ${TASK_INDEX}
 
 pub const don_config_digest: ByteArray = ${hex(donConfigDigest)}
+
+pub const claim_vault_hash: ByteArray = ${hex(claimVaultHash)}
 
 pub const context: ByteArray = ${hex(context)}
 

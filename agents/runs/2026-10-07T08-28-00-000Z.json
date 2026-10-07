@@ -1,0 +1,78 @@
+{
+  "startedAt": "2026-10-07T08:28:00.000Z",
+  "deployment": {
+    "configTx": "631d40a9a001ff9620076047d7d3d7222a47f61d0f663d6abfee800c7770c9a4",
+    "configTxKoios": { "num_confirmations": 6 },
+    "configPolicyId": "d3aa0de999eca3d17ed3e3581d5ebda41771546a25bbfeaf3b1ba313",
+    "coverageAddress": "addr_test1wzxzusuteu9rncmpryrxm0fd7qg59zuxmpuk346kkehnxss0hu6y0",
+    "workflowOwner": "8b11daff84317c7bf96e685da76e063aa73a4ca5",
+    "signerSet": "agents/.signers.json, locally generated secp256k1 keys"
+  },
+  "records": [
+    {
+      "step": "task_lock_attempt_1",
+      "txHash": "55cec9a5a61d1e110a5815838ca908064f3bb3fbb1230d882ae0cbf18ecd1edc",
+      "confirmed": true,
+      "note": "coverage creation correctly refused after confirmation consumed the short expiry margin"
+    },
+    {
+      "step": "task_lock_attempt_2",
+      "txHash": "e9a808378cdfdae3a2ca914505020ac4bf11bcfa85363800ecd7b874ac70721b",
+      "confirmed": true
+    },
+    {
+      "step": "task_lock_final",
+      "txHash": "10784f727599c37c1d9851b57d5151190de31449cc9b7c61723bf78ba3cefc0a",
+      "confirmed": true
+    },
+    {
+      "step": "coverage_lock_final",
+      "txHash": "8dd81a159eca155431cd6524a075cc189e3ee9c7245011c0d3f9c9e6d52c6f20",
+      "ref": "8dd81a159eca155431cd6524a075cc189e3ee9c7245011c0d3f9c9e6d52c6f20#0",
+      "confirmed": true,
+      "koiosTxStatus": { "num_confirmations": 6 }
+    },
+    {
+      "step": "cre_native_report",
+      "status": "blocked",
+      "error": "workflow execution failed: [2]Unknown: cannot wrap null/undefined into Value",
+      "surface": "CRE workflow simulator before report delivery; report sink received no report"
+    },
+    {
+      "step": "flipped_report",
+      "status": "not_run",
+      "reason": "no native report was produced, so no re-signed test report was used"
+    },
+    {
+      "step": "old_coverage_expire",
+      "ref": "4316257a6c9f36782bf1db69ce624a2b225f11327fe4b48bae84bfc08cd7bb11#0",
+      "txHash": "2905ddf2f8ca6585746cfa6551950d47cffdfcae14ad3cfcfc53a4a02e9b2795",
+      "confirmed": true,
+      "koiosTxStatus": { "num_confirmations": 2 }
+    }
+  ],
+  "oldCoverageNotReclaimed": {
+    "reason": "Koios address indexing still exposed stale UTxOs; direct Expire submission returned All inputs are spent. Transaction has probably already been included",
+    "refs": [
+      "4bd9a59dd9c7e3ad02016f7786c9ba23652504ef217a8cb2bc435865eaa85819#0",
+      "9f38341922c092e50676b4e4ee3e51f79ac3bedfc5add2c85ecafb2882c2f079#0",
+      "d3cd6d54685cc1462199a44e77cec2cc29b613d94590d4ad0a2f19724381be9f#0",
+      "a6bdab0741c179b51c790923a7a51d57f9412875ecaa2fabc3dfbfcf994bbe5f#0",
+      "931712b9a20ca04016b9550d5b3c3b6c39e82d056b306f8a957a4ee6695b56e1#0",
+      "60b406eff3a85aa1f6d7a5fbe24a3154348a320f80253c8612f030aad7e5598a#0",
+      "60bbf092558fe6b5ad352f9a6f3602a8f9a1326569ec400971289dfeb3c830d4#0",
+      "fae3165313a55af53d61cd6b4e21aa0f7516b9d3ab8e23bc2e97f19461ab5a4c#0",
+      "e0479ed35427b598214a6a1c1dc1e97ae16edc07b0690c8eaa8b996a3fd4be5e#0",
+      "3925fe037df399faae8d6b3100e4d317ae45cf40b9148e44d9a134b5ab7d8687#0",
+      "3207abfbab7e5382445220b1474b22a5dd4a96730cfb98a8ca7e86cb7e3f415e#0",
+      "75d1c980dff9387ce49dcb96db2901adb332cf40b9148e44d9a134b5ab7d8687#0",
+      "0f1ef85d370052e3b00faf984db0aeab5ed32fd9a4dac2dfa26de93a65609fc2#0",
+      "8b175f671aad445d7b11da567851feb16384fff0e91db242868d21af8e6a7ddd#0"
+    ]
+  },
+  "verification": {
+    "aiken": "80 checks, 0 errors, 0 warnings",
+    "mutation": "removing the task_is_claim_vault guard made fake_key_task_ref_rejected fail; restored green",
+    "workflowOwnerNote": "locally controlled secp256k1 owner key generated with crypto random; not the leaked 001122... value"
+  }
+}

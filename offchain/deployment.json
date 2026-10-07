@@ -1,11 +1,11 @@
 {
   "seed": {
-    "txHash": "4226e3554e83075a2ce9167bbe5f4b091795c675f08d9daa18cd69c9cddd708b",
-    "outputIndex": 1
+    "txHash": "5f44c119aba938848be23a20abd542f473cc4c6447b5e41e2450c032473d10ff",
+    "outputIndex": 0
   },
-  "configPolicyId": "5834a137e2612283f02c2b9942372d081cac914bd7528eea56c9ac18",
+  "configPolicyId": "d3aa0de999eca3d17ed3e3581d5ebda41771546a25bbfeaf3b1ba313",
   "configLockHash": "fc20070d1e5379403add6acbf77b233b2f8240821c187b398525de28",
   "configAddress": "addr_test1wr7zqpcdrefhjsp6m44vhammyvajlqjqsgwps7ees5jau2q8gr5av",
   "claimAddress": "addr_test1wpvyupyu5rclc55v8j342y295mc8f6wdc434ansa7j64vwc2mvcle",
-  "coverageAddress": "addr_test1wqzezvaj9mg39pdfg8hakgx7r5hkr8fra9xcqk7whre7ams7d25s9"
+  "coverageAddress": "addr_test1wzxzusuteu9rncmpryrxm0fd7qg59zuxmpuk346kkehnxss0hu6y0"
 }

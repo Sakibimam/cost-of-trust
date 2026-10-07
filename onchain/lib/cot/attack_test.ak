@@ -154,6 +154,7 @@ fn config() -> ConfigDatum {
     workflow_name: vectors.name,
     workflow_cid: vectors.cid,
     don_config_digest: vectors.don_config_digest,
+    claim_vault_hash: vectors.claim_vault_hash,
   }
 }
 
@@ -172,6 +173,21 @@ fn config_input() -> Input {
         1,
       ),
       datum: InlineDatum(config()),
+      reference_script: None,
+    },
+  }
+}
+
+fn task_input() -> Input {
+  Input {
+    output_reference: task_ref(),
+    output: Output {
+      address: Address {
+        payment_credential: Script(vectors.claim_vault_hash),
+        stake_credential: None,
+      },
+      value: assets.from_lovelace(3_000_000),
+      datum: NoDatum,
       reference_script: None,
     },
   }
@@ -207,7 +223,7 @@ fn cover_tx(
 ) -> Transaction {
   Transaction {
     ..transaction.placeholder,
-    inputs,
+    inputs: [task_input(), ..inputs],
     reference_inputs: [config_input()],
     outputs,
     validity_range: validity,

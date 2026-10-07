@@ -73,6 +73,7 @@ fn config() -> ConfigDatum {
     workflow_name: vectors.name,
     workflow_cid: vectors.cid,
     don_config_digest: vectors.don_config_digest,
+    claim_vault_hash: vectors.claim_vault_hash,
   }
 }
 
@@ -124,6 +125,18 @@ fn config_input(cfg: ConfigDatum) -> Input {
   }
 }
 
+fn task_input(address: Address) -> Input {
+  Input {
+    output_reference: task(),
+    output: Output {
+      address,
+      value: assets.from_lovelace(3_000_000),
+      datum: NoDatum,
+      reference_script: None,
+    },
+  }
+}
+
 fn tagged(address: Address, lovelace: Int, tag: OutputReference) -> Output {
   Output {
     address,
@@ -158,13 +171,33 @@ fn run(
     own_ref(),
     Transaction {
       ..transaction.placeholder,
-      inputs: [cover_input()],
+      inputs: [task_input(Address { payment_credential: Script(vectors.claim_vault_hash), stake_credential: None }), cover_input()],
       reference_inputs: [config_input(cfg)],
       outputs,
       validity_range: validity,
       extra_signatories: signatories,
     },
   )
+}
+
+test fake_key_task_ref_rejected() {
+  !cover.validate(
+    config_policy,
+    Some(datum()),
+    settle(vectors.report_failure, pick(vectors.sigs_failure, [0, 1]), pick(vectors.pubkeys, [0, 1])),
+    own_ref(),
+    Transaction {
+      ..transaction.placeholder,
+      inputs: [task_input(wallet(buyer_key)), cover_input()],
+      reference_inputs: [config_input(config())],
+      outputs: failure_outputs(),
+      validity_range: window(),
+    },
+  )
+}
+
+test real_claim_vault_task_ref_accepted() {
+  settle_with(vectors.report_failure, vectors.sigs_failure, failure_outputs())
 }
 
 fn settle(
