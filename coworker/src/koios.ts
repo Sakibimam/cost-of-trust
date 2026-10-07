@@ -1,11 +1,12 @@
 import { env, loadEnv } from "./config.ts";
 import type { Evidence } from "./types.ts";
+import escrowIndexFile from "../../web/src/data/escrow-index.json" with { type: "json" };
 
 loadEnv();
 
 export type Network = "Preprod" | "Mainnet";
 
-const policies = (network: Network) => network === "Mainnet"
+export const policies = (network: Network) => network === "Mainnet"
   ? [
     env("MASUMI_REGISTRY_POLICY_V1_MAINNET", "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9"),
     env("MASUMI_REGISTRY_POLICY_V2_MAINNET", "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b"),
@@ -16,7 +17,7 @@ const policies = (network: Network) => network === "Mainnet"
   ];
 
 // Masumi payment (escrow) contracts, V2 then V1, from the Masumi Payment Service sources and migrations.
-const contracts = (network: Network) => network === "Mainnet"
+export const contracts = (network: Network) => network === "Mainnet"
   ? env("MASUMI_PAYMENT_CONTRACTS_MAINNET", "addr1wxs4e6wc95hkwezlccjw9mdvq0r0rsgx6zk34avptga3ftgge2j6d,addr1wx7j4kmg2cs7yf92uat3ed4a3u97kr7axxr4avaz0lhwdsq87ujx7").split(",")
   : env("MASUMI_PAYMENT_CONTRACTS_PREPROD", "addr_test1wzs4e6wc95hkwezlccjw9mdvq0r0rsgx6zk34avptga3ftgn37w4g,addr_test1wz7j4kmg2cs7yf92uat3ed4a3u97kr7axxr4avaz0lhwdsqukgwfm").split(",");
 
@@ -29,7 +30,7 @@ export const request = async (path: string, init: RequestInit = {}, network: Net
     headers: { accept: "application/json", "content-type": "application/json", ...(key ? { authorization: `Bearer ${key}` } : {}), ...(init.headers ?? {}) },
     signal: AbortSignal.timeout(20_000),
   });
-  if (response.status === 429 && attempt < 4) {
+  if (response.status === 429 && attempt < 8) {
     const wait = Number(response.headers.get("retry-after")) * 1000 || 2_000 * 2 ** attempt;
     await new Promise((resolve) => setTimeout(resolve, wait));
     return request(path, init, network, attempt + 1);
@@ -38,21 +39,35 @@ export const request = async (path: string, init: RequestInit = {}, network: Net
   return response.json();
 };
 
-const post = (path: string, body: unknown, network: Network = "Preprod") => request(path, { method: "POST", body: JSON.stringify(body) }, network);
+export const post = (path: string, body: unknown, network: Network = "Preprod") => request(path, { method: "POST", body: JSON.stringify(body) }, network);
 
 type Row = Record<string, unknown>;
 const PAGE = 1000;
 
+// Registry policies change slowly; listing them on every task is the call Koios rate-limits first.
+const policyCache = new Map<string, { at: number; rows: Row[] }>();
+const POLICY_TTL_MS = 30 * 60_000;
+
 async function policyAssets(policy: string, network: Network): Promise<Row[]> {
-  const rows: Row[] = [];
-  for (let offset = 0; ; offset += PAGE) {
-    const page = await request(`/policy_asset_list?_asset_policy=${policy}&limit=${PAGE}&offset=${offset}`, {}, network) as Row[];
-    rows.push(...page);
-    if (page.length < PAGE) return rows;
+  const key = `${network}:${policy}`;
+  const hit = policyCache.get(key);
+  if (hit && Date.now() - hit.at < POLICY_TTL_MS) return hit.rows;
+  try {
+    const rows: Row[] = [];
+    for (let offset = 0; ; offset += PAGE) {
+      const page = await request(`/policy_asset_list?_asset_policy=${policy}&limit=${PAGE}&offset=${offset}`, {}, network) as Row[];
+      rows.push(...page);
+      if (page.length < PAGE) break;
+    }
+    policyCache.set(key, { at: Date.now(), rows });
+    return rows;
+  } catch (error) {
+    if (hit) return hit.rows;
+    throw error;
   }
 }
 
-function decodePaymentCredential(address: string): string | null {
+export function decodePaymentCredential(address: string): string | null {
   const alphabet = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
   const separator = address.lastIndexOf("1");
   if (separator < 1) return null;
@@ -172,7 +187,8 @@ export function escrowParty(datum: PlutusJson | undefined): { seller: string; bu
 const ACTIONS: Record<number, "paid" | "refunded" | "disputed" | "resultsSubmitted"> = { 0: "paid", 3: "refunded", 4: "disputed", 5: "resultsSubmitted" };
 
 type TxOutput = { tx_hash?: string; tx_index?: number; payment_addr?: { bech32?: string }; inline_datum?: { value?: PlutusJson } | null };
-type TxInfo = {
+export type TxInfo = {
+  block_height?: number;
   tx_hash: string; tx_timestamp: number;
   inputs?: TxOutput[];
   outputs?: TxOutput[];
@@ -215,9 +231,75 @@ export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: st
   }
 }
 
-// ponytail: reads the newest SCAN_CAP contract txs since registration; a busy mainnet contract (33k txs) needs an indexer for full history.
-const SCAN_CAP = Number(env("ESCROW_SCAN_CAP", "1000"));
+// Full escrow history up to a block is precomputed by scripts/escrow-index.ts with no scan cap.
+// deliveryHistory reads that snapshot and live-scans only the txs after it, so the result is
+// complete and still fast.
+export type Wait = { at: number; seconds: number };
+export type IndexedAgent = {
+  paid: number; refunded: number; disputed: number; resultsSubmitted: number; escrowsOpened: number; walletOnly: number;
+  buyers: string[]; responseSecondsMedian: number | null; responseSecondsP90: number | null; lastTxTime: number | null;
+  scannedThroughBlock: number; generatedAt: string;
+  waits: Wait[]; openPending: Record<string, number>; events: DeliveryTally["events"];
+};
+export type EscrowIndex = { network: "Mainnet"; generatedAt: string | null; agents: Record<string, IndexedAgent> };
+
+let escrowIndex = escrowIndexFile as unknown as EscrowIndex;
+export function setEscrowIndexForTests(next: EscrowIndex | undefined) { escrowIndex = next ?? (escrowIndexFile as unknown as EscrowIndex); }
+
+const WAITS_KEPT = 200;
+const PENDING_KEPT = 100;
+
+// Sorts events, derives response times (opening tx known from this tally or carried over in
+// priorOpens) and returns the data the index must carry forward to merge later txs.
+export function finishTally(tally: DeliveryTally, priorOpens: Record<string, number> = {}, priorWaits: Wait[] = []): { waits: Wait[]; openPending: Record<string, number> } {
+  tally.events.sort((a, b) => b.blockTime - a.blockTime);
+  const opened = new Map<string, number>(Object.entries(priorOpens));
+  for (const event of tally.events) if (event.action === "escrowOpened") opened.set(event.txHash, event.blockTime);
+  const submissions = tally.submissions ?? [];
+  const waits = [
+    ...submissions.filter((s) => opened.has(s.openTx)).map((s) => ({ at: s.at, seconds: s.at - opened.get(s.openTx)! })),
+    ...priorWaits,
+  ].sort((a, b) => b.at - a.at).slice(0, WAITS_KEPT);
+  const sortedWaits = waits.map((wait) => wait.seconds).sort((a, b) => a - b);
+  tally.responseSeconds = waits.map((wait) => wait.seconds);
+  tally.responseSecondsMedian = sortedWaits.length ? sortedWaits[Math.floor(sortedWaits.length / 2)] : null;
+  tally.responseSecondsP90 = sortedWaits.length ? sortedWaits[Math.ceil(sortedWaits.length * 0.9) - 1] : null;
+  const answered = new Set(submissions.map((s) => s.openTx));
+  const openPending = Object.fromEntries([...opened].filter(([tx]) => !answered.has(tx)).sort((a, b) => b[1] - a[1]).slice(0, PENDING_KEPT));
+  return { waits, openPending };
+}
+
+export function toIndexed(tally: DeliveryTally, scannedThroughBlock: number, generatedAt: string, priorOpens: Record<string, number> = {}, priorWaits: Wait[] = []): IndexedAgent {
+  const { waits, openPending } = finishTally(tally, priorOpens, priorWaits);
+  return {
+    paid: tally.paid, refunded: tally.refunded, disputed: tally.disputed, resultsSubmitted: tally.resultsSubmitted, escrowsOpened: tally.escrowsOpened,
+    walletOnly: tally.walletOnly ?? 0, buyers: tally.buyers ?? [],
+    responseSecondsMedian: tally.responseSecondsMedian ?? null, responseSecondsP90: tally.responseSecondsP90 ?? null,
+    lastTxTime: tally.events[0]?.blockTime ?? null, scannedThroughBlock, generatedAt,
+    waits, openPending, events: tally.events.slice(0, 20),
+  };
+}
+
+// indexed covers every tx up to scannedThroughBlock, live only txs after it: the two never overlap.
+export function mergeIndexed(indexed: IndexedAgent, live: DeliveryTally): DeliveryTally {
+  const merged: DeliveryTally = {
+    escrowsOpened: indexed.escrowsOpened + live.escrowsOpened,
+    resultsSubmitted: indexed.resultsSubmitted + live.resultsSubmitted,
+    paid: indexed.paid + live.paid,
+    refunded: indexed.refunded + live.refunded,
+    disputed: indexed.disputed + live.disputed,
+    buyers: [...new Set([...indexed.buyers, ...(live.buyers ?? [])])],
+    submissions: live.submissions,
+    events: [...live.events, ...indexed.events],
+  };
+  const walletOnly = indexed.walletOnly + (live.walletOnly ?? 0);
+  if (walletOnly) merged.walletOnly = walletOnly;
+  finishTally(merged, indexed.openPending, indexed.waits);
+  return merged;
+}
+
 const CHUNK = 50;
+const SCAN_CAP = Number(env("ESCROW_SCAN_CAP", "1000"));
 
 export async function deliveryHistory(identifier: string, network: Network = "Preprod"): Promise<Evidence> {
   const observedAt = () => new Date().toISOString();
@@ -231,31 +313,30 @@ export async function deliveryHistory(identifier: string, network: Network = "Pr
     const sellers = new Set(holders.map((holder) => decodePaymentCredential(String(holder.payment_address ?? ""))).filter((cred): cred is string => Boolean(cred)));
     const [mint] = await post("/tx_info", { _tx_hashes: [info.minting_tx_hash], _inputs: false, _metadata: false, _assets: false, _withdrawals: false, _certs: false, _scripts: false, _bytecode: false }, network) as Row[];
     const registeredAtBlock = Number(mint?.block_height ?? 0);
+    const indexed = network === "Mainnet" ? escrowIndex.agents[unit] : undefined;
+    const afterBlock = indexed ? Math.max(indexed.scannedThroughBlock, registeredAtBlock) : registeredAtBlock;
     const tally: DeliveryTally = { escrowsOpened: 0, resultsSubmitted: 0, paid: 0, refunded: 0, disputed: 0, events: [] };
     const coverage: Array<{ contract: string; scannedTxs: number; truncated: boolean }> = [];
     for (const contract of contracts(network)) {
-      const listed: Row[] = [];
+      let listed: Row[] = [];
       for (let offset = 0; listed.length < SCAN_CAP; offset += PAGE) {
-        const page = await post(`/address_txs?offset=${offset}&limit=${Math.min(PAGE, SCAN_CAP - listed.length)}`, { _addresses: [contract], _after_block_height: registeredAtBlock }, network) as Row[];
+        const page = await post(`/address_txs?offset=${offset}&limit=${Math.min(PAGE, SCAN_CAP - listed.length)}`, { _addresses: [contract], _after_block_height: afterBlock }, network) as Row[];
         listed.push(...page);
         if (page.length < PAGE) break;
       }
+      const truncated = listed.length >= SCAN_CAP;
+      // The koios filter is inclusive: with an index, drop the block it already covers.
+      if (indexed) listed = listed.filter((row) => Number(row.block_height) > afterBlock);
       for (let i = 0; i < listed.length; i += CHUNK) {
         const txs = await post("/tx_info", { _tx_hashes: listed.slice(i, i + CHUNK).map((row) => row.tx_hash), _inputs: true, _metadata: false, _assets: false, _withdrawals: false, _certs: false, _scripts: true, _bytecode: false }, network) as TxInfo[];
         tallyDelivery(txs, sellers, unit, contract, tally);
       }
-      coverage.push({ contract, scannedTxs: listed.length, truncated: listed.length >= SCAN_CAP });
+      coverage.push({ contract, scannedTxs: listed.length, truncated });
     }
-    tally.events.sort((a, b) => b.blockTime - a.blockTime);
-    // Time to respond: escrow opened -> result submitted, for submissions whose opening tx is inside the scanned window.
-    const opened = new Map(tally.events.filter((event) => event.action === "escrowOpened").map((event) => [event.txHash, event.blockTime]));
-    const waits = (tally.submissions ?? []).filter((s) => opened.has(s.openTx)).sort((a, b) => b.at - a.at).slice(0, 200).map((s) => s.at - opened.get(s.openTx)!);
-    const sortedWaits = [...waits].sort((a, b) => a - b);
-    tally.responseSeconds = waits;
-    tally.responseSecondsMedian = sortedWaits.length ? sortedWaits[Math.floor(sortedWaits.length / 2)] : null;
-    tally.responseSecondsP90 = sortedWaits.length ? sortedWaits[Math.ceil(sortedWaits.length * 0.9) - 1] : null;
-    delete tally.submissions;
-    return { source: "masumi_delivery_history", status: "ok", observedAt: observedAt(), data: { identifier, unit, network, sellerCredentials: [...sellers], registeredAtBlock, coverage, ...tally, events: tally.events.slice(0, 20) } };
+    const result = indexed ? mergeIndexed(indexed, tally) : tally;
+    if (!indexed) finishTally(result);
+    delete result.submissions;
+    return { source: "masumi_delivery_history", status: "ok", observedAt: observedAt(), data: { identifier, unit, network, sellerCredentials: [...sellers], registeredAtBlock, coverage, indexedThroughBlock: indexed?.scannedThroughBlock ?? null, indexGeneratedAt: indexed?.generatedAt ?? null, ...result, events: result.events.slice(0, 20) } };
   } catch (error) {
     return { source: "masumi_delivery_history", status: "unavailable", observedAt: observedAt(), error: error instanceof Error ? error.message : "Koios request failed" };
   }
