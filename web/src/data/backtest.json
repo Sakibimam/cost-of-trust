@@ -1,0 +1,222 @@
+{
+  "generatedAt": "2026-10-07T04:16:25.073Z",
+  "sourcePolicyIds": [
+    "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9",
+    "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b"
+  ],
+  "agents": 30,
+  "escrows": 433,
+  "eligibleDecisions": 283,
+  "timeWindow": {
+    "from": "2026-09-15T13:37:05.000Z",
+    "to": "2026-10-06T16:17:09.000Z"
+  },
+  "policies": {
+    "P0": {
+      "5": {
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "realizedFailures": 26,
+        "realizedAdaLost": 130,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 45.936395759717314,
+        "adaSavedVsP0": 0,
+        "modelledBackupLegs": 0
+      },
+      "25": {
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "realizedFailures": 26,
+        "realizedAdaLost": 650,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 229.68197879858656,
+        "adaSavedVsP0": 0,
+        "modelledBackupLegs": 0
+      },
+      "100": {
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "realizedFailures": 26,
+        "realizedAdaLost": 2600,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 918.7279151943462,
+        "adaSavedVsP0": 0,
+        "modelledBackupLegs": 0
+      },
+      "500": {
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "realizedFailures": 26,
+        "realizedAdaLost": 13000,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 4593.639575971732,
+        "adaSavedVsP0": 0,
+        "modelledBackupLegs": 0
+      }
+    },
+    "P1": {
+      "5": {
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "realizedFailures": 26,
+        "realizedAdaLost": 130,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 45.936395759717314,
+        "adaSavedVsP0": 0,
+        "modelledBackupLegs": 0
+      },
+      "25": {
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "realizedFailures": 26,
+        "realizedAdaLost": 650,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 229.68197879858656,
+        "adaSavedVsP0": 0,
+        "modelledBackupLegs": 0
+      },
+      "100": {
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "realizedFailures": 26,
+        "realizedAdaLost": 2600,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 918.7279151943462,
+        "adaSavedVsP0": 0,
+        "modelledBackupLegs": 0
+      },
+      "500": {
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "realizedFailures": 26,
+        "realizedAdaLost": 13000,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 4593.639575971732,
+        "adaSavedVsP0": 0,
+        "modelledBackupLegs": 0
+      }
+    },
+    "P2": {
+      "5": {
+        "jobsAttempted": 271,
+        "jobsSkipped": 12,
+        "realizedFailures": 16,
+        "realizedAdaLost": 80,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 28.26855123674912,
+        "adaSavedVsP0": 50,
+        "modelledBackupLegs": 0
+      },
+      "25": {
+        "jobsAttempted": 271,
+        "jobsSkipped": 12,
+        "realizedFailures": 16,
+        "realizedAdaLost": 400,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 141.3427561837456,
+        "adaSavedVsP0": 250,
+        "modelledBackupLegs": 0
+      },
+      "100": {
+        "jobsAttempted": 271,
+        "jobsSkipped": 12,
+        "realizedFailures": 16,
+        "realizedAdaLost": 1600,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 565.3710247349824,
+        "adaSavedVsP0": 1000,
+        "modelledBackupLegs": 0
+      },
+      "500": {
+        "jobsAttempted": 271,
+        "jobsSkipped": 12,
+        "realizedFailures": 16,
+        "realizedAdaLost": 8000,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 2826.8551236749113,
+        "adaSavedVsP0": 5000,
+        "modelledBackupLegs": 0
+      }
+    },
+    "P3": {
+      "5": {
+        "jobsAttempted": 8,
+        "jobsSkipped": 275,
+        "realizedFailures": 0,
+        "realizedAdaLost": 0,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 0,
+        "adaSavedVsP0": 130,
+        "modelledBackupLegs": 8
+      },
+      "25": {
+        "jobsAttempted": 8,
+        "jobsSkipped": 275,
+        "realizedFailures": 0,
+        "realizedAdaLost": 0,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 0,
+        "adaSavedVsP0": 650,
+        "modelledBackupLegs": 8
+      },
+      "100": {
+        "jobsAttempted": 8,
+        "jobsSkipped": 275,
+        "realizedFailures": 0,
+        "realizedAdaLost": 0,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 0,
+        "adaSavedVsP0": 2600,
+        "modelledBackupLegs": 8
+      },
+      "500": {
+        "jobsAttempted": 8,
+        "jobsSkipped": 275,
+        "realizedFailures": 0,
+        "realizedAdaLost": 0,
+        "feesPaid": 0,
+        "totalCostPer100Decisions": 0,
+        "adaSavedVsP0": 13000,
+        "modelledBackupLegs": 8
+      }
+    }
+  },
+  "calibration": {
+    "betaBinomialBrier": 0.06268531276022733,
+    "disputeRateBrier": 0.09187279151943463,
+    "observations": 283
+  },
+  "drivers": [
+    {
+      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+      "name": "Knight",
+      "adaSaved": 1000,
+      "decisions": 10
+    },
+    {
+      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b91330e9d28bdb0dce69bcfaaba37c93a86ecd7731fe3c7f2a388157d2209d3bf5",
+      "name": "Website Content Clustering (Bansumi)",
+      "adaSaved": 200,
+      "decisions": 10
+    },
+    {
+      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9208b14ecd7c07f0e4279477bb0a39bb5ee9b82792d6f7dfdcf193e0c71075b7f",
+      "name": "Website Traffic Analysis",
+      "adaSaved": 200,
+      "decisions": 8
+    },
+    {
+      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b92a2c23f6db7de2769b7268a122fb6b2b7a17350f08a41e5ff3a84c6a863831d5",
+      "name": "Meta Ads Library",
+      "adaSaved": 200,
+      "decisions": 9
+    },
+    {
+      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b94d63da3ea8f334920bab2b5adba96a527bc35c532c031b06ae20d7350cc9d159",
+      "name": "Product Reality Check (Bansumi)",
+      "adaSaved": 200,
+      "decisions": 9
+    }
+  ],
+  "caveat": "Primary outcomes are observed from mainnet Masumi escrow spends in the newest 1,000 transactions per payment contract. P3 backup legs are modelled from qualifying agents' pre-decision beta-binomial risk, not observed backup executions. Registry prices without a lovelace quote are reported as 0 ADA rather than converted by guesswork. Route fees and coverage are router quotes. V1 shared-wallet attribution remains wallet-based when the datum has no agent unit."
+}
