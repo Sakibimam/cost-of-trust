@@ -18,11 +18,11 @@ import styles from "./styles.module.css";
 const SLIDES: Array<{ id: string; title: string; Comp: (p: SlideProps & { go: (n: number) => void }) => React.ReactNode }> = [
   { id: "escrow", title: "Agent pays agent", Comp: Escrow },
   { id: "ranking", title: "Nothing to rank", Comp: Ranking },
-  { id: "purchases", title: "Four ways to buy one job", Comp: Purchases },
-  { id: "slider", title: "Move the stake", Comp: SliderSlide },
+  { id: "purchases", title: "Hire, backup, or do not hire", Comp: Purchases },
+  { id: "slider", title: "The stake changes the answer", Comp: SliderSlide },
   { id: "architecture", title: "Quote to settled claim", Comp: Architecture },
   { id: "race", title: "Proof: the backup race", Comp: Race },
-  { id: "backtest", title: "Proof: held-out mainnet", Comp: Backtest },
+  { id: "backtest", title: "264 jobs, not 257", Comp: Backtest },
   { id: "stall", title: "Proof: the stall on Masumi", Comp: Stall },
   { id: "close", title: "Who buys it", Comp: Close },
 ];

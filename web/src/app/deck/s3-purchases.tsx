@@ -17,15 +17,15 @@ export function Purchases({ data, run }: SlideProps) {
   return (
     <div className={s.buy}>
       <div className={s.buyHead}>
-        <h1 className={base.h1}>One agent, four ways to pay for the same job.</h1>
+        <h1 className={base.h1}>Hire, hire a backup, or do not hire.</h1>
         <p className={base.lede}>
-          Cost of Trust prices all four from the agent&apos;s own escrow history and the ADA at risk, then recommends one. Shown for {data.agent.name}: {data.agent.paid} paid, {data.agent.refunded} refunded, for a buyer who needs the result within {data.slider.deadlineMinutes} minute.
+          The check reads paid, refunded, and disputed escrows, then answers before the payment. Shown for {data.agent.name}: {data.agent.paid} paid, {data.agent.refunded} refunded. The caller needs the result within {data.slider.deadlineMinutes} minute, so the answer is hire a backup.
         </p>
       </div>
 
       <div key={run} className={s.routes} role="group" aria-label="Purchase options">
         <div className={s.routesHead} aria-hidden="true"><span>Purchase</span><span>Who holds the job</span><span className={s.costHead}>Risk-adjusted, {AT} ADA at risk</span></div>
-        {ROUTES.map((r, i) => (
+        {ROUTES.filter((r) => r.key !== "underwritten").map((r, i) => (
           <button key={r.key} type="button" aria-pressed={pick === r.key} className={s.route} data-on={pick === r.key} data-kind={r.key} onClick={() => setPick(r.key)} style={{ "--i": i } as React.CSSProperties}>
             <span className={s.routeName}>{r.name}</span>
             <span className={s.lane} aria-hidden="true">
@@ -41,7 +41,7 @@ export function Purchases({ data, run }: SlideProps) {
         ))}
       </div>
       <p className={s.pays} aria-live="polite"><b>{sel.short}.</b> {sel.pays}</p>
-      <p className={base.src}>Figures from decide() in coworker/src/report.ts for {data.agent.name} at {AT} ADA at risk, a {data.slider.deadlineMinutes} minute buyer deadline, risk aversion {data.slider.riskAversion} (web/src/data/escrow-index.json). GET /api/check returns the same recommendation.</p>
+      <p className={base.src}>Figures from decide() in coworker/src/report.ts for {data.agent.name} at {AT} ADA at risk, a {data.slider.deadlineMinutes} minute caller window, risk aversion {data.slider.riskAversion} (web/src/data/escrow-index.json). GET /api/check returns the same recommendation.</p>
     </div>
   );
 }

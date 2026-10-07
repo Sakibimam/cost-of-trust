@@ -44,7 +44,7 @@ export function Backtest() {
         </div>
 
         <div className="border-b border-rule py-3 text-[15px] leading-snug">
-          <p className="m-0"><span className="font-extrabold">Calibration.</span> Trust Check Brier {backtest.calibration.betaBinomialBrier.toFixed(3)} versus dispute rate {backtest.calibration.disputeRateBrier.toFixed(3)} across {backtest.calibration.observations} observations; lower is better.</p>
+          <p className="m-0"><span className="font-extrabold">Calibration.</span> Refund-history Brier {backtest.calibration.betaBinomialBrier.toFixed(3)} versus dispute-rate Brier {backtest.calibration.disputeRateBrier.toFixed(3)} across {backtest.calibration.observations} observations; lower is better.</p>
         </div>
         <div className="border-b border-rule py-3 text-[15px] leading-snug">
           <p className="m-0"><span className="font-extrabold">What changes the hire.</span> A dispute count still hires an agent that refunds every job. Trust Check reads paid, refunded and disputed escrows, and a coworker asks it before paying.</p>

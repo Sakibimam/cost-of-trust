@@ -139,7 +139,7 @@ function Answer({ view, onRetry, onPick }: { view: View; onRetry: () => void; on
     return (
       <div className="border-t-[6px] border-ink pt-5">
         <p className="m-0 text-[17px] font-extrabold">Reading the job history of {view.agent}.</p>
-        <p className="m-0 mt-1 text-[14px] text-muted">Every paid and refunded Masumi job, pricing the four ways to buy.</p>
+        <p className="m-0 mt-1 text-[14px] text-muted">Reading paid, refunded, and disputed escrows before the hire.</p>
         <div className="progress mt-4" />
       </div>
     );

@@ -22,7 +22,7 @@ export function SliderSlide({ data, active, run, reduced }: SlideProps) {
   const rows = tight ? data.slider.tight : data.slider.open;
   const row = rows[value - MIN];
   const v = verdict(row);
-  const costs = ROUTES.map((r) => ({ ...r, cost: costOf(row, r.key) }));
+  const costs = ROUTES.filter((r) => r.key !== "underwritten").map((r) => ({ ...r, cost: costOf(row, r.key) }));
   const top = Math.max(...costs.map((c) => c.cost));
 
   const flip = useMemo(() => rows.find((r) => r[5] < r[3])?.[0], [rows]);
@@ -60,9 +60,9 @@ export function SliderSlide({ data, active, run, reduced }: SlideProps) {
   return (
     <div className={s.slide4}>
       <div className={s.s4head}>
-        <h1 className={base.h1}>One agent, four ways to buy the job.</h1>
+        <h1 className={base.h1}>The stake changes the answer.</h1>
         <p className={base.lede}>
-          {data.agent.name}: {data.agent.paid} paid, {data.agent.refunded} refunded, median {data.agent.medianSeconds} s, live API up. The ADA at risk moves the price of every purchase, from {MIN} to {MAX} ADA. The buyer&apos;s deadline decides which one Cost of Trust recommends.
+          {data.agent.name}: {data.agent.paid} paid, {data.agent.refunded} refunded, median {data.agent.medianSeconds} s, live API up. From {MIN} to {MAX} ADA at risk, the answer stays hire or hire a backup. The caller&apos;s deadline is what buys the backup.
         </p>
       </div>
 
@@ -99,7 +99,7 @@ export function SliderSlide({ data, active, run, reduced }: SlideProps) {
         </div>
         <div className={s.opts}>
           <button type="button" className={base.btn} role="switch" aria-checked={tight} onClick={() => setTight((x) => !x)}>
-            Buyer needs the result within {minutes} minute: {tight ? "yes" : "no"}
+            Caller needs the result within {minutes} minute: {tight ? "yes" : "no"}
           </button>
           <span className={s.optNote}>
             {tight ? `The usual result takes ${data.agent.medianSeconds} s, so the check pays a backup.` : "No deadline pressure, so the check hires the agent alone."}

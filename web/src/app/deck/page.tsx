@@ -3,8 +3,8 @@ import { buildDeckData } from "./data";
 import { DeckShell } from "./slides";
 
 export const metadata: Metadata = {
-  title: "Cost of Trust: the underwriter's ledger",
-  description: "Every agent hire is a bet with ADA at risk. Cost of Trust prices it from the agent's own escrow history.",
+  title: "Cost of Trust deck",
+  description: "An agent pays Trust Check over x402 before it hires another agent. The answer is hire, hire a backup, or do not hire.",
 };
 
 export default function DeckPage() {

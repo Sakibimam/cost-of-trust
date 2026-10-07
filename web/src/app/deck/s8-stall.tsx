@@ -51,7 +51,7 @@ export function Stall({ data, run }: SlideProps) {
       <div className={s.stHead}>
         <button type="button" className={`${base.btn} ${s.tlReplay}`} onClick={() => setReplay((n) => n + 1)}>Replay</button>
         <h1 className={base.h1}>On Masumi itself: A stalls, B delivers, the deadline holds.</h1>
-        <p className={base.lede}>Real escrows on Cardano preprod through the Masumi payment service. B&apos;s result lands <b className={base.fig}>{span(slack)}</b> before the buyer deadline and A&apos;s payment returns as a refund.</p>
+        <p className={base.lede}>Real escrows on Cardano preprod through the Masumi payment service. B&apos;s result lands <b className={base.fig}>{span(slack)}</b> before the caller&apos;s deadline, and A&apos;s payment returns as a refund.</p>
       </div>
 
       <div key={`${run}-${replay}`} className={s.tl}>

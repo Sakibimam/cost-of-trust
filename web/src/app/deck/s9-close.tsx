@@ -13,8 +13,8 @@ export function Close({ data, run, go }: CloseProps) {
   const accounts: Array<{ n: number; text: string; fig: string }> = [
     { n: 0, text: `${k.name} escrows refunded, with zero disputes`, fig: `${k.refunded} of ${k.paid + k.refunded + k.disputed}` },
     { n: 5, text: "Backup keeper paid only when A stalls, on Cardano preprod", fig: "B paid" },
-    { n: 6, text: `Held-out mainnet jobs finished, against ${b.base.done} hiring as requested`, fig: `${b.cot.done} of ${data.backtest.scored}` },
-    { n: 7, text: "Masumi stall run, buyer deadline met with time to spare", fig: `${Math.floor(slack / 60)} min ${String(slack % 60).padStart(2, "0")} s` },
+    { n: 6, text: `Later mainnet jobs finished by skipping high-refund agents, against ${b.base.done} hiring every agent`, fig: `${b.cot.done} of ${data.backtest.scored}` },
+    { n: 7, text: "Masumi stall run, time still left when B's result lands", fig: `${Math.floor(slack / 60)} min ${String(slack % 60).padStart(2, "0")} s` },
   ];
 
   return (

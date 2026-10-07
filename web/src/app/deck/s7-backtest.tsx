@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { SlideProps } from "./shared";
-import { day, int } from "./shared";
+import { int } from "./shared";
 import base from "./styles.module.css";
 import s from "./proof.module.css";
 
@@ -12,18 +12,17 @@ export function Backtest({ data, run }: SlideProps) {
   const saved = p0.adaLost - cot.adaLost;
   const maxLost = Math.max(...b.losses.map((l) => b.byLoss[l].base.adaLost));
   const brierMax = Math.max(b.brier.cot, b.brier.dispute);
-  const to = day(b.to);
   const rows = [
-    { key: "base", name: "Hire as requested", p: p0 },
-    { key: "cot", name: "Cost of Trust", p: cot },
+    { key: "base", name: "Hire every agent", p: p0 },
+    { key: "cot", name: "Skip high-refund agents", p: cot },
   ] as const;
 
   return (
     <div className={s.bt}>
       <div className={s.btHead}>
-        <h1 className={base.h1}>Held out on mainnet: fewer failed jobs, better predictions.</h1>
+        <h1 className={base.h1}>{int(cot.done)} jobs finished. Hiring every agent finishes {int(p0.done)}.</h1>
         <p className={base.lede}>
-          {int(b.escrows)} resolved escrows across {b.agents} agents, {day(b.from)} to {to} 2026. The prior is fitted on escrows before {day(b.splitAt)}. The {b.scored} jobs after it are scored, each priced from history that existed before the job.
+          On {b.brier.n} later mainnet jobs, skipping agents with more than one refund in five finishes {int(cot.done)} jobs at {loss} ADA at risk. Hiring every agent finishes {int(p0.done)}. Refund-history Brier {b.brier.cot.toFixed(3)} against dispute-rate Brier {b.brier.dispute.toFixed(3)}.
         </p>
       </div>
 
@@ -36,7 +35,7 @@ export function Backtest({ data, run }: SlideProps) {
 
       <div key={`${run}`} className={s.charts}>
         <section className={s.chart} aria-labelledby="c1">
-          <h2 id="c1" className={s.chartH}>Jobs finished of {b.scored} scored</h2>
+          <h2 id="c1" className={s.chartH}>Jobs finished, of {b.scored} later decisions</h2>
           {rows.map((r) => (
             <div key={r.key} className={s.cRow}>
               <span className={s.cName}>{r.name}</span>
@@ -50,7 +49,7 @@ export function Backtest({ data, run }: SlideProps) {
         </section>
 
         <section className={s.chart} aria-labelledby="c2">
-          <h2 id="c2" className={s.chartH}>ADA lost at {loss} ADA per job</h2>
+          <h2 id="c2" className={s.chartH}>Work left undone at {loss} ADA per job</h2>
           {rows.map((r) => (
             <div key={r.key} className={s.cRow}>
               <span className={s.cName}>{r.name}</span>
@@ -58,12 +57,12 @@ export function Backtest({ data, run }: SlideProps) {
               <span className={`${base.fig} ${s.cVal}`}>{int(r.p.adaLost)} ADA</span>
             </div>
           ))}
-          <p className={s.delta}>{saved > 0 ? <>Cost of Trust keeps <b className={base.fig}>{int(saved)} ADA</b> that hiring as requested loses.</> : "No difference at this stake."}</p>
+          <p className={s.delta}>{saved > 0 ? <>Skipping high-refund agents leaves <b className={base.fig}>{int(cot.adaLost)} ADA</b> of work undone. Hiring every agent leaves {int(p0.adaLost)} ADA undone.</> : "No difference at this stake."}</p>
         </section>
 
         <section className={s.chart} aria-labelledby="c3">
           <h2 id="c3" className={s.chartH}>Brier score for predicting non-delivery, walk-forward, lower is better</h2>
-          {[{ key: "cot", name: "Cost of Trust", v: b.brier.cot }, { key: "base", name: "Dispute rate", v: b.brier.dispute }].map((r) => (
+          {[{ key: "cot", name: "Refund-history Brier", v: b.brier.cot }, { key: "base", name: "Dispute-rate Brier", v: b.brier.dispute }].map((r) => (
             <div key={r.key} className={s.cRow}>
               <span className={s.cName}>{r.name}</span>
               <span className={s.hbar}><i data-kind={r.key} style={{ transform: `scaleX(${r.v / brierMax})` }} /></span>
@@ -74,7 +73,7 @@ export function Backtest({ data, run }: SlideProps) {
       </div>
 
       <p className={base.src}>
-        Source: web/src/data/backtest.json, heldOut policies P0 and P3-new, {b.scored} scored jobs, each rate computed on the same {b.scored}. At 100 ADA the backup route observes {cot.backupObserved} backup legs and models {cot.backupModelled}. Largest single saving over the full window: {b.driver.name}, {int(b.driver.adaSaved)} ADA across {b.driver.decisions} decisions. Brier over {b.brier.n} walk-forward predictions.
+        Source: web/src/data/backtest.json, policies P0 and P2, {b.scored} later decisions. At {loss} ADA, P2 attempts {cot.attempted} and skips the rest. Brier over {b.brier.n} walk-forward predictions.
       </p>
     </div>
   );

@@ -5,7 +5,7 @@ const STEPS = [
   },
   {
     title: "Trust Check reads the agent's real record.",
-    body: "It pulls that agent's actual job history from Masumi on Cardano: jobs paid, jobs refunded, how long each took. Then it prices four ways to buy the job and picks one, or says to skip the agent.",
+    body: "It reads that agent's paid, refunded, and disputed escrows on Cardano, plus how long results took and the latest time the seller set. The answer is hire, hire a backup, or do not hire.",
   },
   {
     title: "A backup is paid only if it is needed.",
@@ -62,7 +62,7 @@ export function HowItWorks() {
         <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-8 lg:grid-cols-2">
           <div className="min-w-0 border-t-[6px] border-ink pt-4">
             <p className="label m-0">Free preview</p>
-            <p className="m-0 mt-2 max-w-[52ch] text-[15px] leading-snug text-muted">Reads the same escrow history and prices the same four ways to buy. Answers in under a second with plain JSON: the decision, the expected cost and the options.</p>
+            <p className="m-0 mt-2 max-w-[52ch] text-[15px] leading-snug text-muted">Reads the same escrow history. Answers in under a second with plain JSON: hire, hire a backup, or do not hire, plus the expected cost.</p>
             <pre className="m-0 mt-3 overflow-x-auto bg-paper-3 p-3 text-[13px] leading-snug"><code>{`curl "https://cost-of-trust.vercel.app/api/check\\
 ?agent=Knight&valueAda=500&deadlineMinutes=15"`}</code></pre>
           </div>

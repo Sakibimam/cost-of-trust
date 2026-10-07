@@ -17,17 +17,13 @@ import { Sellers } from "./Sellers";
 import { Verdict } from "./Verdict";
 
 const LOSS_ADA = 100;
-const START_ROUTER = "cd router && PORT=8787 bun src/server.ts";
-
 type Load<T> = { status: "loading" } | { status: "error"; message: string } | { status: "ready"; data: T };
 
 function Failure({ what, message, onRetry }: { what: string; message: string; onRetry: () => void }) {
   return (
     <div role="alert" className="border-l-[6px] border-signal bg-paper-2 p-4">
       <p className="m-0 text-[17px] font-extrabold">{what}</p>
-      <p className="mt-1 text-[14px] text-muted">{ROUTER_URL} said: {message}</p>
-      <p className="mt-3 text-[14px]">Start the router from the repo root:</p>
-      <pre className="m-0 mt-1 overflow-x-auto bg-paper-3 p-3 text-[13px]"><code>{START_ROUTER}</code></pre>
+      <p className="mt-1 text-[14px] text-muted">{message}</p>
       <button type="button" onClick={onRetry} className="btn mt-4">Ask again</button>
     </div>
   );
@@ -110,7 +106,7 @@ export function Board({ runs, tryIt, howItWorks }: { runs: React.ReactNode; tryI
         <div className="wrap relative z-10 py-8 md:py-12">
           <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">For anyone whose software hires other software.</p>
           <h1 id="top-h" className="display mt-3 max-w-[16ch]">Ask before the coworker pays.</h1>
-          <p className="mt-6 max-w-[56ch] text-[18px] leading-[1.45]">An AI coworker is a program that does jobs for you and pays other programs to help. Some of them take the payment and miss the deadline. Trust Check reads each agent&apos;s real job history on Cardano and tells you what to do before you pay: hire it, hire it with a backup, or skip it.</p>
+          <p className="mt-6 max-w-[56ch] text-[18px] leading-[1.45]">An AI coworker is a program that does jobs for you and pays other programs to help. Some of them take the payment and miss the deadline. Trust Check reads each agent&apos;s paid, refunded, and disputed escrows on Cardano and answers before the payment: hire, hire a backup, or do not hire.</p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-[14px] font-extrabold">
             <a href="#try" className="btn inline-flex items-center whitespace-nowrap !bg-ink !text-paper no-underline hover:!bg-blue hover:!border-blue">Check an agent now</a>
             <a href="https://preprod.sokosumi.com" className="whitespace-nowrap">Hire Trust Check on Sokosumi</a>
@@ -141,7 +137,7 @@ export function Board({ runs, tryIt, howItWorks }: { runs: React.ReactNode; tryI
           ) : route.status === "loading" || sellers.status === "loading" ? (
             <Loading what={`Asking ${ROUTER_URL}/best-route to price every route across the sellers at a ${fmt(LOSS_ADA)} ADA loss.`} />
           ) : sellers.status === "ready" && sellers.data.length === 0 ? (
-            <p className="m-0 border-t-[6px] border-ink pt-6 text-[17px]">The router lists no sellers. Add one to <span className="fig !font-medium">router/sellers.json</span> and reload.</p>
+            <p className="m-0 border-t-[6px] border-ink pt-6 text-[17px]">Seller records are on their way back.</p>
           ) : route.status === "ready" ? (
             <div aria-busy={busy} className={busy ? "opacity-60" : undefined} style={{ transition: "opacity 140ms var(--ease-out)" }}>
               {busy && <p role="status" className="label mb-2">Re-pricing at riskAversion {riskAversion}, sharedInfrastructure {String(shared)}</p>}

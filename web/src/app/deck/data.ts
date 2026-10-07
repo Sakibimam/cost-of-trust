@@ -27,9 +27,9 @@ export function buildDeckData(): DeckData {
   if (!knight) throw new Error("deck: Knight missing from showcase.json");
   const rec = (escrowIndex.agents as Record<string, { paid: number; refunded: number; disputed: number }>)[slider.agent.identifier];
   if (!rec || rec.paid !== slider.agent.paid || rec.refunded !== slider.agent.refunded) throw new Error("deck: slider.json is stale against escrow-index.json, rerun gen-slider.mjs");
-  const held = backtest.heldOut as unknown as Record<string, Record<string, { jobsAttempted: number; jobsDone: number; realizedFailures: number; totalCostAda: number; observedBackupLegs: number; modelledBackupLegs: number }>>;
-  const pol = (p: string, l: string): Pol => ({ attempted: held[p][l].jobsAttempted, done: held[p][l].jobsDone, failures: held[p][l].realizedFailures, adaLost: held[p][l].totalCostAda, backupObserved: held[p][l].observedBackupLegs, backupModelled: held[p][l].modelledBackupLegs });
-  const losses = Object.keys(held.P0);
+  const sample = backtest.policies as unknown as Record<string, Record<string, { jobsAttempted: number; jobsDone: number; realizedFailures: number; undoneWorkAda: number; observedBackupLegs: number; modelledBackupLegs: number }>>;
+  const pol = (p: string, l: string): Pol => ({ attempted: sample[p][l].jobsAttempted, done: sample[p][l].jobsDone, failures: sample[p][l].realizedFailures, adaLost: sample[p][l].undoneWorkAda, backupObserved: sample[p][l].observedBackupLegs, backupModelled: sample[p][l].modelledBackupLegs });
+  const losses = Object.keys(sample.P0);
   const driver = (backtest.drivers as Array<{ name: string; adaSaved: number; decisions: number }>)[0];
 
   const txRole = Object.fromEntries(Object.entries(proofs.txs).map(([id, t]) => [t.txHash, id]));
@@ -38,7 +38,7 @@ export function buildDeckData(): DeckData {
     agent: { name: slider.agent.name, paid: slider.agent.paid, refunded: slider.agent.refunded, disputed: slider.agent.disputed, medianSeconds: slider.agent.medianSeconds, p90Seconds: slider.agent.p90Seconds, deadlineMinutes: slider.deadlineMinutes },
     registry: { liveAgents: registry.liveAgents, taggedAgents: registry.taggedAgents, tags: registry.tags, oneOrTwo: registry.tagsWithOneOrTwoAgents, one: registry.tagsWithOneAgent, dist: Object.entries(registry.agentsPerTagDistribution).map(([k, v]) => [Number(k), v as number]), block: registry.readAtBlock, readAt: registry.readAtBlockTime },
     slider: { open: slider.points.open as SliderRow[], tight: slider.points.tight as SliderRow[], deadlineMinutes: slider.deadlineMinutes, riskAversion: slider.riskAversion },
-    backtest: { escrows: backtest.escrows, agents: backtest.agents, from: backtest.timeWindow.from, to: backtest.timeWindow.to, splitAt: backtest.splitAt, scored: held.P0["100"].jobsAttempted, losses, byLoss: Object.fromEntries(losses.map((l) => [l, { base: pol("P0", l), cot: pol("P3-new", l) }])), brier: { cot: backtest.calibration.betaBinomialBrier, dispute: backtest.calibration.disputeRateBrier, n: backtest.calibration.observations }, driver },
+    backtest: { escrows: backtest.escrows, agents: backtest.agents, from: backtest.timeWindow.from, to: backtest.timeWindow.to, splitAt: backtest.splitAt, scored: backtest.eligibleDecisions, losses, byLoss: Object.fromEntries(losses.map((l) => [l, { base: pol("P0", l), cot: pol("P2", l) }])), brier: { cot: backtest.calibration.betaBinomialBrier, dispute: backtest.calibration.disputeRateBrier, n: backtest.calibration.observations }, driver },
     run: { quoteAt: run.quote.at, startedAt: run.startedAt, buyerDeadline: run.buyerDeadline, resultAt: run.result.resultArrivedAt, checkpointAt: run.checkpoint.checkpointAt, timeline: run.timeline as unknown as Record<string, string>, txs: run.txs.map((t) => ({ id: txRole[t.txHash], role: t.role, state: t.state, at: t.at })) },
     proofs: { explorer: proofs.explorer, txs: Object.fromEntries(Object.entries(proofs.txs).map(([id, t]) => [id, { label: t.label, txHash: t.txHash }])), races: proofs.races },
   };
