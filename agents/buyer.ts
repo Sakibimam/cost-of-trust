@@ -16,10 +16,28 @@ const run: { startedAt: string; selectedRoute?: unknown; records: RecordItem[] }
 const runFile = () => `${import.meta.dirname}/runs/${run.startedAt.replace(/[:.]/g, "-")}.json`;
 const save = (item: RecordItem) => { run.records.push(item); console.error(JSON.stringify({ at: new Date().toISOString(), ...item }).slice(0, 600)); writeFileSync(runFile(), JSON.stringify(run, null, 2)); };
 const record = async (step: string, txHash: string) => { await waitForTx(txHash); save({ step, txHash, confirmed: true }); };
-const pay = async (url: string, body: Record<string, unknown>, seed: string): Promise<{ response: Response; body: any }> => { const first = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); if (first.status !== 402) return { response: first, body: await first.json() }; const required = new x402HTTPClient(new x402Client().setSpendControls(false).register("cardano:*", new ExactClient(toClientCardanoSigner({ mnemonic: seed, network: "cardano:preprod", provider: { koios: { baseUrl: process.env.X402_KOIOS_URL ?? "http://127.0.0.1:4102/koios" } } })))); const paymentRequired = required.getPaymentRequiredResponse((name) => first.headers.get(name)); const challenge = await first.json() as { job_id?: string }; const payload = await required.createPaymentPayload(paymentRequired); const paid = await fetch(url, { method: "POST", headers: { "content-type": "application/json", ...required.encodePaymentSignatureHeader(payload) }, body: JSON.stringify({ ...body, ...(challenge.job_id ? { job_id: challenge.job_id } : {}) }) }); return { response: paid, body: await paid.json() }; };
+const pay = async (url: string, body: Record<string, unknown>, seed: string, seller: { priceAda: number; payTo: string }, spent: bigint, limits: { perPayment: bigint; task: bigint }): Promise<{ response: Response; body: any; amount: bigint }> => {
+  const first = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  if (first.status !== 402) return { response: first, body: await first.json(), amount: 0n };
+  const client = new x402Client().setSpendControls({ maxAmountPerPayment: limits.perPayment.toString(), allowedAssets: [{ network: "cardano:preprod", asset: "lovelace", maxAmountPerPayment: limits.perPayment.toString() }] }).register("cardano:*", new ExactClient(toClientCardanoSigner({ mnemonic: seed, network: "cardano:preprod", provider: { koios: { baseUrl: process.env.X402_KOIOS_URL ?? "http://127.0.0.1:4102/koios" } } })));
+  const required = new x402HTTPClient(client);
+  const paymentRequired = required.getPaymentRequiredResponse((name) => first.headers.get(name));
+  const accepted = paymentRequired.accepts[0];
+  if (!accepted || accepted.asset !== "lovelace") throw new Error("keeper requested a disallowed asset");
+  const amount = BigInt(accepted.amount);
+  if (accepted.payTo !== seller.payTo) throw new Error("keeper payTo does not match router seller");
+  if (amount > BigInt(Math.round(seller.priceAda * 1_000_000))) throw new Error("keeper price exceeds router quote");
+  if (amount > limits.perPayment || spent + amount > limits.task) throw new Error("keeper spend exceeds buyer limit");
+  const challenge = await first.json() as { job_id?: string };
+  const payload = await required.createPaymentPayload(paymentRequired);
+  const paid = await fetch(url, { method: "POST", headers: { "content-type": "application/json", ...required.encodePaymentSignatureHeader(payload) }, body: JSON.stringify({ ...body, ...(challenge.job_id ? { job_id: challenge.job_id } : {}) }) });
+  return { response: paid, body: await paid.json(), amount };
+};
 async function main() {
-  const buyer = await context("buyer");
-  const sponsor = await context("admin2");
+  const buyer = await context(process.env.BUYER_CONTEXT ?? "buyer");
+  const sponsor = await context(process.env.SPONSOR_CONTEXT ?? "admin2");
+  const buyerWallet = wallets[process.env.BUYER_WALLET ?? process.env.BUYER_CONTEXT ?? "buyer"];
+  if (!buyerWallet) throw new Error("configured buyer wallet is missing");
   const lossAda = Number(process.env.DEMO_LOSS_ADA ?? 10);
   const expiry = BigInt(Math.floor((Date.now() + Number(process.env.DEMO_EXPIRY_MINUTES ?? 10) * 60_000) / 1000) * 1000);
   const locked = await lockClaimVault(sponsor.lucid, sponsor.deployment, { beneficiary: buyer.address, expiry, value: BigInt(Math.round(lossAda * 1_000_000)) });
@@ -41,9 +59,13 @@ async function main() {
   const selectedQuote = quote.routes.find((r: any) => r.route === quote.selectedRoute && r.sellers.join(",") === quote.selectedSellers.join(","));
   if (!selectedQuote) throw new Error("router returned no selected route details");
   if (underwritten) { const bind = await fetch(`${underwriter}/bind`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ buyer: buyer.address, payoutAda: lossAda, coverageAda: selectedQuote.coverageAda, taskRef: refString(locked.ref), taskExpiry: String(expiry), decideBy: String(expiry + 1_860_000n), terms: { route: quote.selectedRoute, sellers: quote.selectedSellers, servicePriceAda: selectedQuote.servicePriceAda, premiumAda: selectedQuote.premiumAda, coverageAda: selectedQuote.coverageAda } }) }); const b = await bind.json() as any; if (!bind.ok) throw new Error(JSON.stringify(b)); coverageRef = parseRef(b.coverageRef); await assertCoverage(buyer.lucid, buyer.deployment, coverageRef, { buyer: buyer.address, taskRef: locked.ref, taskExpiry: expiry, config: config() }); await record("coverage_lock", b.txHash); }
-  const selected = quote.selectedSellers.map((seller: string) => ({ seller, url: `${keeperUrl(seller)}/start_job` }));
-  const startKeeper = async ({ seller, url }: { seller: string; url: string }) => {
-    const paid = await pay(url, { taskId: quote.quoteId, claimVault: refString(locked.ref), beneficiary: buyer.address, expiry: String(expiry), priceLovelace: 1_000_000, termsHash: quote.termsHash, identifier_from_purchaser: crypto.randomUUID() }, wallets.buyer.seed);
+  const limits = { perPayment: BigInt(process.env.MAX_PAYMENT_LOVELACE ?? "10000000"), task: BigInt(process.env.MAX_TASK_SPEND_LOVELACE ?? "20000000") };
+  let spent = 0n;
+  const selected = quote.selectedSellers.map((seller: string) => ({ seller, url: `${keeperUrl(seller)}/start_job`, record: discovered.find((item) => item.id === seller) }));
+  const startKeeper = async ({ seller, url, record: sellerRecord }: { seller: string; url: string; record?: { priceAda: number; payTo: string } }) => {
+    if (!sellerRecord) throw new Error(`router seller record missing ${seller}`);
+    const paid = await pay(url, { taskId: quote.quoteId, claimVault: refString(locked.ref), beneficiary: buyer.address, expiry: String(expiry), termsHash: quote.termsHash, identifier_from_purchaser: crypto.randomUUID() }, buyerWallet.seed, sellerRecord, spent, limits);
+    spent += paid.amount;
     if (!paid.response.ok) throw new Error(`${seller} returned ${paid.response.status}: ${JSON.stringify(paid.body)}`);
     if (paid.body.paymentTx) await record(`${seller}_payment`, paid.body.paymentTx);
     return `${url.replace(/\/start_job$/, "")}/status?job_id=${paid.body.job_id}`;

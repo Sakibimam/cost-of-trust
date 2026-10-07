@@ -10,17 +10,43 @@ const port = Number(process.env.PORT ?? (id === "seller-a" ? 4101 : id === "sell
 const stall = process.env.STALL === "true";
 const koiosUrl = `http://127.0.0.1:${port}/koios`;
 const { lucid, deployment: d, address } = await context(id === "seller-a" ? "relayer" : id === "seller-c" ? "admin2" : "seller");
+const routerUrl = process.env.ROUTER_URL ?? "http://127.0.0.1:8787";
+const sellerConfigResponse = await fetch(`${routerUrl}/sellers`);
+if (!sellerConfigResponse.ok) throw new Error(`seller config failed ${sellerConfigResponse.status}`);
+const sellerConfig = (await sellerConfigResponse.json() as Array<{ id: string; priceAda: number; payTo: string }>).find((seller) => seller.id === id);
+if (!sellerConfig) throw new Error(`router seller record missing ${id}`);
+if (sellerConfig.payTo !== address) throw new Error(`router payTo does not match keeper address for ${id}`);
+const configuredPriceLovelace = BigInt(Math.round(sellerConfig.priceAda * 1_000_000));
 const signer = toFacilitatorCardanoSigner({ network: "cardano:preprod", provider: { koios: { baseUrl: koiosUrl }, requestTimeoutMs: 120_000 } });
 const facilitator = new x402Facilitator();
 facilitator.register("cardano:preprod", new ExactCardanoScheme(signer));
 
 type Job = { id: string; ref: ReturnType<typeof parseRef>; beneficiary: string; expiry: bigint; paymentTx?: string; result?: Record<string, unknown>; error?: string };
 const jobs = new Map<string, Job>();
+const paymentJobs = new Map<string, string>();
 const requirements = (body: Record<string, unknown>, jobId: string) => ({
   x402Version: 2,
-  resource: { url: `${process.env.PUBLIC_URL ?? `http://127.0.0.1:${port}`}/start_job`, description: `Cost-of-Trust keeper ${id}`, mimeType: "application/json" },
-  accepts: [{ scheme: "exact", network: "cardano:preprod", amount: String(body.priceLovelace ?? 1_000_000), asset: "lovelace", payTo: address, maxTimeoutSeconds: 600, extra: { assetTransferMethod: "default", confirmationPolicy: { l1Confirmations: 0 }, costOfTrust: { riskQuoteEndpoint: `${process.env.ROUTER_URL ?? "http://127.0.0.1:8787"}/quotes/${String(body.taskId ?? jobId)}`, riskTermsHash: body.termsHash } } }]
+  resource: { url: `${process.env.PUBLIC_URL ?? `http://127.0.0.1:${port}`}/jobs/${jobId}`, description: `Cost-of-Trust keeper ${id}`, mimeType: "application/json" },
+  accepts: [{ scheme: "exact", network: "cardano:preprod", amount: configuredPriceLovelace.toString(), asset: "lovelace", payTo: address, maxTimeoutSeconds: 600, extra: { assetTransferMethod: "default", confirmationPolicy: { l1Confirmations: 0 }, costOfTrust: { jobId, riskQuoteEndpoint: `${routerUrl}/quotes/${String(body.taskId ?? jobId)}`, riskTermsHash: body.termsHash } } }]
 });
+
+function paymentKey(payment: ReturnType<typeof decodePaymentSignatureHeader>): string {
+  const payload = payment.payload as { transaction?: unknown; nonce?: unknown };
+  if (typeof payload.transaction !== "string" || typeof payload.nonce !== "string") throw new Error("payment payload missing transaction nonce");
+  return `${payload.transaction}:${payload.nonce}`;
+}
+
+function bindPaymentToJob(payment: ReturnType<typeof decodePaymentSignatureHeader>, req: ReturnType<typeof requirements>, jobId: string): string {
+  if (payment.resource?.url !== req.resource.url) throw new Error("payment resource is not bound to this job");
+  const extra = req.accepts[0].extra as { costOfTrust?: { jobId?: string } };
+  if (extra.costOfTrust?.jobId !== jobId) throw new Error("payment terms are not bound to this job");
+  const key = paymentKey(payment);
+  const previous = paymentJobs.get(key);
+  if (previous && previous !== jobId) throw new Error("payment already used for another job");
+  if (previous === jobId) throw new Error("payment replay refused");
+  paymentJobs.set(key, jobId);
+  return key;
+}
 
 async function settlePayment(header: string, req: ReturnType<typeof requirements>["accepts"][number]): Promise<string> {
   const payment = decodePaymentSignatureHeader(header);
@@ -55,6 +81,8 @@ Bun.serve({ port, async fetch(request) {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/koios/")) {
       const path = url.pathname.slice("/koios".length);
+      const allowed = new Set(["GET /tip", "POST /tx_info", "POST /tx_status", "POST /tx_utxos", "POST /address_utxos", "POST /epoch_params", "POST /submittx"]);
+      if (!allowed.has(`${request.method} ${path}`)) return json({ error: "koios path not allowed" }, 404);
       const raw = path === "/submittx" ? "" : await request.text();
       let body: BodyInit | undefined = path === "/submittx" ? await request.arrayBuffer() : raw;
       if (path === "/tx_info" && raw) {
@@ -84,6 +112,8 @@ Bun.serve({ port, async fetch(request) {
       const paymentHeader = request.headers.get("payment-signature");
       if (!paymentHeader) return new Response(JSON.stringify({ x402Version: 2, job_id: job.id, accepts: requirements(input, job.id).accepts }), { status: 402, headers: { "content-type": "application/json", "PAYMENT-REQUIRED": encodePaymentRequiredHeader(requirements(input, job.id) as never) } });
       if (job.paymentTx) return json({ job_id: job.id, status: job.result ? "completed" : job.error ? "failed" : "running", paymentTx: job.paymentTx });
+      const payment = decodePaymentSignatureHeader(paymentHeader);
+      bindPaymentToJob(payment, requirements(input, job.id), job.id);
       const paymentTx = await settlePayment(paymentHeader, requirements(input, job.id).accepts[0]);
       job.paymentTx = paymentTx;
       if (stall) {
@@ -99,5 +129,5 @@ Bun.serve({ port, async fetch(request) {
   } catch (error) {
     return json({ error: error instanceof Error ? error.message : String(error) }, 400);
   }
-} });
+}, hostname: "127.0.0.1" });
 console.log(JSON.stringify({ seller: id, port, stall, address, mip003: ["/availability", "/input_schema", "/start_job", "/status"] }));
