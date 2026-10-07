@@ -1,0 +1,60 @@
+{
+  "startedAt": "2026-10-07T03:21:19.300Z",
+  "deployment": {
+    "configTx": "631d40a9a001ff9620076047d7d3d7222a47f61d0f663d6abfee800c7770c9a4",
+    "coverageRef": "8dd81a159eca155431cd6524a075cc189e3ee9c7245011c0d3f9c9e6d52c6f20#0",
+    "buyer": "addr_test1qp3d5uypvnx8ujr2mjdppu2whvrraps8ac7he3fj63zfjv3jctq4qksmzd858a52pajdtyl0fg6kf9gwaxql9emvn7gsa04dkf",
+    "underwriter": "addr_test1qq52fvmvrtrh66cdjs455gq0e6gazemmhsfpn0jwxv5vfjpk0d2jxe82ahk737wekjfu8s3pzjx2up4p9lya5hh8suwqac46kh"
+  },
+  "records": [
+    {
+      "step": "koios_tx_status",
+      "txs": {
+        "631d40a9a001ff9620076047d7d3d7222a47f61d0f663d6abfee800c7770c9a4": { "num_confirmations": 88 },
+        "8dd81a159eca155431cd6524a075cc189e3ee9c7245011c0d3f9c9e6d52c6f20": { "num_confirmations": 73 }
+      }
+    },
+    {
+      "step": "cre_native_report",
+      "status": "delivered_false",
+      "workflowResult": "{\"report\":true,\"decision\":\"FAILURE\",\"delivered\":false}",
+      "relayerHttpStatus": 400,
+      "error": "CRE simulation did not deliver a report (exit 0)",
+      "relayerRejection": "workflow report rejected: workflow cid, name or owner differ from the config NFT",
+      "surface": "relayer preflight after CRE report POST"
+    },
+    {
+      "step": "native_report_capture",
+      "status": "captured_without_resigning",
+      "rawBytes": 210,
+      "contextBytes": 96,
+      "signatureCount": 4,
+      "decisionByte": 1,
+      "metadata": "CRE simulator emitted placeholder workflow metadata, not the config NFT identity"
+    },
+    {
+      "step": "flipped_report",
+      "status": "rejected",
+      "decisionByte": 0,
+      "error": "\"failed script execution Spend[1] the validator crashed / exited prematurely\"",
+      "surface": "Cardano node validation via Koios submittx"
+    },
+    {
+      "step": "native_report_settle",
+      "status": "rejected",
+      "decisionByte": 1,
+      "error": "\"failed script execution Spend[1] the validator crashed / exited prematurely\"",
+      "surface": "Cardano node validation via Koios submittx"
+    }
+  ],
+  "settleTx": null,
+  "flippedReportResult": {
+    "result": "node_rejected",
+    "error": "\"failed script execution Spend[1] the validator crashed / exited prematurely\"",
+    "evaluationOrNode": "node"
+  },
+  "verification": {
+    "koios": "config and coverage transactions confirmed",
+    "blindSpot": "No settle transaction exists because both native and flipped submissions were rejected by the node."
+  }
+}

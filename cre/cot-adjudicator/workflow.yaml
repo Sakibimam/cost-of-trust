@@ -1,6 +1,7 @@
 staging-settings:
   user-workflow:
     workflow-name: "cot-adjudicator"
+    workflow-owner-address: "0x8b11daff84317c7bf96e685da76e063aa73a4ca5"
     deployment-registry: "onchain:ethereum-mainnet"
   workflow-artifacts:
     workflow-path: "./main.ts"
