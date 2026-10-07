@@ -81,9 +81,13 @@ async function settleUncoordinated(header: string, requirements: Record<string, 
   const payment = decodePaymentSignatureHeader(header);
   const verified = await facilitator.verify(payment as never, requirements as never);
   if (!verified.isValid) throw new Error(`payment rejected: ${verified.invalidReason ?? "invalid"}`);
-  const settled = await facilitator.settle(payment as never, requirements as never);
-  if (!settled.success) throw new Error(`payment settlement failed: ${settled.errorReason ?? "failed"}`);
-  return { txId, paymentResponse: settled };
+  const deadline = Date.now() + 35_000;
+  for (;;) {
+    const settled = await facilitator.settle(payment as never, requirements as never);
+    if (settled.success) return { txId, paymentResponse: settled };
+    if (!(settled.errorReason === "settlement_pending" || settled.errorReason === "exact_cardano_settlement_not_confirmed") || Date.now() >= deadline) throw new Error(`payment settlement failed: ${settled.errorReason ?? "failed"}`);
+    await new Promise((resolve) => setTimeout(resolve, 5_000));
+  }
 }
 
 export async function settleOnce(header: string, requirements: Record<string, unknown>) {
