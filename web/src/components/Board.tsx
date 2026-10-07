@@ -15,7 +15,6 @@ import { MasumiBackup } from "./MasumiBackup";
 import { Backtest } from "./Backtest";
 import { Sellers } from "./Sellers";
 import { Verdict } from "./Verdict";
-import backtest from "@/data/backtest.json";
 
 const LOSS_ADA = 100;
 const START_ROUTER = "cd router && PORT=8787 bun src/server.ts";
@@ -55,7 +54,7 @@ function Section({ id, title, kicker, children }: { id: string; title: string; k
   );
 }
 
-export function Board({ runs }: { runs: React.ReactNode }) {
+export function Board({ runs, tryIt, howItWorks }: { runs: React.ReactNode; tryIt: React.ReactNode; howItWorks: React.ReactNode }) {
   const [buyer, setBuyer] = useState<Buyer>("treasury");
   const [shared, setShared] = useState(true);
   const [sellers, setSellers] = useState<Load<SellerRecord[]>>({ status: "loading" });
@@ -96,7 +95,8 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         <div className="wrap flex flex-wrap items-center justify-between gap-x-6">
           <p className="m-0 py-3 text-[17px] font-extrabold tracking-tight">Cost of Trust</p>
           <nav aria-label="Sections" className="flex gap-x-1 text-[14px] font-semibold">
-            <a href="#subhire" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Check</a>
+            <a href="#try" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Try it</a>
+            <a href="#how" className="inline-flex min-h-[44px] items-center px-2 !text-ink">How</a>
             <a href="#sellers" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Sellers</a>
             <a href="#run" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Latest run</a>
             <a href="/thesis" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Thesis</a>
@@ -107,23 +107,20 @@ export function Board({ runs }: { runs: React.ReactNode }) {
 
       <section aria-labelledby="top-h" className="relative">
         <div className="hero-rules" aria-hidden><div className="wrap h-full"><div className="rules" /></div></div>
-        <div className="wrap relative z-10 grid grid-cols-1 gap-x-10 gap-y-6 py-6 md:py-8 lg:grid-cols-12 lg:gap-y-8">
-          <div className="min-w-0 lg:col-span-7 lg:row-start-1">
-            <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">A dispute count hires the agent that refunds every job. A coworker asks Trust Check before it pays and gets one answer: hire, hire a backup, or do not hire.</p>
-            <h1 id="top-h" className="display mt-3">Ask before the coworker pays.</h1>
-          </div>
-          <div className="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
-            <Controls buyer={buyer} onBuyer={setBuyer} shared={shared} onShared={setShared} busy={busy} />
-          </div>
-          <div className="lg:col-span-7 lg:row-start-2">
-            <p className="m-0 max-w-[58ch] text-[18px] leading-[1.45]">On {backtest.calibration.observations} later mainnet jobs, reading refunds instead of disputes scores Brier {backtest.calibration.betaBinomialBrier.toFixed(3)} against {backtest.calibration.disputeRateBrier.toFixed(3)}. Skipping agents with more than one refund in five finishes {backtest.policies.P2["100"].jobsDone} jobs instead of {backtest.policies.P0["100"].jobsDone}.</p>
-            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-[14px] font-extrabold">
-              <a href="https://preprod.sokosumi.com" className="btn whitespace-nowrap">Hire Trust Check on Sokosumi</a>
-              <a href="/api/x402/trust-check#docs" className="whitespace-nowrap">Read the x402 endpoint</a>
-            </div>
+        <div className="wrap relative z-10 py-8 md:py-12">
+          <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">For anyone whose software hires other software.</p>
+          <h1 id="top-h" className="display mt-3 max-w-[16ch]">Ask before the coworker pays.</h1>
+          <p className="mt-6 max-w-[56ch] text-[18px] leading-[1.45]">An AI coworker is a program that does jobs for you and pays other programs to help. Some of them take the payment and miss the deadline. Trust Check reads each agent&apos;s real job history on Cardano and tells you what to do before you pay: hire it, hire it with a backup, or skip it.</p>
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-[14px] font-extrabold">
+            <a href="#try" className="btn inline-flex items-center whitespace-nowrap !bg-ink !text-paper no-underline hover:!bg-blue hover:!border-blue">Check an agent now</a>
+            <a href="https://preprod.sokosumi.com" className="whitespace-nowrap">Hire Trust Check on Sokosumi</a>
+            <a href="#api" className="whitespace-nowrap">Call it from your agent</a>
           </div>
         </div>
       </section>
+
+      {tryIt}
+      {howItWorks}
 
       <Showcase />
       <MasumiBackup />
@@ -134,6 +131,7 @@ export function Board({ runs }: { runs: React.ReactNode }) {
 
       <section id="ranking" aria-labelledby="ranking-h" className="scroll-mt-6 pb-12 md:pb-16">
         <div className="wrap">
+        <div className="mb-8 max-w-[640px]"><Controls buyer={buyer} onBuyer={setBuyer} shared={shared} onShared={setShared} busy={busy} /></div>
         <div className="mb-10" data-testid="hero-pair">
             {ready ? <HeroPair result={ready} names={names} /> : failed ? <p className="m-0 text-[15px] text-muted">The numbers appear once the router answers.</p> : <Loading what={`Pricing every route at ${ROUTER_URL}.`} />}
         </div>
