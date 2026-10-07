@@ -1,0 +1,121 @@
+{
+ "source": "agents/runs/2026-10-07T07-36-20Z-masumi-backup-stall-final.json",
+ "startedAt": "2026-10-07T07:36:20.280Z",
+ "finishedAt": "2026-10-07T08:27:03.342Z",
+ "buyerDeadline": "2026-10-07T07:56:20.280Z",
+ "primaryAgent": "Masumi Backup Primary (STALL=true)",
+ "backupAgent": "Masumi Backup Fallback ADA (3 ADA)",
+ "quote": {
+  "at": "2026-10-07T07:36:26.392Z",
+  "selectedRoute": "redundant",
+  "selectedSellers": [
+   "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000",
+   "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10653cacce1093ec95156bb719ff7775f2e267f315113154a269755edc000000"
+  ],
+  "options": {
+   "single": {
+    "sellers": [
+     "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000"
+    ],
+    "expectedTotalCostAda": 0.2727272727272727,
+    "riskAdjustedCostAda": 0.6735528670008837
+   },
+   "redundant": {
+    "sellers": [
+     "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000",
+     "seller-a"
+    ],
+    "expectedTotalCostAda": 8.049586776859504,
+    "riskAdjustedCostAda": 8.244967487320782
+   },
+   "staggered": {
+    "sellers": [
+     "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000",
+     "seller-c"
+    ],
+    "expectedTotalCostAda": 1.7045454545454544,
+    "riskAdjustedCostAda": 1.9313973376311016
+   },
+   "underwritten": {
+    "sellers": [
+     "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000"
+    ],
+    "expectedTotalCostAda": 2.0777272727272726,
+    "riskAdjustedCostAda": 2.0777272727272726
+   }
+  }
+ },
+ "timeline": {
+  "A_hired": "2026-10-07T07:36:29Z",
+  "buyer_checkpoint": "2026-10-07T07:39:30Z (no A result, hireBackup=true)",
+  "B_hired": "2026-10-07T07:39:34Z",
+  "B_funds_locked_seen": "2026-10-07T07:45:20Z",
+  "B_result_on_chain": "2026-10-07T07:51:08Z",
+  "buyer_deadline": "2026-10-07T07:56:20.280Z",
+  "buyerDeadlineMet": true,
+  "A_submitResultTime": "2026-10-07T07:51:56Z",
+  "A_unlockTime": "2026-10-07T08:06:56Z",
+  "A_refund_requested": "2026-10-07T07:57:15Z",
+  "A_refund_withdrawn_confirmed": "2026-10-07T08:18:50Z (collect-refund tick; state seen RefundWithdrawn 08:20Z)",
+  "B_submitResultTime": "2026-10-07T08:00:03Z",
+  "B_unlockTime": "2026-10-07T08:15:03Z"
+ },
+ "checkpoint": {
+  "at": "2026-10-07T07:39:33.033Z",
+  "checkpointAt": "2026-10-07T07:39:30.019Z",
+  "primaryResultArrivedAt": null,
+  "hireBackup": true
+ },
+ "result": {
+  "at": "2026-10-07T07:51:08.439Z",
+  "resultArrivedAt": "2026-10-07T07:51:08.438Z",
+  "buyerDeadline": "2026-10-07T07:56:20.280Z",
+  "buyerDeadlineMet": true
+ },
+ "txs": [
+  {
+   "txHash": "5d70db26db11b4e7e3711ce11febef7031b790f710e23c10927ff4ab3d9518d8",
+   "role": "A escrow lock",
+   "state": "FundsLocked",
+   "at": "2026-10-07T07:39:39Z"
+  },
+  {
+   "txHash": "d9b06473307dbf9c056bc51a66637d5af2e153c63b770d4650434967ab74c63e",
+   "role": "B escrow lock",
+   "state": "FundsLocked",
+   "at": "2026-10-07T07:45:16Z"
+  },
+  {
+   "txHash": "7934f7a085a4c491469994f6c7964f601219487cb6888bcefebce05862189fdf",
+   "role": "B ResultSubmitted",
+   "state": "ResultSubmitted",
+   "at": "2026-10-07T07:51:08Z"
+  },
+  {
+   "txHash": "b6dde9c1337932dcc5fd28713cf832ccb2788c9a374a55791791da40ae04ab5a",
+   "role": "A refund request",
+   "state": "RefundRequested",
+   "at": "2026-10-07T08:00:08Z"
+  },
+  {
+   "txHash": "f6445aa1b4a1eae1f69516d215763fe6e4cf20e8d6e4cb94340bd9e206ae9db8",
+   "role": "A refund withdrawn",
+   "state": "RefundWithdrawn",
+   "at": "2026-10-07T08:18:50Z"
+  }
+ ],
+ "stepNames": [
+  "2026-10-07T07:36:26.392Z trust_check_decision",
+  "2026-10-07T07:36:29.001Z primary_payment_request",
+  "2026-10-07T07:36:30.019Z primary_escrow_lock_requested",
+  "2026-10-07T07:39:33.033Z buyer_checkpoint",
+  "2026-10-07T07:39:34.529Z backup_escrow_lock_requested",
+  "2026-10-07T07:45:20.493Z backup_funds_locked",
+  "2026-10-07T07:51:08.439Z backup_result_submitted",
+  "2026-10-07T07:51:08.440Z primary_refund_pending",
+  "2026-10-07T07:51:08.440Z backup_collection_pending",
+  "2026-10-07T07:57:15.164Z primary_refund_requested",
+  "2026-10-07T08:11:59.421Z primary_refund_pending",
+  "2026-10-07T08:27:03.342Z backup_collection_pending"
+ ]
+}

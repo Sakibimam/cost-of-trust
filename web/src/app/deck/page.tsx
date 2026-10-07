@@ -1,10 +1,12 @@
-import { DeckSlides } from "./slides";
+import type { Metadata } from "next";
+import { buildDeckData } from "./data";
+import { DeckShell } from "./slides";
 
-export const metadata = {
-  title: "Pitch deck | Cost of Trust",
-  description: "A keyboard-navigable pitch deck for risk-priced agent hiring.",
+export const metadata: Metadata = {
+  title: "Cost of Trust: the underwriter's ledger",
+  description: "Every agent hire is a bet with ADA at risk. Cost of Trust prices it from the agent's own escrow history.",
 };
 
 export default function DeckPage() {
-  return <DeckSlides />;
+  return <DeckShell data={buildDeckData()} />;
 }

@@ -1,0 +1,107 @@
+{
+ "network": "preprod",
+ "explorer": "https://preprod.cardanoscan.io/transaction/",
+ "koios": "https://preprod.koios.rest/api/v1/tx_status",
+ "txs": {
+  "delivers-lock": {
+   "label": "Claim vault lock",
+   "txHash": "502926e99ddd2f6dd15478ec1994d62ed4bded94936752c0a36fa80ad85325a5",
+   "source": "agents/runs/2026-10-07T02-11-35-743Z.json"
+  },
+  "delivers-pay": {
+   "label": "Keeper A payment",
+   "txHash": "314faaa5dc8c69f75bc53557c43f9832ce6bc833ee7bf80f835ee2dc8ca91f89",
+   "source": "agents/runs/2026-10-07T02-11-35-743Z.json"
+  },
+  "delivers-claim": {
+   "label": "Keeper A claim",
+   "txHash": "8650e923c2e2fcc0684976a062079c6cea4a3fa809e1f14db1f64cf96b188cb1",
+   "source": "agents/runs/2026-10-07T02-11-35-743Z.json"
+  },
+  "stall-lock": {
+   "label": "Claim vault lock",
+   "txHash": "4488de11cf15ccd060bbf93be00611ca300e820b75afca8b03a6333d8166958d",
+   "source": "agents/runs/2026-10-07T02-20-00-676Z.json"
+  },
+  "stall-payA": {
+   "label": "Keeper A payment",
+   "txHash": "791e0480e5a14165a363adb36bd10d283dde7dfd40b16f276f31352e9a837cee",
+   "source": "agents/runs/2026-10-07T02-20-00-676Z.json"
+  },
+  "stall-payB": {
+   "label": "Keeper B payment",
+   "txHash": "ae6d7761d845ccff08ac29ff7ecd9beecac9ca34fbea3969ea2eb9c0c0391810",
+   "source": "agents/runs/2026-10-07T02-20-00-676Z.json"
+  },
+  "stall-claimB": {
+   "label": "Keeper B claim",
+   "txHash": "2851e9b2df9bfabb621376f446b2dc2fd79944540b7a415cc3140ee63aec638b",
+   "source": "agents/runs/2026-10-07T02-20-00-676Z.json"
+  },
+  "race-lock": {
+   "label": "Race lock",
+   "txHash": "c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814",
+   "source": "README.md"
+  },
+  "race-payA": {
+   "label": "Keeper A payment",
+   "txHash": "e458925a99e85fe742b0f0a2a1dbf1dfc8ece3724752a8862227e27c89309cac",
+   "source": "README.md"
+  },
+  "race-claimA": {
+   "label": "Winning claim",
+   "txHash": "43b27058c91abc30ff560251cc7997a0ca0343df4432319c265b4f140163de9b",
+   "source": "README.md"
+  },
+  "race-payB": {
+   "label": "Keeper B payment",
+   "txHash": "aa40b41742f98be7520e3003fc49e11266cab049dcabdafa59677a6042b9354a",
+   "source": "README.md"
+  },
+  "cre-settle": {
+   "label": "CRE coverage settlement",
+   "txHash": "3e33929dbf296722029680f3ff26676da5b420ebe4e4e34265b9992a8526ff1b",
+   "source": "README.md"
+  },
+  "trust-result": {
+   "label": "Trust Check result hash",
+   "txHash": "0be9fa229a864ddbaa8847afa84657d535d93d4a26fdbab506e2a2ebde573f91",
+   "source": "README.md"
+  },
+  "masumi-lockA": {
+   "label": "A escrow lock",
+   "txHash": "5d70db26db11b4e7e3711ce11febef7031b790f710e23c10927ff4ab3d9518d8",
+   "source": "agents/runs/2026-10-07T07-36-20Z-masumi-backup-stall-final.json"
+  },
+  "masumi-lockB": {
+   "label": "B escrow lock",
+   "txHash": "d9b06473307dbf9c056bc51a66637d5af2e153c63b770d4650434967ab74c63e",
+   "source": "agents/runs/2026-10-07T07-36-20Z-masumi-backup-stall-final.json"
+  },
+  "masumi-resultB": {
+   "label": "B ResultSubmitted",
+   "txHash": "7934f7a085a4c491469994f6c7964f601219487cb6888bcefebce05862189fdf",
+   "source": "agents/runs/2026-10-07T07-36-20Z-masumi-backup-stall-final.json"
+  },
+  "masumi-refundReq": {
+   "label": "A refund request",
+   "txHash": "b6dde9c1337932dcc5fd28713cf832ccb2788c9a374a55791791da40ae04ab5a",
+   "source": "agents/runs/2026-10-07T07-36-20Z-masumi-backup-stall-final.json"
+  },
+  "masumi-refundDone": {
+   "label": "A refund withdrawn",
+   "txHash": "f6445aa1b4a1eae1f69516d215763fe6e4cf20e8d6e4cb94340bd9e206ae9db8",
+   "source": "agents/runs/2026-10-07T07-36-20Z-masumi-backup-stall-final.json"
+  }
+ },
+ "races": {
+  "delivers": {
+   "checkpointAt": "2026-10-07T02:15:37.000Z",
+   "savedFeeAda": 10
+  },
+  "stall": {
+   "checkpointAt": "2026-10-07T02:24:01.000Z",
+   "savedFeeAda": 10
+  }
+ }
+}

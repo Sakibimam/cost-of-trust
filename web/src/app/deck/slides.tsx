@@ -1,55 +1,129 @@
 "use client";
-
-import { ProblemProof } from "@/components/ProblemProof";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { instant, runs, tx } from "../thesis/evidence";
+import { useCallback, useEffect, useState } from "react";
+import type { DeckData } from "./data";
+import { body, display, figures } from "./fonts";
+import { useReducedMotion, useRun, type SlideProps } from "./shared";
+import { Escrow } from "./s1-escrow";
+import { Ranking } from "./s2-ranking";
+import { Purchases } from "./s3-purchases";
+import { SliderSlide } from "./s4-slider";
+import { Architecture } from "./s5-architecture";
+import { Race } from "./s6-race";
+import { Backtest } from "./s7-backtest";
+import { Stall } from "./s8-stall";
+import { Close } from "./s9-close";
 import styles from "./styles.module.css";
 
-const short = (hash: string) => `${hash.slice(0, 10)}...${hash.slice(-8)}`;
+const SLIDES: Array<{ id: string; title: string; Comp: (p: SlideProps & { go: (n: number) => void }) => React.ReactNode }> = [
+  { id: "escrow", title: "Agent pays agent", Comp: Escrow },
+  { id: "ranking", title: "Nothing to rank", Comp: Ranking },
+  { id: "purchases", title: "Four ways to buy one job", Comp: Purchases },
+  { id: "slider", title: "Move the stake", Comp: SliderSlide },
+  { id: "architecture", title: "Quote to settled claim", Comp: Architecture },
+  { id: "race", title: "Proof: the backup race", Comp: Race },
+  { id: "backtest", title: "Proof: held-out mainnet", Comp: Backtest },
+  { id: "stall", title: "Proof: the stall on Masumi", Comp: Stall },
+  { id: "close", title: "Who buys it", Comp: Close },
+];
 
-function SlideFrame({ index, kicker, title, children }: { index: number; kicker: string; title: string; children: React.ReactNode }) {
-  return <section className={styles.slide} aria-labelledby={`slide-${index}`}><div className="wrap"><div className={styles.slideGrid}><div><p className={styles.kicker}>{kicker}</p><h1 id={`slide-${index}`}>{title}</h1>{children}</div><aside className={styles.side}><strong>{String(index + 1).padStart(2, "0")}</strong><span>Cost of Trust<br />Cardano agentic commerce</span></aside></div></div></section>;
+const fromHash = () => {
+  const n = parseInt(window.location.hash.replace(/^#/, ""), 10);
+  return Number.isFinite(n) && n >= 1 && n <= SLIDES.length ? n - 1 : 0;
+};
+
+function SlideHost({ index, current, data, go, reduced }: { index: number; current: number; data: DeckData; go: (n: number) => void; reduced: boolean }) {
+  const active = index === current;
+  const run = useRun(active);
+  const { Comp, id, title } = SLIDES[index];
+  return (
+    <section className={styles.slide} data-active={active} data-slide={id} aria-label={`${index + 1} of ${SLIDES.length}: ${title}`} inert={!active} tabIndex={-1}>
+      <div className={styles.inner}>
+        <Comp data={data} active={active} run={run} reduced={reduced} go={go} />
+      </div>
+    </section>
+  );
 }
 
-export function DeckSlides() {
-  const [slide, setSlide] = useState(0);
-  const max = 12;
+export function DeckShell({ data }: { data: DeckData }) {
+  const [current, setCurrent] = useState(0);
+  const reduced = useReducedMotion();
+
+  const go = useCallback((n: number) => {
+    const next = Math.max(0, Math.min(SLIDES.length - 1, n));
+    setCurrent(next);
+    const hash = `#${next + 1}-${SLIDES[next].id}`;
+    if (window.location.hash !== hash) window.history.replaceState(null, "", hash);
+  }, []);
+
   useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight" || event.key === "PageDown") setSlide((value) => Math.min(max - 1, value + 1));
-      if (event.key === "ArrowLeft" || event.key === "PageUp") setSlide((value) => Math.max(0, value - 1));
-      if (event.key === "Home") setSlide(0);
-      if (event.key === "End") setSlide(max - 1);
+    setCurrent(fromHash());
+    const onHash = () => setCurrent(fromHash());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (t?.closest("input, textarea, select")) return;
+      const onControl = !!t?.closest("button, a");
+      if (e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && !onControl)) go(current + 1);
+      else if (e.key === "ArrowLeft" || e.key === "PageUp") go(current - 1);
+      else if (e.key === "Home") go(0);
+      else if (e.key === "End") go(SLIDES.length - 1);
+      else if (/^[1-9]$/.test(e.key)) go(Number(e.key) - 1);
+      else return;
+      e.preventDefault();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [current, go]);
 
-  return <div className={styles.page} aria-roledescription="slideshow" aria-label="Cost of Trust pitch deck">
-    <header className={styles.mast}><div className="wrap"><div className={styles.mastInner}><Link className={styles.brand} href="/">Cost of Trust</Link><nav className={styles.nav} aria-label="Deck routes"><Link href="/thesis">Thesis</Link><a href="/deck/cost-of-trust.pptx">PPTX</a></nav></div></div></header>
-    <div className="wrap"><div className={styles.bar}><span className={styles.counter} aria-live="polite">Slide {slide + 1} of {max}</span><span className={styles.hint}>Use ← →, Home, or End</span></div></div>
-    <div aria-live="polite">
-      {slide === 0 && <SlideFrame index={0} kicker="Cardano agentic commerce" title="Agents can buy reliability, not just access."><p className={styles.lede}>The cheapest keeper is not the cheapest route. Cost of Trust prices the counterparty, the deadline loss, and the backup before payment.</p></SlideFrame>}
-      {slide === 1 && <SlideFrame index={1} kicker="The problem" title="Price alone is the wrong decision rule."><p className={styles.lede}>A missed deadline destroys more value than the request costs. Seller price, delivery history, infrastructure correlation, and buyer risk appetite belong in the same quote.</p><div className={styles.routeRows}><div className={styles.routeRow}><strong>10 ADA</strong><span>service price</span><b>not enough</b></div><div className={styles.routeRow}><strong>100 ADA</strong><span>deadline loss</span><b>the real input</b></div></div></SlideFrame>}
-      {/* Source: docs/SPEC.md selection table, also summarized in README.md. */}
-      {slide === 2 && <SlideFrame index={2} kicker="In their words" title="Builders already name the gap."><ProblemProof limit={4} className="mt-6" /></SlideFrame>}
-      {/* Source: web/src/data/showcase.json (live mainnet registry) and agents/runs/2026-10-07T02-11-35-743Z.json, 2026-10-07T02-20-00-676Z.json. */}
-      {slide === 3 && <SlideFrame index={3} kicker="Answer to the ranking question" title="One agent. Four ways to buy the job."><p className={styles.lede}>A ranking needs several agents. A purchase decision does not. dpa Research Agent, 175 paid and 51 refunded escrows: at 5 ADA at risk hire it alone, at 100 and 500 ADA hire it with a backup.</p><div className={styles.routeRows}><div className={`${styles.routeRow} ${styles.routeRowWide}`}><span>Dispute rate</span><strong>Knight: 0 disputes, ranked flawless</strong><span>251 of 293 escrows refunded: do not hire</span></div><div className={`${styles.routeRow} ${styles.routeRowWide}`}><span>Keeper A delivers</span><strong>backup never paid</strong><span>10 ADA not spent</span></div><div className={`${styles.routeRow} ${styles.routeRowWide}`}><span>Keeper A stalls</span><strong>vault unspent at checkpoint</strong><span>backup paid, backup claims</span></div></div></SlideFrame>}
-      {slide === 4 && <SlideFrame index={4} kicker="Selection map" title="The buyer's route changes with risk and correlation."><div className={styles.routeRows}>{[["0", "independent keepers", "10.82 ADA"], ["0.25", "independent keepers", "14.89 ADA"], ["0.5", "shared infrastructure", "25.20 ADA"], ["1", "shared infrastructure", "28.20 ADA"]].map(([risk, mode, value]) => <div className={styles.routeRow} key={risk}><strong>risk {risk}</strong><span>{mode}</span><b>{value}</b></div>)}</div></SlideFrame>}
-      {/* Source: docs/WRITEUP.md risk-adjusted cost formula. */}
-      {slide === 5 && <SlideFrame index={5} kicker="Decision layer" title="Two buyers. Same sellers. Different winners."><p className={styles.lede}>The router returns every eligible route and selects the minimum risk-adjusted cost. The quote includes the terms hash before the buyer pays.</p><div className={styles.rule}><strong>risk-adjusted cost = service price + premium + expected loss + risk aversion × loss standard deviation</strong></div></SlideFrame>}
-      {slide === 6 && <SlideFrame index={6} kicker="Cardano mechanism" title="One deadline task. One spend. One winner."><div className={styles.mechanism}>{[["01", "Quote", "route and terms hash"], ["02", "Lock", "one claim-vault UTxO"], ["03", "Race", "two keepers claim that UTxO"], ["04", "Settle", "one winner on chain"]].map(([num, head, body]) => <div className={styles.step} key={num}><span className={styles.kicker}>{num}</span><strong>{head}</strong><p>{body}</p></div>)}</div></SlideFrame>}
-      {slide === 7 && <SlideFrame index={7} kicker="Masumi and Cost of Trust" title="Masumi moves payment. Cost of Trust chooses the route."><p className={styles.lede}>Masumi supplies escrow, identity, reputation, discovery, and payment execution. Cost of Trust adds observed seller histories, correlation-aware route choice, and a terms hash before x402 payment.</p></SlideFrame>}
-      {/* Source: docs/GTM.md provider table and router/probes/results-20261006051159.json. */}
-      {slide === 8 && <SlideFrame index={8} kicker="Measured provider evidence" title="Availability is a route input, not a footnote."><p className={styles.lede}>The router treats every 429 and non-2xx response as a failure. The probe turns free versus paid infrastructure into a decision the buyer can price.</p><div className={styles.bench}>{[["Koios auth", "60 / 60"], ["Koios public", "0 / 60"], ["Tatum", "60 / 60"], ["calls each", "60"]].map(([name, value]) => <div key={name}><span className={styles.kicker}>{name}</span><strong>{value}</strong></div>)}</div></SlideFrame>}
-      {slide === 9 && <SlideFrame index={9} kicker="Trust Check Coworker" title="Diligence becomes a hiring action."><p className={styles.lede}>An agent identifier and task value at risk become a cited report. Registry, escrow history, endpoint health, and the Cost of Trust route resolve into hire, backup, coverage, or do not hire.</p></SlideFrame>}
-      {slide === 10 && <SlideFrame index={10} kicker="Preprod evidence" title="The proof is confirmed and inspectable."><div className={styles.proof}>{runs.map((run) => <div className={styles.proofRow} key={run.time}><strong>{run.time}</strong><span>{run.route}</span><div>{run.hashes.map((hash) => <a key={hash} href={tx(hash)} target="_blank" rel="noreferrer">{short(hash)} ↗</a>)}</div></div>)}</div></SlideFrame>}
-      {/* Source: instant/results.json. */}
-      {slide === 11 && <SlideFrame index={11} kicker="Measured close" title="Trust is a route choice."><p className={styles.lede}>Instant mode confirmed 20 of 20 requests. The benchmark recorded a {Math.round(instant.instant.p50)} ms p50 and {Math.round(instant.instant.p95)} ms p95. The thesis is simple: price the counterparty, protect the deadline, let Cardano enforce the route.</p><a className={styles.download} href="/deck/cost-of-trust.pptx">Download the PPTX</a></SlideFrame>}
+  const onStageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const t = e.target as HTMLElement;
+    if (t.closest("a, button, input, label, select, iframe, svg [data-keep], [data-keep]")) return;
+    if (window.getSelection()?.toString()) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    go(e.clientX - rect.left < rect.width * 0.12 ? current - 1 : current + 1);
+  };
+
+  return (
+    <div className={`${styles.deck} ${display.variable} ${body.variable} ${figures.variable}`} aria-roledescription="slide deck" aria-label="Cost of Trust pitch deck">
+      <header className={styles.mast}>
+        <Link className={styles.brand} href="/">Cost of Trust</Link>
+        <nav className={styles.mastLinks} aria-label="Site">
+          <Link href="/">Live app</Link>
+          <Link href="/thesis">Thesis</Link>
+        </nav>
+      </header>
+
+      <div className={styles.stage} onClick={onStageClick}>
+        {SLIDES.map((_, i) => (
+          <SlideHost key={SLIDES[i].id} index={i} current={current} data={data} go={go} reduced={reduced} />
+        ))}
+      </div>
+
+      <footer className={styles.foot}>
+        <div className={styles.bar} role="group" aria-label="Slide progress">
+          {SLIDES.map((s, i) => (
+            <button key={s.id} type="button" className={styles.seg} data-state={i < current ? "past" : i === current ? "now" : "future"} onClick={() => go(i)} aria-label={`Go to slide ${i + 1}: ${s.title}`} aria-current={i === current ? "step" : undefined} />
+          ))}
+        </div>
+        <div className={styles.footRow}>
+          <span className={styles.title}>{SLIDES[current].title}</span>
+          <span className={styles.hint}>Arrow keys, click or tap to move</span>
+          <div className={styles.controls}>
+            <button type="button" className={styles.step} onClick={() => go(current - 1)} disabled={current === 0} aria-label="Previous slide">&larr;</button>
+            <span className={styles.counter} aria-live="polite" aria-atomic="true">
+              <span aria-hidden="true">{String(current + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}</span>
+              <span className="sr-only" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>Slide {current + 1} of {SLIDES.length}</span>
+            </span>
+            <button type="button" className={styles.step} onClick={() => go(current + 1)} disabled={current === SLIDES.length - 1} aria-label="Next slide">&rarr;</button>
+          </div>
+        </div>
+      </footer>
     </div>
-    <div className="sr-only" aria-label="Deck evidence index">
-      {runs.flatMap((run) => run.hashes).map((hash) => <a key={hash} href={tx(hash)}>{hash}</a>)}
-    </div>
-  </div>;
+  );
 }
