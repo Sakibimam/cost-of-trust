@@ -56,7 +56,7 @@ export async function isUnsafeUrl(url: string, resolve = lookup): Promise<boolea
 export async function getJson(source: string, url: string, init?: RequestInit, resolve = lookup): Promise<Evidence> {
   try {
     if (await isUnsafeUrl(url, resolve)) return { source, status: "unavailable", observedAt: now(), error: `private API URL (${url})` };
-    const response = await fetch(url, { ...init, redirect: "manual", signal: AbortSignal.timeout(15_000) });
+    const response = await fetch(url, { ...init, redirect: "manual", signal: init?.signal ?? AbortSignal.timeout(15_000) });
     if (response.status >= 300 && response.status < 400) return { source, status: "unavailable", observedAt: now(), error: `redirect refused (${response.status})` };
     const text = await response.text();
     let data: unknown;

@@ -78,7 +78,7 @@ export async function preview(params: { agent: string | null; valueAda: string |
   // The paid report refuses an agent whose API is down; the preview reads the same /availability so both answer alike.
   const registry = await registryFromChain(entry.identifier, entry.network);
   const endpoint = registry.status === "ok" ? advertisedUrl(registry.data) : null;
-  if (endpoint) facts.push(await getJson("agent_availability", `${endpoint}/availability`));
+  if (endpoint) facts.push(await getJson("agent_availability", `${endpoint}/availability`, { signal: AbortSignal.timeout(4_000) }));
   const decision = decide(facts, valueAda, { agentIdentifier: entry.identifier, deadlineMinutes });
 
   const options = (Object.keys(ROUTES) as Array<keyof typeof ROUTES>).flatMap((route) => {
