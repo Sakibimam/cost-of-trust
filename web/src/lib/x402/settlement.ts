@@ -52,11 +52,18 @@ async function confirmedOnChain(txId: string): Promise<boolean> {
   const headers = { "content-type": "application/json", ...(process.env.KAIOS_KEY ? { authorization: `Bearer ${process.env.KAIOS_KEY}` } : {}) };
   const request = koiosFetch ?? fetch;
   const body = JSON.stringify({ _tx_hashes: [txId] });
-  const status = await request(`${baseUrl}/tx_status`, { method: "POST", headers, body });
+  const get = async (url: string) => {
+    for (let attempt = 0; ; attempt++) {
+      const response = await request(url, { method: "POST", headers, body });
+      if (response.status !== 429 || attempt === 3) return response;
+      await new Promise((resolve) => setTimeout(resolve, 1_000 * 2 ** attempt));
+    }
+  };
+  const status = await get(`${baseUrl}/tx_status`);
   if (!status.ok) throw new Error(`Koios tx_status failed: ${status.status}`);
   const rows = await status.json() as Array<{ num_confirmations?: number | null }>;
   if ((rows[0]?.num_confirmations ?? 0) > 0) return true;
-  const info = await request(`${baseUrl}/tx_info`, { method: "POST", headers, body });
+  const info = await get(`${baseUrl}/tx_info`);
   if (info.status === 404) return false;
   if (!info.ok) throw new Error(`Koios tx_info failed: ${info.status}`);
   const infoRows = await info.json() as Array<{ block_hash?: string | null; block_height?: number | null }>;
