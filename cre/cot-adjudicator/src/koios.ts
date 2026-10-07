@@ -70,7 +70,12 @@ const CHUNK = 25;
 const same = (a: { tx_hash: string; tx_index: number }, r: Ref) => a.tx_hash === r.txHash && a.tx_index === r.index;
 
 // Koios has no "spent by" lookup: list the script's txs from the lock block on, take the one that has the vault as an input.
-function findSpender(post: Post, vault: Ref, row: UtxoRow): TxInfo {
+function findSpender(post: Post, vault: Ref, row: UtxoRow, spendTxHash?: string): TxInfo {
+  if (spendTxHash) {
+    const direct = json<TxInfo[]>(post, "tx_info", { _tx_hashes: [spendTxHash], _inputs: true, _metadata: false, _assets: false, _withdrawals: false, _certs: false, _scripts: true })[0];
+    if (direct?.inputs?.some((input) => same(input, vault))) return direct;
+    throw new Error(`${spendTxHash} does not spend ${vault.txHash}#${vault.index}`);
+  }
   for (let page = 0; page < SCAN_PAGES; page++) {
     const listed = json<Array<{ tx_hash: string }>>(post, `credential_txs?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`, { _payment_credentials: [row.payment_cred], _after_block_height: row.block_height - 1 });
     for (let i = 0; i < listed.length; i += CHUNK) {
@@ -93,8 +98,8 @@ const taggedWith = (o: TxOutput, vault: Ref): boolean => {
 
 export type VaultSpend = NonNullable<AdjudicationFacts["spend"]>;
 // Classify how the vault UTxO was spent, from the spending tx's redeemer, outputs and required signers.
-export function readSpend(post: Post, vault: Ref, row: UtxoRow, terms: ClaimDatum, redeemers: Redeemers = CLAIM_VAULT_REDEEMERS): VaultSpend {
-  const tx = findSpender(post, vault, row);
+export function readSpend(post: Post, vault: Ref, row: UtxoRow, terms: ClaimDatum, redeemers: Redeemers = CLAIM_VAULT_REDEEMERS, spendTxHash?: string): VaultSpend {
+  const tx = findSpender(post, vault, row, spendTxHash);
   const contract = tx.plutus_contracts?.find((c) => c.spends_input && same(c.spends_input, vault));
   if (!contract || contract.valid_contract !== true) throw new Error(`${tx.tx_hash} has no valid script spend of the vault`);
   if (contract.script_hash !== row.payment_cred) throw new Error(`${tx.tx_hash} spent the vault with a different script`);
@@ -112,16 +117,18 @@ export function readSpend(post: Post, vault: Ref, row: UtxoRow, terms: ClaimDatu
 }
 
 // The task, its expiry and the terms come only from the coverage datum on chain. Nothing the trigger carries can steer which vault is adjudicated.
-export function readFacts(post: Post, coverageRef: Ref, now: number): { facts: AdjudicationFacts; coverageTxHash: string; coverageIndex: number; termsHash: string; taskRef: Ref } {
+export function readFacts(post: Post, coverageRef: Ref, now: number, spendTxHash?: string, claimVaultHash?: string): { facts: AdjudicationFacts; coverageTxHash: string; coverageIndex: number; termsHash: string; taskRef: Ref } {
   const coverageRow = utxo(post, coverageRef);
   const coverage = parseCoverageDatum(datumOf(coverageRow.inline_datum));
   const taskRef = coverage.taskRef;
   const vaultRow = utxo(post, taskRef);
+  if (!claimVaultHash || vaultRow.payment_cred !== claimVaultHash) throw new Error("task_ref is not a claim-vault script UTxO");
   const claim = parseClaimDatum(datumOf(vaultRow.inline_datum));
   if (claim.expiry !== coverage.taskExpiry) throw new Error("coverage task_expiry does not match the claim vault expiry");
-  const spend = vaultRow.is_spent ? readSpend(post, taskRef, vaultRow, claim) : undefined;
+  const spend = vaultRow.is_spent ? readSpend(post, taskRef, vaultRow, claim, CLAIM_VAULT_REDEEMERS, spendTxHash) : undefined;
   const lockTime = Number(coverageRow.block_time) * 1000;
-  const tipRows = json<Array<{ block_time: number }>>(post, "tip", {});
-  const blocksInWindow = tipRows[0] && Number(tipRows[0].block_time) * 1000 >= lockTime ? 1 : 0;
-  return { facts: { coverageLockTime: lockTime, decideBy: coverage.decideBy, expiry: coverage.taskExpiry, now, blocksInWindow, spend }, coverageTxHash: coverageRef.txHash, coverageIndex: coverageRef.index, termsHash: coverage.termsHash, taskRef };
+  const tipRows = json<Array<{ block_time: number; block_height?: number }>>(post, "tip", {});
+  const tipTime = Number(tipRows[0]?.block_time ?? 0) * 1000;
+  const blocksInWindow = tipTime > coverage.taskExpiry + 600_000 && tipTime >= lockTime ? 1 : 0;
+  return { facts: { coverageLockTime: lockTime, decideBy: coverage.decideBy, expiry: coverage.taskExpiry, now: tipTime, blocksInWindow, spend }, coverageTxHash: coverageRef.txHash, coverageIndex: coverageRef.index, termsHash: coverage.termsHash, taskRef };
 }

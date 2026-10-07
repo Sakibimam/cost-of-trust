@@ -21,7 +21,8 @@ pub const body_len = 101
 
 pub const report_len = 210
 
-pub const context_len = 64
+pub const context_len_legacy = 64
+pub const context_len_native = 96
 
 pub const decision_success = 0
 
@@ -126,7 +127,7 @@ pub fn verify_report(
 ) -> Bool {
   and {
     length_of_bytearray(raw_report) == report_len,
-    length_of_bytearray(context) == context_len,
+    (length_of_bytearray(context) == context_len_legacy || length_of_bytearray(context) == context_len_native),
     list.length(sigs) >= f + 1,
     check_proofs(sigs, pubkeys, signers, report_digest(raw_report, context), []),
   }

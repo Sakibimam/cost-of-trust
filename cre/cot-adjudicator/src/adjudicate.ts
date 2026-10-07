@@ -8,9 +8,9 @@ export const parseRef = (value: string): Ref => {
 };
 
 // The trigger names one thing: the coverage UTxO. Any other field it carries (a taskRef, a termsHash, an expiry) is never read.
-export type Trigger = { coverageRef: string };
-export function adjudicate(post: Post, trigger: Trigger, now: number) {
-  if (!trigger || typeof trigger.coverageRef !== "string") throw new Error("trigger needs coverageRef");
-  const outcome = readFacts(post, parseRef(trigger.coverageRef), now);
+export type Trigger = { coverageRef: string; nonce: string; taskSpendTxHash?: string };
+export function adjudicate(post: Post, trigger: Trigger, now: number, claimVaultHash: string) {
+  if (!trigger || typeof trigger.coverageRef !== "string" || typeof trigger.nonce !== "string") throw new Error("trigger needs coverageRef and nonce");
+  const outcome = readFacts(post, parseRef(trigger.coverageRef), now, trigger.taskSpendTxHash, claimVaultHash);
   return { ...outcome, ...decide(outcome.facts) } as ReturnType<typeof readFacts> & DecisionResult;
 }

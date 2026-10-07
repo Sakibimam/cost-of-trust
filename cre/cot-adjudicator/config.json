@@ -2,5 +2,6 @@
   "koiosUrl": "https://preprod.koios.rest/api/v1",
   "koiosKeySecret": "KAIOS_KEY",
   "relayerUrl": "http://127.0.0.1:3919",
+  "claimVaultHash": "584e049ca0f1fc528c3ca3551145a6f074e9cdc5635ece1df4b5563b",
   "verbose": true
 }

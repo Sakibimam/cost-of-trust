@@ -51,8 +51,9 @@ const post: Post = (path, body: any) => {
 test("real claim datum and CBOR response parse, and attacker taskRef is ignored", () => {
   const result = adjudicate(post, {
     coverageRef: `${coverageHash}#0`,
+    nonce: "test",
     taskRef: `${"ff".repeat(32)}#99`,
-  } as any, taskExpiry - 1_000);
+  } as any, taskExpiry - 1_000, scriptHash);
   expect(claim.sponsor).toHaveLength(56);
   expect(result.taskRef).toEqual({ txHash: vaultHash, index: 0 });
   expect(result.facts.spend?.kind).toBe("claim");
