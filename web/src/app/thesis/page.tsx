@@ -1,3 +1,4 @@
+import { ProblemProof } from "@/components/ProblemProof";
 import Link from "next/link";
 import { coworker, ecosystem, footnotes, instant, priorArt, quotes, runs, tx } from "./evidence";
 import styles from "./styles.module.css";
@@ -38,6 +39,18 @@ export default function ThesisPage() {
             </ul>
           </div>
         </div></div>
+      </section>
+
+      <section className={styles.section}>
+        <div className={styles.sectionGrid}>
+          <div><p className={styles.kicker}>problem / in their words</p><h2>Builders already name the gap.</h2></div>
+          <div className={styles.prose}>
+            <p>Monitoring of x402 services, the Chainlink team, the x402 issue tracker, Masumi and infrastructure operators describe the same problem from different sides: paying an agent is solved, choosing how much trust to buy before paying is not.</p>
+            {/* Source: probe of every mainnet Masumi registry entry's /availability on 2026-10-07 (policy ad6424e3...). */}
+            <p>We measured the Masumi registry on 7 October: of 92 mainnet agent entries with an API URL, 44 run on two servers and 7 answer their MIP-003 <code>/availability</code> endpoint. Two agents that look independent in a ranking can be one machine.</p>
+            <ProblemProof />
+          </div>
+        </div>
       </section>
 
       <section className={styles.section}>
