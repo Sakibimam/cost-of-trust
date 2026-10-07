@@ -34,7 +34,8 @@ const server = createServer(async (request, response) => {
       const input = await readBody(request);
       if (typeof input.url !== "string" || !/^https?:\/\//.test(input.url)) return send(response, 400, { error: "url is required" });
       const now = Date.now();
-      const payment = await mpsJson("/payment", { network: "Preprod", paymentSourceType: "Web3CardanoV2", supportedPaymentSourceIndex: 0, agentIdentifier, inputHash: sha256(JSON.stringify(input)), identifierFromPurchaser: randomBytes(10).toString("hex"), RequestedFunds: [{ amount: process.env.MASUMI_PRICE_AMOUNT ?? "1000000", unit: priceAsset }], payByTime: String(now + 5 * 60_000), submitResultTime: String(now + 20 * 60_000), unlockTime: String(now + 40 * 60_000), externalDisputeUnlockTime: String(now + 55 * 60_000) });
+      const identifierFromPurchaser = randomBytes(10).toString("hex");
+      const payment = await mpsJson("/payment", { network: "Preprod", paymentSourceType: "Web3CardanoV2", supportedPaymentSourceIndex: 0, agentIdentifier, inputHash: sha256(JSON.stringify(input)), identifierFromPurchaser, payByTime: new Date(now + 5 * 60_000).toISOString(), submitResultTime: new Date(now + 20 * 60_000).toISOString(), unlockTime: new Date(now + 40 * 60_000).toISOString(), externalDisputeUnlockTime: new Date(now + 55 * 60_000).toISOString() });
       const jobId = crypto.randomUUID();
       jobs.set(jobId, { payment, status: "awaiting_purchase" });
       if (!(process.env.STALL === "true" && role === "primary")) void (async () => {
@@ -44,7 +45,7 @@ const server = createServer(async (request, response) => {
           try { await mpsJson("/payment/resolve-blockchain-identifier", { network: "Preprod", blockchainIdentifier: identifier(payment), includeHistory: "true" }); await submit(jobs.get(jobId)!, `Title: ${title}`); return; } catch { await new Promise((resolve) => setTimeout(resolve, 2_000)); }
         }
       })();
-      return send(response, 200, { job_id: jobId, payment });
+      return send(response, 200, { job_id: jobId, payment: { ...payment, identifierFromPurchaser } });
     }
     if (request.method === "GET" && request.url?.startsWith("/status?job_id=")) {
       const job = jobs.get(new URL(request.url, "http://localhost").searchParams.get("job_id")!);

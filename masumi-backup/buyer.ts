@@ -1,5 +1,5 @@
-import { appendFile, mkdir, writeFile } from "node:fs/promises";
-import { createHash, randomBytes } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { createReport, decide } from "../coworker/src/report.ts";
 import { evaluateRoutes, type Seller } from "../router/src/routes.ts";
 import underwriter from "../router/underwriter.json" with { type: "json" };
@@ -21,6 +21,7 @@ const wait = async (identifier: string, predicate: (value: any) => boolean, time
 const txs = (data: any) => [...(data.TransactionHistory ?? []), ...(data.CurrentTransaction ? [data.CurrentTransaction] : [])].filter((tx: any) => tx?.txHash).map((tx: any) => ({ txHash: tx.txHash, state: tx.newOnChainState, status: tx.status }));
 const recordTxStatuses = async (records: any[]) => { for (const record of records) { const response = await fetch("https://preprod.koios.rest/api/v1/tx_status", { method: "POST", headers: { "content-type": "application/json", ...(process.env.KAIOS_KEY ? { authorization: `Bearer ${process.env.KAIOS_KEY}` } : {}) }, body: JSON.stringify({ _tx_hashes: [record.txHash] }) }); record.koios = response.ok ? (await response.json())[0] : { status: `HTTP ${response.status}` }; } };
 const start = async (url: string) => { const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: "https://example.com/" }) }); if (!response.ok) throw new Error(`agent start ${response.status}: ${await response.text()}`); return await response.json() as any; };
+const purchasePayload = (payment: any, agentIdentifier: string) => ({ network: "Preprod", paymentSourceType: "Web3CardanoV2", supportedPaymentSourceIndex: 0, blockchainIdentifier: idOf(payment), sellerVkey: payment.sellerVkey ?? payment.SmartContractWallet?.walletVkey, agentIdentifier, inputHash: sha256(JSON.stringify(input)), Amounts: [{ amount: process.env.MASUMI_PRICE_AMOUNT ?? "1000000", unit: priceAsset }], payByTime: payment.payByTime, submitResultTime: payment.submitResultTime, unlockTime: payment.unlockTime, externalDisputeUnlockTime: payment.externalDisputeUnlockTime, identifierFromPurchaser: payment.identifierFromPurchaser });
 
 await mkdir("agents/runs", { recursive: true });
 const startedAt = nowIso();
@@ -35,7 +36,7 @@ record("trust_check_decision", { recommendation: decide(report.facts, 1, report.
 const primaryJob = await start(process.env.PRIMARY_URL ?? "http://127.0.0.1:4511/start_job");
 const primaryPayment = primaryJob.payment.data ?? primaryJob.payment;
 record("primary_payment_request", { blockchainIdentifier: idOf(primaryPayment), submitResultTime: primaryPayment.submitResultTime, unlockTime: primaryPayment.unlockTime });
-const primaryPurchase = await mpsJson("/purchase", { ...primaryPayment, network: "Preprod", blockchainIdentifier: idOf(primaryPayment), sellerVkey: primaryPayment.sellerVkey ?? primaryPayment.SmartContractWallet?.walletVkey, agentIdentifier: primaryId, inputHash: sha256(JSON.stringify(input)), Amounts: [{ amount: process.env.MASUMI_PRICE_AMOUNT ?? "1000000", unit: priceAsset }], identifierFromPurchaser: primaryPayment.identifierFromPurchaser ?? randomBytes(10).toString("hex"), supportedPaymentSourceIndex: 0 });
+const primaryPurchase = await mpsJson("/purchase", purchasePayload(primaryPayment, primaryId));
 record("primary_escrow_lock_requested", { purchaseId: primaryPurchase.id, blockchainIdentifier: idOf(primaryPurchase), txs: txs(primaryPurchase) });
 const primaryIdValue = idOf(primaryPurchase);
 const checkpointAt = Date.now() + (Number(process.env.CHECKPOINT_MS ?? 120_000));
@@ -48,7 +49,7 @@ if (!hireBackup) { record("primary_result_delivered", { resultHash: primaryState
 else {
   const backupJob = await start(process.env.BACKUP_URL ?? "http://127.0.0.1:4512/start_job");
   const backupPayment = backupJob.payment.data ?? backupJob.payment;
-  const backupPurchase = await mpsJson("/purchase", { ...backupPayment, network: "Preprod", blockchainIdentifier: idOf(backupPayment), sellerVkey: backupPayment.sellerVkey ?? backupPayment.SmartContractWallet?.walletVkey, agentIdentifier: backupId, inputHash: sha256(JSON.stringify(input)), Amounts: [{ amount: process.env.MASUMI_PRICE_AMOUNT ?? "1000000", unit: priceAsset }], identifierFromPurchaser: backupPayment.identifierFromPurchaser ?? randomBytes(10).toString("hex"), supportedPaymentSourceIndex: 0 });
+  const backupPurchase = await mpsJson("/purchase", purchasePayload(backupPayment, backupId));
   record("backup_escrow_lock_requested", { purchaseId: backupPurchase.id, blockchainIdentifier: idOf(backupPurchase), txs: txs(backupPurchase) });
   const backupState = await wait(idOf(backupPurchase), (value) => Boolean(value.resultHash || value.onChainState === "ResultSubmitted"), 180_000);
   record("backup_result_submitted", { resultHash: backupState.resultHash, resultArrivedAt: nowIso(), txs: txs(backupState) });
