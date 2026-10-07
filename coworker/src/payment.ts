@@ -6,7 +6,7 @@ type Payment = Record<string, unknown>;
 const mps = (path: string, init: RequestInit = {}) => fetch(`${env("MPS_URL", "http://127.0.0.1:3012/api/v1")}${path}`, {
   ...init,
   headers: { "content-type": "application/json", token: env("MPS_API_TOKEN"), ...(init.headers ?? {}) },
-  signal: AbortSignal.timeout(20_000),
+  signal: AbortSignal.timeout(Number(process.env.MPS_TIMEOUT_MS ?? 60_000)),
 });
 
 async function mpsJson(path: string, init: RequestInit = {}): Promise<Payment> {
