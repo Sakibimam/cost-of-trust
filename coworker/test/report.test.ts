@@ -1,9 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { createReport, decide, getJson, isUnsafeUrl } from "../src/report.ts";
-import { registryFromChain, tallyDelivery, type DeliveryTally } from "../src/koios.ts";
-import type { Evidence } from "../src/types.ts";
+import { createReport, decide, getJson, isUnsafeUrl, renderReportMarkdown } from "../src/report.ts";
+import { finishTally, registryFromChain, submitResultTimeSeconds, tallyDelivery, type DeliveryTally } from "../src/koios.ts";
+import type { Evidence, TrustReport } from "../src/types.ts";
+import backtest from "../../web/src/data/backtest.json" with { type: "json" };
+
 
 const TRUST_CHECK = "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b101b443d8a410f64eb02369ab743ce57e0dcafc68a4c64ded88bab415e000000";
 const SELLER = "99faa9dc9bab087ac3cded09a0789d7102219c519e770005c567f31c";
@@ -41,11 +43,15 @@ test("delivery tally classifies recorded escrow txs for the seller", async () =>
   const txs = await fixture("escrow-txs.json");
   const tally = empty();
   tallyDelivery(txs, new Set([SELLER]), TRUST_CHECK, V2_PREPROD, tally);
-  const { submissions: _submissions, ...counted } = tally;
+  const { submissions: _submissions, ceilingByOpenTx = {}, ...counted } = tally;
   assert.deepEqual({ ...counted, events: tally.events.map((event) => `${event.action} ${event.txHash.slice(0, 8)}`) }, {
     escrowsOpened: 1, resultsSubmitted: 1, paid: 1, refunded: 1, disputed: 0,
     events: ["escrowOpened a6e3fbda", "resultsSubmitted 8c9db324", "paid 9c560b70", "refunded d3e30266"],
   });
+  const opened = tally.events.find((event) => event.action === "escrowOpened");
+  assert.ok(opened);
+  assert.ok((ceilingByOpenTx[opened.txHash] ?? 0) > opened.blockTime);
+  assert.equal(Object.keys(ceilingByOpenTx).length, 3);
 });
 
 test("delivery tally ignores escrows of another seller and agent", async () => {
@@ -61,13 +67,16 @@ const health = (status: Evidence["status"], error?: string): Evidence => ({ sour
 test("decision prices the agent's own escrow outcomes", () => {
   assert.equal(decide([delivery(0, 0)], 100).recommendation, "insufficient_data");
   const input = { agentIdentifier: "registry-agent", riskAversion: 0.25, sharedInfrastructure: false } as const;
-  assert.equal(decide([delivery(1, 4), health("ok")], 5, input).recommendation, "hire_as_is");
-  assert.equal(decide([delivery(1, 4), health("ok")], 500, input).recommendation, "hire_with_backup_keeper");
+  assert.equal(decide([delivery(1, 4), health("ok")], 5, input).recommendation, "do_not_hire");
+  assert.equal(decide([delivery(1, 4), health("ok")], 500, input).recommendation, "do_not_hire");
   assert.notEqual(decide([delivery(1, 4), health("ok")], 5, input).expectedCostAda, decide([delivery(1, 4), health("ok")], 500, input).expectedCostAda);
   const independent = decide([delivery(1, 4), health("ok")], 500, input);
   const shared = decide([delivery(1, 4), health("ok")], 500, { ...input, sharedInfrastructure: true });
   assert.ok((shared.options.staggered?.riskAdjustedCostAda ?? 0) > (independent.options.staggered?.riskAdjustedCostAda ?? 0));
-  assert.equal(decide([delivery(20, 0), health("ok")], 100, input).recommendation, "hire_with_backup_keeper");
+  const clean = decide([delivery(20, 0), health("ok")], 100, input);
+  assert.equal(clean.recommendation, "hire_as_is");
+  assert.equal(clean.selectedRoute, "single");
+  assert.equal(clean.expectedCostAda, clean.options.single?.expectedTotalCostAda);
   assert.equal(decide([delivery(1, 12), health("ok")], 100).recommendation, "do_not_hire");
   assert.equal(decide([delivery(20, 0), health("unavailable", "HTTP 502")], 100).recommendation, "do_not_hire");
 });
@@ -148,24 +157,81 @@ test("V1 escrows on a shared selling wallet are attributed per agent with respon
   assert.deepEqual(tally.responseSeconds, undefined);
 });
 
-test("buyer deadline changes the route cost from the same response history", () => {
-  const facts = [{ source: "masumi_delivery_history", status: "ok" as const, observedAt: "", data: { paid: 10, refunded: 0, disputed: 0, responseSeconds: [60, 120] } }];
+test("a slow response is not a refund, and a tight caller deadline buys a backup", () => {
+  const history = { paid: 10, refunded: 0, disputed: 0, responseSeconds: [60, 120] };
+  const facts = [{ source: "masumi_delivery_history", status: "ok" as const, observedAt: "", data: history }];
+  const noTimes = [{ source: "masumi_delivery_history", status: "ok" as const, observedAt: "", data: { paid: 10, refunded: 0, disputed: 0 } }];
   const oneMinute = decide(facts, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 1 });
   const thirtyMinutes = decide(facts, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 30 });
-  assert.notEqual(oneMinute.options.single?.riskAdjustedCostAda, thirtyMinutes.options.single?.riskAdjustedCostAda);
+  const sameHistory = decide(noTimes, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 1 });
+  assert.equal(oneMinute.options.single?.riskAdjustedCostAda, thirtyMinutes.options.single?.riskAdjustedCostAda);
+  assert.equal(oneMinute.options.single?.riskAdjustedCostAda, sameHistory.options.single?.riskAdjustedCostAda);
+  assert.equal(oneMinute.recommendation, "hire_with_backup_keeper");
   assert.equal(oneMinute.selectedRoute, "staggered");
-  assert.equal(oneMinute.deadlineStats?.within, 1);
-  assert.equal(thirtyMinutes.deadlineStats?.within, 2);
+  assert.equal(oneMinute.expectedCostAda, oneMinute.options.staggered?.expectedTotalCostAda);
+  assert.equal(oneMinute.deadlineStats?.buyerDeadline, "tighter");
+  assert.equal(oneMinute.deadlineStats?.responseMean, 90);
+  assert.equal(oneMinute.deadlineStats?.responseVariance, 900);
+  assert.equal(thirtyMinutes.recommendation, "hire_as_is");
+  assert.equal(thirtyMinutes.selectedRoute, "single");
+  assert.equal(thirtyMinutes.deadlineStats?.buyerDeadline, "inside");
 });
 
-test("buyer deadline evidence remains visible when the recommendation is do not hire", () => {
+test("endpoint down stays do not hire and the timing spread is still reported", () => {
   const facts = [
     { source: "masumi_delivery_history", status: "ok" as const, observedAt: "", data: { paid: 10, refunded: 0, disputed: 0, responseSeconds: [60, 120] } },
     { source: "agent_availability", status: "unavailable" as const, observedAt: "", error: "HTTP 502" },
   ];
   const report = decide(facts, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 1 });
   assert.equal(report.recommendation, "do_not_hire");
-  assert.deepEqual(report.deadlineStats, { within: 1, total: 2, deadlineSeconds: 60, median: null, p90: null });
+  assert.equal(report.deadlineStats?.responseCount, 2);
+  assert.equal(report.deadlineStats?.responseMean, 90);
+  assert.equal(report.deadlineStats?.buyerDeadline, "tighter");
+  assert.equal(report.deadlineStats?.buyerDeadlineSeconds, 60);
+  assert.equal(report.deadlineStats?.ceilingCount, 0);
+});
+
+test("the sokosumi result leads with hire, backup, or do not hire", () => {
+  const facts = [{ source: "masumi_delivery_history", status: "ok" as const, observedAt: "", data: { paid: 10, refunded: 0, disputed: 0, responseSeconds: [60, 120], buyers: ["a", "b"] } }];
+  const decision = decide(facts, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 1 });
+  const report: TrustReport = {
+    input: { agentIdentifier: "registry-agent", taskValueAtRiskAda: 100, deadlineMinutes: 1 },
+    ...decision,
+    facts,
+    summary: "",
+    generatedAt: "2026-10-07T00:00:00.000Z",
+  };
+  const markdown = renderReportMarkdown(report);
+  assert.match(markdown, /^Hire this agent, and pay a backup/);
+  assert.equal(/buyer deadline/i.test(markdown), false);
+  assert.equal(/\d+ buyers/.test(markdown), false);
+  assert.match(markdown, /10 paid, 0 refunded, 0 disputed/);
+  assert.match(markdown, new RegExp(backtest.calibration.betaBinomialBrier.toFixed(3)));
+  assert.match(markdown, new RegExp(backtest.calibration.disputeRateBrier.toFixed(3)));
+  assert.ok(markdown.includes(String(backtest.policies.P2["100"].jobsDone)));
+  assert.ok(markdown.includes(String(backtest.policies.P0["100"].jobsDone)));
+  assert.ok(markdown.includes(String(backtest.calibration.observations)));
+});
+
+test("V1 submit_result_time at field 10 is the seller ceiling", () => {
+  const openAt = 1_700_000_000;
+  const unit = "a".repeat(56) + "b".repeat(64);
+  const seller = "f0".repeat(28);
+  const buyer = "e5".repeat(28);
+  const contract = "addr1escrow";
+  const cred = (bytes: string) => ({ constructor: 0, fields: [{ constructor: 0, fields: [{ bytes }] }] });
+  const fields = [cred(buyer), cred(seller), { bytes: "" }, { bytes: "" }, { bytes: "1".repeat(64) + unit }, { bytes: "" }, { int: 1 }, { bytes: "" }, { bytes: "" }, { int: 0 }, { int: openAt + 900 }, { int: 0 }, { int: 0 }, { int: 0 }, { int: 0 }, { constructor: 0, fields: [] }];
+  const datum = { constructor: 0, fields };
+  assert.equal(fields.length, 16);
+  assert.equal(submitResultTimeSeconds(datum), openAt + 900);
+  const tally = empty();
+  tallyDelivery([{ tx_hash: "open1", tx_timestamp: openAt, outputs: [{ payment_addr: { bech32: contract }, inline_datum: { value: datum } }] }] as never, new Set([seller]), unit, contract, tally);
+  finishTally(tally);
+  assert.deepEqual(tally.ceilingSeconds, [900]);
+  const v2 = { constructor: 0, fields: Array.from({ length: 19 }, (_, index) => index === 13 ? { int: openAt + 900 } : { int: 0 }) };
+  assert.equal(submitResultTimeSeconds(v2), openAt + 900);
+  v2.fields[10] = { int: 1 };
+  assert.equal(submitResultTimeSeconds(v2), openAt + 900);
 });
 
 test("recorded Knight V1 refund responses remain attributed to Knight", async () => {

@@ -29,7 +29,16 @@ export type TrustReport = {
     arithmetic: string;
   } | null>;
   pricingNote: string;
-  deadlineStats?: { within: number; total: number; deadlineSeconds: number; median: number | null; p90: number | null };
+  deadlineStats?: {
+    responseMean: number | null;
+    responseVariance: number | null;
+    responseCount: number;
+    ceilingMean: number | null;
+    ceilingVariance: number | null;
+    ceilingCount: number;
+    buyerDeadlineSeconds: number | null;
+    buyerDeadline: "inside" | "tighter" | "unknown";
+  };
   alternateAgents?: string[];
   facts: Evidence[];
   summary: string;

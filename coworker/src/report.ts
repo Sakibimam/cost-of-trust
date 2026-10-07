@@ -6,6 +6,7 @@ import sellersSeed from "../../router/sellers.json" with { type: "json" };
 import underwriterSeed from "../../router/underwriter.json" with { type: "json" };
 import { deliveryHistory, detectNetwork, registryFromChain, registryMatchesByName, type Network } from "./koios.ts";
 import type { CheckInput, Evidence, TrustReport } from "./types.ts";
+import backtest from "../../web/src/data/backtest.json" with { type: "json" };
 
 loadEnv();
 
@@ -184,7 +185,46 @@ async function gather(input: CheckInput): Promise<Evidence[]> {
   return [registryFact, ...endpointFacts, await deliveryHistory(input.agentIdentifier, network)];
 }
 
-type Delivery = { paid: number; refunded: number; disputed: number; responseSeconds?: number[]; responseSecondsMedian?: number | null; responseSecondsP90?: number | null };
+type Delivery = { paid: number; refunded: number; disputed: number; responseSeconds?: number[]; ceilingSeconds?: number[] };
+
+function spread(values: number[]): { mean: number | null; variance: number | null; count: number } {
+  if (!values.length) return { mean: null, variance: null, count: 0 };
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+  return { mean, variance, count: values.length };
+}
+
+const DECISION_LINE: Record<TrustReport["recommendation"], string> = {
+  hire_as_is: "Hire this agent.",
+  hire_with_backup_keeper: "Hire this agent, and pay a backup if the first one does not deliver.",
+  require_coverage: "Hire this agent only with coverage.",
+  do_not_hire: "Do not hire this agent.",
+  insufficient_data: "Not enough escrow history to hire this agent.",
+};
+
+export function measurementSentence(): string {
+  const sample = backtest.policies;
+  const p2 = sample.P2["100"].jobsDone;
+  const p0 = sample.P0["100"].jobsDone;
+  return `On ${backtest.calibration.observations} later mainnet jobs, reading refunds instead of disputes scores Brier ${backtest.calibration.betaBinomialBrier.toFixed(3)} against ${backtest.calibration.disputeRateBrier.toFixed(3)}, and skipping agents with more than one refund in five finishes ${p2} jobs instead of ${p0}.`;
+}
+
+function timingLine(stats: TrustReport["deadlineStats"]): string {
+  if (!stats || (stats.responseCount === 0 && stats.ceilingCount === 0)) return "No landed response times are recorded yet.";
+  const rounded = (value: number | null) => value === null ? "n/a" : String(Math.round(value));
+  const response = stats.responseCount
+    ? `Results landed in ${rounded(stats.responseMean)} s on average (variance ${rounded(stats.responseVariance)}, ${stats.responseCount} results).`
+    : "No landed response times are recorded yet.";
+  const ceiling = stats.ceilingCount
+    ? ` The seller-set submit-result ceiling averaged ${rounded(stats.ceilingMean)} s (variance ${rounded(stats.ceilingVariance)}, ${stats.ceilingCount} ceilings).`
+    : "";
+  const caller = stats.buyerDeadline === "tighter"
+    ? " The requested deadline is tighter than that average, so pay a backup."
+    : stats.buyerDeadline === "inside"
+      ? " The requested deadline sits inside that average."
+      : "";
+  return `${response}${ceiling}${caller}`;
+}
 
 export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput, "agentIdentifier" | "riskAversion" | "sharedInfrastructure" | "deadlineMinutes"> = { agentIdentifier: "registry-agent" }): Decision {
   const delivery = facts.find((fact) => fact.source === "masumi_delivery_history");
@@ -193,19 +233,27 @@ export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput
   const registryData = pricing?.data;
   const registryId = input.agentIdentifier;
   const price = lovelacePrice(registryData);
-  const responseSeconds = record?.responseSeconds ?? [];
-  const deadlineSeconds = input.deadlineMinutes === undefined ? undefined : input.deadlineMinutes * 60;
-  const missedDeadlineCount = deadlineSeconds === undefined ? 0 : responseSeconds.filter((seconds) => seconds > deadlineSeconds).length;
-  const deadlineStats = deadlineSeconds === undefined ? undefined : { within: responseSeconds.length - missedDeadlineCount, total: responseSeconds.length, deadlineSeconds, median: record?.responseSecondsMedian ?? null, p90: record?.responseSecondsP90 ?? null };
-  const registrySeller: Seller = { id: registryId, name: registryName(registryData, registryId), priceAda: price.priceAda, provider: advertisedUrl(registryData) ? new URL(advertisedUrl(registryData)!).host : "unknown", payTo: "registry-agent", endpoint: advertisedUrl(registryData) ?? "", successes: record?.paid ?? 0, failures: (record?.refunded ?? 0) + (record?.disputed ?? 0) + missedDeadlineCount, evidence: [] };
+  const response = spread(record?.responseSeconds ?? []);
+  const ceiling = spread(record?.ceilingSeconds ?? []);
+  const reference = response.mean ?? ceiling.mean;
+  const buyerDeadlineSeconds = input.deadlineMinutes === undefined ? null : input.deadlineMinutes * 60;
+  const buyerDeadline: "inside" | "tighter" | "unknown" = buyerDeadlineSeconds === null || reference === null ? "unknown" : buyerDeadlineSeconds < reference ? "tighter" : "inside";
+  const deadlineStats = response.count || ceiling.count || buyerDeadlineSeconds !== null
+    ? { responseMean: response.mean, responseVariance: response.variance, responseCount: response.count, ceilingMean: ceiling.mean, ceilingVariance: ceiling.variance, ceilingCount: ceiling.count, buyerDeadlineSeconds, buyerDeadline }
+    : undefined;
+  const refunded = (record?.refunded ?? 0) + (record?.disputed ?? 0);
+  const registrySeller: Seller = { id: registryId, name: registryName(registryData, registryId), priceAda: price.priceAda, provider: advertisedUrl(registryData) ? new URL(advertisedUrl(registryData)!).host : "unknown", payTo: "registry-agent", endpoint: advertisedUrl(registryData) ?? "", successes: record?.paid ?? 0, failures: refunded, evidence: [] };
   const backups = (sellersSeed as Seller[]).filter((seller) => seller.type === "agent");
   const underwriter = underwriterSeed as UnderwriterConfig;
-  const routes = record && record.paid + record.refunded + record.disputed > 0
+  const settled = (record?.paid ?? 0) + refunded;
+  const routes = record && settled > 0
     ? evaluateRoutes({ downstreamLossAda: atRisk, candidateSellers: [registrySeller, ...backups], constraints: { allowRedundancy: true }, underwriter, riskAversion: input.riskAversion ?? 0.25, sharedInfrastructure: input.sharedInfrastructure ?? false })
     : null;
   const options = routes ? cheapestOptions(routes.routes) : emptyOptions();
-  if (!record || record.paid + record.refunded + record.disputed === 0) return { recommendation: "insufficient_data", expectedCostAda: null, options, pricingNote: price.note, ...(deadlineStats ? { deadlineStats } : {}) };
+  const withStats = deadlineStats ? { deadlineStats } : {};
+  if (!record || settled === 0) return { recommendation: "insufficient_data", expectedCostAda: null, options, pricingNote: price.note, ...withStats };
   const pLoss = sellerRisk(registrySeller, underwriter).pLoss;
+  const refundRate = refunded / settled;
   // MIP-003 defines /availability, not /health, so availability decides; /health only counts when it answers and reports a fault.
   const availability = facts.find((fact) => fact.source === "agent_availability");
   const advertised = availability?.error !== "registry did not advertise an API URL";
@@ -216,19 +264,17 @@ export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput
     ? advertised && (availability.status !== "ok" || !["available", "ok", "online"].includes(availabilityStatus) || (health?.status === "ok" && ["unhealthy", "down", "error"].includes(healthStatus)))
     : facts.some((fact) => fact.source === "agent_health" && fact.status !== "ok" && fact.error !== "registry did not advertise an API URL");
   const selected = routes!.routes.find((route) => route.route === routes!.selectedRoute && route.sellers.join(",") === routes!.selectedSellers.join(","))!;
-  if (endpointDown || pLoss >= 0.5) return { recommendation: "do_not_hire", expectedCostAda: selected.expectedTotalCostAda, selectedRoute: routes!.selectedRoute, options, pricingNote: price.note, ...(deadlineStats ? { deadlineStats } : {}) };
-  const recommendation = routes!.selectedRoute === "single" && routes!.selectedSellers[0] === registryId ? "hire_as_is" : routes!.selectedRoute === "underwritten" ? "require_coverage" : "hire_with_backup_keeper";
-  return { recommendation, expectedCostAda: selected.expectedTotalCostAda, selectedRoute: routes!.selectedRoute, options, pricingNote: price.note, ...(deadlineStats ? { deadlineStats } : {}) };
+  if (endpointDown || refundRate > 0.2 || pLoss >= 0.5) return { recommendation: "do_not_hire", expectedCostAda: selected.expectedTotalCostAda, selectedRoute: routes!.selectedRoute, options, pricingNote: price.note, ...withStats };
+  if (buyerDeadline === "tighter" && options.staggered) return { recommendation: "hire_with_backup_keeper", expectedCostAda: options.staggered.expectedTotalCostAda, selectedRoute: "staggered", options, pricingNote: price.note, ...withStats };
+  return { recommendation: "hire_as_is", expectedCostAda: options.single?.expectedTotalCostAda ?? selected.expectedTotalCostAda, selectedRoute: "single", options, pricingNote: price.note, ...withStats };
 }
 
 async function summarize(input: CheckInput, facts: Evidence[], decision: ReturnType<typeof decide>): Promise<string> {
   const registry = facts.find((fact) => fact.source === "registry" || fact.source === "registry_chain");
   const delivery = facts.find((fact) => fact.source === "masumi_delivery_history")?.data as Delivery | undefined;
-  const available = facts.find((fact) => fact.source === "agent_availability")?.status ?? "unavailable";
   const name = registryName(registry?.data, input.agentIdentifier);
   const outcomes = delivery ? `${delivery.paid} paid, ${delivery.refunded} refunded, ${delivery.disputed} disputed` : "delivery history unavailable";
-  const deadline = decision.deadlineStats ? ` ${decision.deadlineStats.within} of ${decision.deadlineStats.total} recorded responses met the ${decision.deadlineStats.deadlineSeconds}-second buyer deadline.` : "";
-  return `${name} is ${available} in the registry evidence and has ${outcomes}.${deadline} Recommendation: ${decision.recommendation.replaceAll("_", " ")} with expected cost ${decision.expectedCostAda === null ? "unknown" : `${decision.expectedCostAda} ADA`}.`;
+  return `${DECISION_LINE[decision.recommendation]} ${name}: ${outcomes}. ${timingLine(decision.deadlineStats)} ${measurementSentence()}`;
 }
 
 export async function createReport(input: CheckInput): Promise<TrustReport> {
@@ -243,15 +289,18 @@ export async function createReport(input: CheckInput): Promise<TrustReport> {
 }
 
 export function renderReportMarkdown(report: TrustReport): string {
-  const delivery = report.facts.find((fact) => fact.source === "masumi_delivery_history")?.data as Record<string, unknown> | undefined;
-  const registry = report.facts.find((fact) => fact.source === "registry" || fact.source === "registry_chain");
-  const availability = report.facts.find((fact) => fact.source === "agent_availability");
-  const total = Number(delivery?.escrowsOpened ?? 0);
-  const response = Array.isArray(delivery?.responseSeconds) ? delivery.responseSeconds.join(", ") : "none recorded";
-  const scanNetwork = String(delivery?.network ?? "Mainnet").toLowerCase() === "preprod" ? "preprod.cardanoscan.io" : "cardanoscan.io";
-  const links = Array.isArray(delivery?.events) ? delivery.events.filter((event): event is { txHash: string; action: string } => Boolean(event && typeof event === "object" && "txHash" in event)).filter((event) => event.action !== "escrowOpened").slice(0, 2).map((event) => `https://${scanNetwork}/transaction/${event.txHash}`).join(", ") : "none";
-  const selected = report.selectedRoute === "single" ? report.input.agentIdentifier : "none";
-  const deadline = report.deadlineStats ? `${report.deadlineStats.within} of ${report.deadlineStats.total} past results arrived within your deadline (median ${report.deadlineStats.median ?? "n/a"} s, p90 ${report.deadlineStats.p90 ?? "n/a"} s).` : "No buyer deadline was supplied.";
-  const json = JSON.stringify({ ...report, markdown: undefined }, null, 2);
-  return `## Decision\n${report.recommendation.replaceAll("_", " ")} with expected cost ${report.expectedCostAda === null ? "unknown" : `${report.expectedCostAda} ADA`}.\n\n| Way to buy | Risk-adjusted ADA | Chosen |\n| --- | ---: | :---: |\n| Single | ${report.options.single?.riskAdjustedCostAda ?? "n/a"} | ${report.selectedRoute === "single" ? "yes" : "no"} |\n| Redundant | ${report.options.redundant?.riskAdjustedCostAda ?? "n/a"} | ${report.selectedRoute === "redundant" ? "yes" : "no"} |\n| Staggered | ${report.options.staggered?.riskAdjustedCostAda ?? "n/a"} | ${report.selectedRoute === "staggered" ? "yes" : "no"} |\n| Underwritten | ${report.options.underwritten?.riskAdjustedCostAda ?? "n/a"} | ${report.selectedRoute === "underwritten" ? "yes" : "no"} |\n\nEvidence:\n- Registry entry: ${registry?.status ?? "unavailable"}; resolved agent: ${report.input.agentIdentifier}.\n- /availability: ${availability?.status ?? "unavailable"}.\n- Escrows: ${total}; result txs: ${links}.\n- Response times (newest up to 200): ${response} s. ${deadline}\n${report.alternateAgents?.length ? `- Other exact name matches: ${report.alternateAgents.join(", ")}.\n` : ""}\n\n${report.summary}\n\n\`\`\`json\n${json}\n\`\`\``;
+  const delivery = report.facts.find((fact) => fact.source === "masumi_delivery_history")?.data as { paid?: number; refunded?: number; disputed?: number } | undefined;
+  const paid = Number(delivery?.paid ?? 0);
+  const refunded = Number(delivery?.refunded ?? 0);
+  const disputed = Number(delivery?.disputed ?? 0);
+  const json = JSON.stringify({
+    recommendation: report.recommendation,
+    selectedRoute: report.selectedRoute ?? null,
+    expectedCostAda: report.expectedCostAda,
+    paid,
+    refunded,
+    disputed,
+    deadlineStats: report.deadlineStats ?? null,
+  }, null, 2);
+  return `${DECISION_LINE[report.recommendation]}\n${paid} paid, ${refunded} refunded, ${disputed} disputed. ${timingLine(report.deadlineStats)}\n${measurementSentence()}\n\n\`\`\`json\n${json}\n\`\`\``;
 }

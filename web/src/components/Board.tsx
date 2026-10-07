@@ -15,6 +15,7 @@ import { MasumiBackup } from "./MasumiBackup";
 import { Backtest } from "./Backtest";
 import { Sellers } from "./Sellers";
 import { Verdict } from "./Verdict";
+import backtest from "@/data/backtest.json";
 
 const LOSS_ADA = 100;
 const START_ROUTER = "cd router && PORT=8787 bun src/server.ts";
@@ -95,7 +96,7 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         <div className="wrap flex flex-wrap items-center justify-between gap-x-6">
           <p className="m-0 py-3 text-[17px] font-extrabold tracking-tight">Cost of Trust</p>
           <nav aria-label="Sections" className="flex gap-x-1 text-[14px] font-semibold">
-            <a href="#ranking" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Routes</a>
+            <a href="#subhire" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Check</a>
             <a href="#sellers" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Sellers</a>
             <a href="#run" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Latest run</a>
             <a href="/thesis" className="inline-flex min-h-[44px] items-center px-2 !text-ink">Thesis</a>
@@ -108,14 +109,14 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         <div className="hero-rules" aria-hidden><div className="wrap h-full"><div className="rules" /></div></div>
         <div className="wrap relative z-10 grid grid-cols-1 gap-x-10 gap-y-6 py-6 md:py-8 lg:grid-cols-12 lg:gap-y-8">
           <div className="min-w-0 lg:col-span-7 lg:row-start-1">
-            <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">Your agent pays another agent to finish a job before a deadline. Cost of Trust does not rank agents: it decides how to buy the job. Hire it alone, add a backup keeper racing for one claim UTxO, add coverage, or walk away, priced from delivery history, value at risk and shared infrastructure, then settled on Cardano.</p>
-            <h1 id="top-h" className="display mt-3">Agents can buy reliability, not just access.</h1>
+            <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">A dispute count hires the agent that refunds every job. A coworker asks Trust Check before it pays and gets one answer: hire, hire a backup, or do not hire.</p>
+            <h1 id="top-h" className="display mt-3">Ask before the coworker pays.</h1>
           </div>
           <div className="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
             <Controls buyer={buyer} onBuyer={setBuyer} shared={shared} onShared={setShared} busy={busy} />
           </div>
           <div className="lg:col-span-7 lg:row-start-2">
-            <p className="m-0 max-w-[58ch] text-[18px] leading-[1.45]">Masumi refunds your fee when an agent misses. It cannot refund your deadline. Trust Check decides before you pay whether to buy a backup, and the backup is paid only if the first agent misses its checkpoint.</p>
+            <p className="m-0 max-w-[58ch] text-[18px] leading-[1.45]">On {backtest.calibration.observations} later mainnet jobs, reading refunds instead of disputes scores Brier {backtest.calibration.betaBinomialBrier.toFixed(3)} against {backtest.calibration.disputeRateBrier.toFixed(3)}. Skipping agents with more than one refund in five finishes {backtest.policies.P2["100"].jobsDone} jobs instead of {backtest.policies.P0["100"].jobsDone}.</p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-[14px] font-extrabold">
               <a href="https://preprod.sokosumi.com" className="btn whitespace-nowrap">Hire Trust Check on Sokosumi</a>
               <a href="/api/x402/trust-check#docs" className="whitespace-nowrap">Read the x402 endpoint</a>

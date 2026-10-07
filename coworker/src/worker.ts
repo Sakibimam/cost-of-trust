@@ -47,7 +47,7 @@ export async function processTask(task: InFlightTask, journal: InFlightTask[]): 
   try {
     const reportInput = parseTaskInput(task.input);
     // Sokosumi accepts one RUNNING event, so the escrow terms must exist before it is posted.
-    if (reportInput && env("ENABLE_MPS_PAYMENTS") === "true" && !task.payment) { task.payment = await createPayment(task.input); await saveJournal(journal); }
+    if (reportInput && env("ENABLE_MPS_PAYMENTS") === "true" && !task.payment && !task.runningPosted) { task.payment = await createPayment(task.input); await saveJournal(journal); }
     await markRunning(task);
     await saveJournal(journal);
     if (!reportInput) { await taskEvent(task.id, { status: "COMPLETED", comment: USAGE_RESULT }); journal.splice(journal.indexOf(task), 1); await saveJournal(journal); return; }
@@ -81,18 +81,56 @@ export async function processTask(task: InFlightTask, journal: InFlightTask[]): 
   }
 }
 
+function asList(payload: unknown): Array<Record<string, unknown>> {
+  if (Array.isArray(payload)) return payload.filter((item): item is Record<string, unknown> => Boolean(item && typeof item === "object"));
+  if (!payload || typeof payload !== "object") return [];
+  const record = payload as Record<string, unknown>;
+  for (const key of ["tasks", "events", "data"]) {
+    const value = record[key];
+    if (Array.isArray(value)) return asList(value);
+    if (value && typeof value === "object") {
+      const nested = asList(value);
+      if (nested.length) return nested;
+    }
+  }
+  return [];
+}
+
+// A restart drops the local journal. Sokosumi still has the RUNNING task, and its RUNNING event
+// carries the escrow when one was created. Resume that task instead of leaving the buyer to a refund.
+export function taskInFlight(task: Record<string, unknown>, events: Array<Record<string, unknown>> = []): InFlightTask {
+  const running = [...events].reverse().find((event) => event.status === "RUNNING");
+  const attached = running?.masumiPayment;
+  const payment = attached && typeof attached === "object" ? attached as Payment : null;
+  return {
+    id: String(task.id),
+    input: typeof task.description === "string" ? task.description : String(task.input ?? ""),
+    payment,
+    runningPosted: task.status === "RUNNING",
+  };
+}
+
 export async function once(): Promise<void> {
   const coworker = env("SOKOSUMI_COWORKER_ID"); if (!coworker) throw new Error("SOKOSUMI_COWORKER_ID is required");
   const journal = await loadJournal();
   for (const task of [...journal]) await processTask(task, journal);
   const response = await core("/tasks?scope=owned");
   if (!response.ok) throw new Error(`Sokosumi task list HTTP ${response.status}`);
-  const parsed = await response.json() as Array<Record<string, unknown>> | { tasks?: Array<Record<string, unknown>>; data?: Array<Record<string, unknown>> };
-  const tasks = Array.isArray(parsed) ? parsed : parsed.tasks ?? parsed.data ?? [];
-  for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker && !journal.some((entry) => entry.id === String(item.id)))) {
+  const tasks = asList(await response.json());
+  const pending = tasks.filter((item) => (item.status === "RUNNING" || item.status === "READY") && item.coworkerId === coworker && !journal.some((entry) => entry.id === String(item.id)));
+  pending.sort((a, b) => Number(b.status === "RUNNING") - Number(a.status === "RUNNING"));
+  for (const task of pending) {
     const id = String(task.id);
-    const input = typeof task.description === "string" ? task.description : String(task.input ?? "");
-    const entry: InFlightTask = { id, input, payment: null, runningPosted: false };
+    let events: Array<Record<string, unknown>> = [];
+    if (task.status === "RUNNING") {
+      try {
+        const eventsResponse = await core(`/tasks/${encodeURIComponent(id)}/events`);
+        if (eventsResponse.ok) events = asList(await eventsResponse.json());
+      } catch (error) {
+        console.error(`Task ${id}: could not read events (${error instanceof Error ? error.message : error})`);
+      }
+    }
+    const entry = taskInFlight(task, events);
     journal.push(entry); await saveJournal(journal); await processTask(entry, journal);
   }
 }

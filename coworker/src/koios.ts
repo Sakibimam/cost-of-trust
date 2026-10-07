@@ -176,6 +176,18 @@ export async function registryFromChain(identifier: string, network: Network = "
 type PlutusJson = { constructor?: number; fields?: PlutusJson[]; bytes?: string; int?: number };
 
 // Escrow datum layouts from the Masumi vested_pay validators: V2 has 19 fields (seller at 2, agent_identifier at 8), V1 has 16 (seller at 1).
+// V1 vested_pay stores submit_result_time at field 10. V2 stores it at field 13.
+// A value above 1e11 is POSIX milliseconds. The caller compares it with tx_timestamp, which is seconds.
+export function submitResultTimeSeconds(datum: PlutusJson | undefined): number | null {
+  const fields = datum?.fields;
+  if (!fields) return null;
+  const slot = fields.length === 19 ? fields[13] : fields.length === 16 ? fields[10] : undefined;
+  const raw = (slot as { int?: number | string } | undefined)?.int;
+  const parsed = typeof raw === "number" ? raw : typeof raw === "string" && /^-?\d+(\.\d+)?$/.test(raw) ? Number(raw) : null;
+  if (parsed === null || !Number.isFinite(parsed)) return null;
+  return parsed > 1e11 ? parsed / 1000 : parsed;
+}
+
 export function escrowParty(datum: PlutusJson | undefined): { seller: string; buyer?: string; agent?: string; state: number } | null {
   const fields = datum?.fields;
   if (!fields || (fields.length !== 19 && fields.length !== 16)) return null;
@@ -202,7 +214,15 @@ export type TxInfo = {
   plutus_contracts?: Array<{ valid_contract?: boolean; spends_input?: { tx_hash: string; tx_index: number } | null; input?: { redeemer?: { datum?: { value?: PlutusJson } } } }>;
 };
 
-export type DeliveryTally = { escrowsOpened: number; resultsSubmitted: number; paid: number; refunded: number; disputed: number; walletOnly?: number; buyers?: string[]; submissions?: Array<{ openTx: string; at: number }>; responseSeconds?: number[]; responseSecondsMedian?: number | null; responseSecondsP90?: number | null; events: Array<{ txHash: string; blockTime: number; action: string; contract: string }> };
+export type DeliveryTally = { escrowsOpened: number; resultsSubmitted: number; paid: number; refunded: number; disputed: number; walletOnly?: number; buyers?: string[]; submissions?: Array<{ openTx: string; at: number }>; responseSeconds?: number[]; responseSecondsMedian?: number | null; responseSecondsP90?: number | null; ceilingByOpenTx?: Record<string, number>; ceilingSeconds?: number[]; events: Array<{ txHash: string; blockTime: number; action: string; contract: string }> };
+
+const THIRTY_DAYS_S = 30 * 24 * 60 * 60;
+
+function rememberCeiling(tally: DeliveryTally, openTx: string | undefined, datum: PlutusJson | undefined): void {
+  const seconds = submitResultTimeSeconds(datum);
+  if (!openTx || seconds === null) return;
+  (tally.ceilingByOpenTx ??= {})[openTx] = seconds;
+}
 
 export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: string, contract: string, tally: DeliveryTally): void {
   const ours = (datum: PlutusJson | undefined) => {
@@ -223,6 +243,7 @@ export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: st
       tally[action] += 1;
       const party = escrowParty(spent.inline_datum?.value);
       if (action === "resultsSubmitted" && spend.spends_input?.tx_hash) (tally.submissions ??= []).push({ openTx: spend.spends_input.tx_hash, at: tx.tx_timestamp });
+      rememberCeiling(tally, spend.spends_input?.tx_hash, spent.inline_datum?.value);
       // V1 escrow datums carry no agent identifier, so the outcome belongs to the selling wallet, which several registry agents can share.
       if (action !== "resultsSubmitted" && escrowParty(spent.inline_datum?.value)?.agent === undefined) tally.walletOnly = (tally.walletOnly ?? 0) + 1;
       tally.events.push({ txHash: tx.tx_hash, blockTime: tx.tx_timestamp, action, contract });
@@ -232,6 +253,7 @@ export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: st
       const party = output.payment_addr?.bech32 === contract ? ours(output.inline_datum?.value) : null;
       if (party?.state !== 0) continue;
       tally.escrowsOpened += 1;
+      rememberCeiling(tally, tx.tx_hash, output.inline_datum?.value);
       if (party.buyer && !(tally.buyers ??= []).includes(party.buyer)) tally.buyers.push(party.buyer);
       tally.events.push({ txHash: tx.tx_hash, blockTime: tx.tx_timestamp, action: "escrowOpened", contract });
     }
@@ -244,7 +266,7 @@ export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: st
 export type Wait = { at: number; seconds: number };
 export type IndexedAgent = {
   paid: number; refunded: number; disputed: number; resultsSubmitted: number; escrowsOpened: number; walletOnly: number;
-  buyers: string[]; responseSecondsMedian: number | null; responseSecondsP90: number | null; lastTxTime: number | null;
+  buyers: string[]; responseSecondsMedian: number | null; responseSecondsP90: number | null; ceilingSeconds?: number[]; lastTxTime: number | null;
   scannedThroughBlock: number; generatedAt: string;
   waits: Wait[]; openPending: Record<string, number>; events: DeliveryTally["events"];
 };
@@ -258,10 +280,18 @@ const PENDING_KEPT = 100;
 
 // Sorts events, derives response times (opening tx known from this tally or carried over in
 // priorOpens) and returns the data the index must carry forward to merge later txs.
-export function finishTally(tally: DeliveryTally, priorOpens: Record<string, number> = {}, priorWaits: Wait[] = []): { waits: Wait[]; openPending: Record<string, number> } {
+export function finishTally(tally: DeliveryTally, priorOpens: Record<string, number> = {}, priorWaits: Wait[] = [], priorCeilings: number[] = []): { waits: Wait[]; openPending: Record<string, number> } {
   tally.events.sort((a, b) => b.blockTime - a.blockTime);
   const opened = new Map<string, number>(Object.entries(priorOpens));
   for (const event of tally.events) if (event.action === "escrowOpened") opened.set(event.txHash, event.blockTime);
+  const slacks: number[] = [];
+  for (const [openTx, ceilingAt] of Object.entries(tally.ceilingByOpenTx ?? {})) {
+    const openedAt = opened.get(openTx);
+    if (openedAt === undefined) continue;
+    const slack = ceilingAt - openedAt;
+    if (slack > 0 && slack < THIRTY_DAYS_S) slacks.push(slack);
+  }
+  tally.ceilingSeconds = [...slacks, ...priorCeilings].slice(0, WAITS_KEPT);
   const submissions = tally.submissions ?? [];
   const waits = [
     ...submissions.filter((s) => opened.has(s.openTx)).map((s) => ({ at: s.at, seconds: s.at - opened.get(s.openTx)! })),
@@ -281,7 +311,7 @@ export function toIndexed(tally: DeliveryTally, scannedThroughBlock: number, gen
   return {
     paid: tally.paid, refunded: tally.refunded, disputed: tally.disputed, resultsSubmitted: tally.resultsSubmitted, escrowsOpened: tally.escrowsOpened,
     walletOnly: tally.walletOnly ?? 0, buyers: tally.buyers ?? [],
-    responseSecondsMedian: tally.responseSecondsMedian ?? null, responseSecondsP90: tally.responseSecondsP90 ?? null,
+    responseSecondsMedian: tally.responseSecondsMedian ?? null, responseSecondsP90: tally.responseSecondsP90 ?? null, ceilingSeconds: tally.ceilingSeconds ?? [],
     lastTxTime: tally.events[0]?.blockTime ?? null, scannedThroughBlock, generatedAt,
     waits, openPending, events: tally.events.slice(0, 20),
   };
@@ -297,11 +327,12 @@ export function mergeIndexed(indexed: IndexedAgent, live: DeliveryTally): Delive
     disputed: indexed.disputed + live.disputed,
     buyers: [...new Set([...indexed.buyers, ...(live.buyers ?? [])])],
     submissions: live.submissions,
+    ceilingByOpenTx: live.ceilingByOpenTx,
     events: [...live.events, ...indexed.events],
   };
   const walletOnly = indexed.walletOnly + (live.walletOnly ?? 0);
   if (walletOnly) merged.walletOnly = walletOnly;
-  finishTally(merged, indexed.openPending, indexed.waits);
+  finishTally(merged, indexed.openPending, indexed.waits, indexed.ceilingSeconds ?? []);
   return merged;
 }
 

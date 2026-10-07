@@ -11,7 +11,7 @@ export function Subhire() {
       <div className="wrap">
         <p className="label">Sokosumi Coworker pattern, Trust Check paid over x402</p>
         <h2 id="subhire-h" className="mt-2 max-w-[24ch] text-[32px] font-extrabold leading-[1.05] md:text-[40px]">A Coworker that checks before it sub-hires</h2>
-        <p className="mt-4 max-w-[64ch] leading-[1.45]">The job is a {job.title} with {job.taskValueAtRiskAda} ADA at risk and a {job.deadlineMinutes} minute buyer deadline. The agent finds {payments.length} candidates by capability tag in the live Masumi mainnet registry and, before it sub-hires any of them, buys a Trust Check on each: a 402 quote, a signed payment, the report back.</p>
+        <p className="mt-4 max-w-[64ch] leading-[1.45]">The job is a {job.title} with {job.taskValueAtRiskAda} ADA at risk. Before the coworker pays another agent, it buys a Trust Check: a 402 quote, a signed payment, and one answer, hire, hire a backup, or do not hire, from paid, refunded and disputed escrows.</p>
         <div className="mt-8">
           <table className="w-full table-fixed border-collapse text-left text-[13px] sm:text-[15px]">
             <caption className="sr-only">Trust Check result for each sub-hire candidate</caption>
