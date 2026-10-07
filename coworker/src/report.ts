@@ -103,7 +103,7 @@ async function resolveNamedAgent(name: string): Promise<{ identifier: string; al
   const scored = await Promise.all(matches.map(async (match) => {
     const history = await deliveryHistory(match.identifier, match.network);
     const data = history.status === "ok" ? history.data as { paid?: number; refunded?: number; disputed?: number } : {};
-    return { ...match, score: (data.paid ?? 0) + (data.refunded ?? 0) + (data.disputed ?? 0) };
+    return { ...match, score: data.paid ?? 0 };
   }));
   scored.sort((a, b) => b.score - a.score);
   return { identifier: scored[0].identifier, alternateAgents: scored.slice(1).map((match) => match.identifier) };
@@ -157,7 +157,7 @@ function registryName(data: unknown, fallback: string): string {
 }
 
 const routeKinds = ["single", "redundant", "staggered", "underwritten"] as const;
-type Decision = Pick<TrustReport, "recommendation" | "expectedCostAda" | "options" | "pricingNote" | "deadlineStats">;
+type Decision = Pick<TrustReport, "recommendation" | "expectedCostAda" | "selectedRoute" | "options" | "pricingNote" | "deadlineStats">;
 const emptyOptions = (): TrustReport["options"] => ({ single: null, redundant: null, staggered: null, underwritten: null });
 
 function cheapestOptions(routes: RouteQuote[]): TrustReport["options"] {
@@ -196,6 +196,7 @@ export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput
   const responseSeconds = record?.responseSeconds ?? [];
   const deadlineSeconds = input.deadlineMinutes === undefined ? undefined : input.deadlineMinutes * 60;
   const missedDeadlineCount = deadlineSeconds === undefined ? 0 : responseSeconds.filter((seconds) => seconds > deadlineSeconds).length;
+  const deadlineStats = deadlineSeconds === undefined ? undefined : { within: responseSeconds.length - missedDeadlineCount, total: responseSeconds.length, deadlineSeconds, median: record?.responseSecondsMedian ?? null, p90: record?.responseSecondsP90 ?? null };
   const registrySeller: Seller = { id: registryId, name: registryName(registryData, registryId), priceAda: price.priceAda, provider: advertisedUrl(registryData) ? new URL(advertisedUrl(registryData)!).host : "unknown", payTo: "registry-agent", endpoint: advertisedUrl(registryData) ?? "", successes: record?.paid ?? 0, failures: (record?.refunded ?? 0) + (record?.disputed ?? 0) + missedDeadlineCount, evidence: [] };
   const backups = (sellersSeed as Seller[]).filter((seller) => seller.type === "agent");
   const underwriter = underwriterSeed as UnderwriterConfig;
@@ -203,7 +204,7 @@ export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput
     ? evaluateRoutes({ downstreamLossAda: atRisk, candidateSellers: [registrySeller, ...backups], constraints: { allowRedundancy: true }, underwriter, riskAversion: input.riskAversion ?? 0.25, sharedInfrastructure: input.sharedInfrastructure ?? false })
     : null;
   const options = routes ? cheapestOptions(routes.routes) : emptyOptions();
-  if (!record || record.paid + record.refunded + record.disputed === 0) return { recommendation: "insufficient_data", expectedCostAda: null, options, pricingNote: price.note };
+  if (!record || record.paid + record.refunded + record.disputed === 0) return { recommendation: "insufficient_data", expectedCostAda: null, options, pricingNote: price.note, ...(deadlineStats ? { deadlineStats } : {}) };
   const pLoss = sellerRisk(registrySeller, underwriter).pLoss;
   // MIP-003 defines /availability, not /health, so availability decides; /health only counts when it answers and reports a fault.
   const availability = facts.find((fact) => fact.source === "agent_availability");
@@ -215,9 +216,9 @@ export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput
     ? advertised && (availability.status !== "ok" || !["available", "ok", "online"].includes(availabilityStatus) || (health?.status === "ok" && ["unhealthy", "down", "error"].includes(healthStatus)))
     : facts.some((fact) => fact.source === "agent_health" && fact.status !== "ok" && fact.error !== "registry did not advertise an API URL");
   const selected = routes!.routes.find((route) => route.route === routes!.selectedRoute && route.sellers.join(",") === routes!.selectedSellers.join(","))!;
-  if (endpointDown || pLoss >= 0.5) return { recommendation: "do_not_hire", expectedCostAda: selected.expectedTotalCostAda, options, pricingNote: price.note };
+  if (endpointDown || pLoss >= 0.5) return { recommendation: "do_not_hire", expectedCostAda: selected.expectedTotalCostAda, selectedRoute: routes!.selectedRoute, options, pricingNote: price.note, ...(deadlineStats ? { deadlineStats } : {}) };
   const recommendation = routes!.selectedRoute === "single" && routes!.selectedSellers[0] === registryId ? "hire_as_is" : routes!.selectedRoute === "underwritten" ? "require_coverage" : "hire_with_backup_keeper";
-  return { recommendation, expectedCostAda: selected.expectedTotalCostAda, options, pricingNote: price.note, ...(deadlineSeconds === undefined ? {} : { deadlineStats: { within: responseSeconds.length - missedDeadlineCount, total: responseSeconds.length, deadlineSeconds, median: record?.responseSecondsMedian ?? null, p90: record?.responseSecondsP90 ?? null } }) };
+  return { recommendation, expectedCostAda: selected.expectedTotalCostAda, selectedRoute: routes!.selectedRoute, options, pricingNote: price.note, ...(deadlineStats ? { deadlineStats } : {}) };
 }
 
 async function summarize(input: CheckInput, facts: Evidence[], decision: ReturnType<typeof decide>): Promise<string> {
@@ -249,8 +250,8 @@ export function renderReportMarkdown(report: TrustReport): string {
   const response = Array.isArray(delivery?.responseSeconds) ? delivery.responseSeconds.join(", ") : "none recorded";
   const scanNetwork = String(delivery?.network ?? "Mainnet").toLowerCase() === "preprod" ? "preprod.cardanoscan.io" : "cardanoscan.io";
   const links = Array.isArray(delivery?.events) ? delivery.events.filter((event): event is { txHash: string; action: string } => Boolean(event && typeof event === "object" && "txHash" in event)).filter((event) => event.action !== "escrowOpened").slice(0, 2).map((event) => `https://${scanNetwork}/transaction/${event.txHash}`).join(", ") : "none";
-  const selected = report.options.single?.sellers.join(", ") ?? "none";
+  const selected = report.selectedRoute === "single" ? report.input.agentIdentifier : "none";
   const deadline = report.deadlineStats ? `${report.deadlineStats.within} of ${report.deadlineStats.total} past results arrived within your deadline (median ${report.deadlineStats.median ?? "n/a"} s, p90 ${report.deadlineStats.p90 ?? "n/a"} s).` : "No buyer deadline was supplied.";
   const json = JSON.stringify({ ...report, markdown: undefined }, null, 2);
-  return `## Decision\n${report.recommendation.replaceAll("_", " ")} with expected cost ${report.expectedCostAda === null ? "unknown" : `${report.expectedCostAda} ADA`}.\n\n| Way to buy | Risk-adjusted ADA | Chosen |\n| --- | ---: | :---: |\n| Single | ${report.options.single?.riskAdjustedCostAda ?? "n/a"} | ${selected === report.input.agentIdentifier ? "yes" : "no"} |\n| Redundant | ${report.options.redundant?.riskAdjustedCostAda ?? "n/a"} | ${report.recommendation === "hire_with_backup_keeper" ? "yes" : "no"} |\n| Staggered | ${report.options.staggered?.riskAdjustedCostAda ?? "n/a"} | ${report.recommendation === "hire_with_backup_keeper" ? "yes" : "no"} |\n| Underwritten | ${report.options.underwritten?.riskAdjustedCostAda ?? "n/a"} | ${report.recommendation === "require_coverage" ? "yes" : "no"} |\n\nEvidence:\n- Registry entry: ${registry?.status ?? "unavailable"}; resolved agent: ${report.input.agentIdentifier}.\n- /availability: ${availability?.status ?? "unavailable"}.\n- Escrows: ${total}; result txs: ${links}.\n- Response times (newest up to 200): ${response} s. ${deadline}\n${report.alternateAgents?.length ? `- Other exact name matches: ${report.alternateAgents.join(", ")}.\n` : ""}\n\n${report.summary}\n\n\`\`\`json\n${json}\n\`\`\``;
+  return `## Decision\n${report.recommendation.replaceAll("_", " ")} with expected cost ${report.expectedCostAda === null ? "unknown" : `${report.expectedCostAda} ADA`}.\n\n| Way to buy | Risk-adjusted ADA | Chosen |\n| --- | ---: | :---: |\n| Single | ${report.options.single?.riskAdjustedCostAda ?? "n/a"} | ${report.selectedRoute === "single" ? "yes" : "no"} |\n| Redundant | ${report.options.redundant?.riskAdjustedCostAda ?? "n/a"} | ${report.selectedRoute === "redundant" ? "yes" : "no"} |\n| Staggered | ${report.options.staggered?.riskAdjustedCostAda ?? "n/a"} | ${report.selectedRoute === "staggered" ? "yes" : "no"} |\n| Underwritten | ${report.options.underwritten?.riskAdjustedCostAda ?? "n/a"} | ${report.selectedRoute === "underwritten" ? "yes" : "no"} |\n\nEvidence:\n- Registry entry: ${registry?.status ?? "unavailable"}; resolved agent: ${report.input.agentIdentifier}.\n- /availability: ${availability?.status ?? "unavailable"}.\n- Escrows: ${total}; result txs: ${links}.\n- Response times (newest up to 200): ${response} s. ${deadline}\n${report.alternateAgents?.length ? `- Other exact name matches: ${report.alternateAgents.join(", ")}.\n` : ""}\n\n${report.summary}\n\n\`\`\`json\n${json}\n\`\`\``;
 }

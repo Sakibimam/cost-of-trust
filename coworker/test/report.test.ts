@@ -153,6 +153,17 @@ test("buyer deadline changes the route cost from the same response history", () 
   const oneMinute = decide(facts, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 1 });
   const thirtyMinutes = decide(facts, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 30 });
   assert.notEqual(oneMinute.options.single?.riskAdjustedCostAda, thirtyMinutes.options.single?.riskAdjustedCostAda);
+  assert.equal(oneMinute.selectedRoute, "staggered");
   assert.equal(oneMinute.deadlineStats?.within, 1);
   assert.equal(thirtyMinutes.deadlineStats?.within, 2);
+});
+
+test("buyer deadline evidence remains visible when the recommendation is do not hire", () => {
+  const facts = [
+    { source: "masumi_delivery_history", status: "ok" as const, observedAt: "", data: { paid: 10, refunded: 0, disputed: 0, responseSeconds: [60, 120] } },
+    { source: "agent_availability", status: "unavailable" as const, observedAt: "", error: "HTTP 502" },
+  ];
+  const report = decide(facts, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 1 });
+  assert.equal(report.recommendation, "do_not_hire");
+  assert.deepEqual(report.deadlineStats, { within: 1, total: 2, deadlineSeconds: 60, median: null, p90: null });
 });

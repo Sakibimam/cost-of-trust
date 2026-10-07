@@ -21,6 +21,7 @@ export type TrustReport = {
   input: CheckInput;
   recommendation: "hire_as_is" | "hire_with_backup_keeper" | "require_coverage" | "do_not_hire" | "insufficient_data";
   expectedCostAda: number | null;
+  selectedRoute?: "single" | "redundant" | "staggered" | "underwritten";
   options: Record<"single" | "redundant" | "staggered" | "underwritten", {
     sellers: string[];
     expectedTotalCostAda: number;
