@@ -1,0 +1,838 @@
+{
+  "generatedAt": "2026-10-07T02:02:55.695Z",
+  "network": "Mainnet",
+  "registryPolicy": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9",
+  "agents": [
+    {
+      "agentName": "Knight",
+      "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+      "apiHost": "v2.api.nuauthzk.nucast.io",
+      "delivery": {
+        "paid": 0,
+        "refunded": 15,
+        "disputed": 0,
+        "disputeRate": 0
+      },
+      "scenarios": [
+        {
+          "taskValueAtRiskAda": 5,
+          "sharedInfrastructure": false,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495"
+              ],
+              "expectedTotalCostAda": 3.4000000000000004,
+              "riskAdjustedCostAda": 3.9830951894845303,
+              "arithmetic": "0 + 0.68 * 5 + 0.25 * 2.33238075793812"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 8.68,
+              "riskAdjustedCostAda": 9.108485705712571,
+              "arithmetic": "0 + 8 + 0.136 * 5 + 0.25 * 1.713942822850284"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 4.93,
+              "riskAdjustedCostAda": 5.399540999274824,
+              "arithmetic": "0 * 0.31999999999999995 + 8 * 0.68 * 0.75 + 0.17 * 5 + 0.25 * 1.878163997099295"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495"
+              ],
+              "expectedTotalCostAda": 5.225,
+              "riskAdjustedCostAda": 5.653485705712571,
+              "arithmetic": "0 + 4.545 + (0.68 * 5 - 0.544 * 5) + 0.25 * 1.713942822850284"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 3.4000000000000004,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 5,
+          "sharedInfrastructure": true,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495"
+              ],
+              "expectedTotalCostAda": 3.4000000000000004,
+              "riskAdjustedCostAda": 3.9830951894845303,
+              "arithmetic": "0 + 0.68 * 5 + 0.25 * 2.33238075793812"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 9.146476151587624,
+              "riskAdjustedCostAda": 9.671950532015618,
+              "arithmetic": "0 + 8 + 0.22929523031752483 * 5 + 0.25 * 2.1018975217119773"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 5.434975246918104,
+              "riskAdjustedCostAda": 5.990567178714147,
+              "arithmetic": "0 * 0.31999999999999995 + 8 * 0.68 * 0.75 + 0.2709950493836208 * 5 + 0.25 * 2.222367727184172"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495"
+              ],
+              "expectedTotalCostAda": 5.225,
+              "riskAdjustedCostAda": 5.653485705712571,
+              "arithmetic": "0 + 4.545 + (0.68 * 5 - 0.544 * 5) + 0.25 * 1.713942822850284"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 3.4000000000000004,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 100,
+          "sharedInfrastructure": false,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 20.000033333333334,
+              "riskAdjustedCostAda": 27.500044444431587,
+              "arithmetic": "10 + 0.10000033333333333 * 100 + 0.25 * 30.000044444393005"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 16.800022666666667,
+              "riskAdjustedCostAda": 23.09367998177113,
+              "arithmetic": "0 + 10 + 0.06800022666666666 * 100 + 0.25 * 25.17462926041784"
+            },
+            "staggered": {
+              "sellers": [
+                "seller-a",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 11.100006,
+              "riskAdjustedCostAda": 15.364691119286523,
+              "arithmetic": "8 * 0.8 + 10 * 0.2 * 0.8499996666666667 + 0.030000066666666672 * 100 + 0.25 * 17.058740477146088"
+            },
+            "underwritten": {
+              "sellers": [
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 22.200033333333334,
+              "riskAdjustedCostAda": 25.90003913512937,
+              "arithmetic": "10 + 8.600021333333334 + (0.10000033333333333 * 100 - 0.08000026666666667 * 80) + 0.25 * 14.800023207184147"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 11.100006,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 100,
+          "sharedInfrastructure": true,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 20.000033333333334,
+              "riskAdjustedCostAda": 27.500044444431587,
+              "arithmetic": "10 + 0.10000033333333333 * 100 + 0.25 * 30.000044444393005"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 23.79717530660573,
+              "riskAdjustedCostAda": 32.41893369823966,
+              "arithmetic": "0 + 10 + 0.1379717530660573 * 100 + 0.25 * 34.48703356653573"
+            },
+            "staggered": {
+              "sellers": [
+                "seller-b",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 18.59520715087664,
+              "riskAdjustedCostAda": 25.748034706931804,
+              "arithmetic": "10 * 0.8999996666666666 + 8 * 0.10000033333333333 * 0.75 + 0.08995208484209971 * 100 + 0.25 * 28.611310224220666"
+            },
+            "underwritten": {
+              "sellers": [
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 22.200033333333334,
+              "riskAdjustedCostAda": 25.90003913512937,
+              "arithmetic": "10 + 8.600021333333334 + (0.10000033333333333 * 100 - 0.08000026666666667 * 80) + 0.25 * 14.800023207184147"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 18.59520715087664,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 500,
+          "sharedInfrastructure": false,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 60.000166666666665,
+              "riskAdjustedCostAda": 97.50022222215793,
+              "arithmetic": "10 + 0.10000033333333333 * 500 + 0.25 * 150.00022222196503"
+            },
+            "redundant": {
+              "sellers": [
+                "seller-a",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 28.000033333333334,
+              "riskAdjustedCostAda": 45.5000619047366,
+              "arithmetic": "8 + 10 + 0.020000066666666667 * 500 + 0.25 * 70.00011428561305"
+            },
+            "staggered": {
+              "sellers": [
+                "seller-b",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 22.100040333333332,
+              "riskAdjustedCostAda": 41.615690770330254,
+              "arithmetic": "10 * 0.8999996666666666 + 8 * 0.10000033333333333 * 0.75 + 0.025000083333333332 * 500 + 0.25 * 78.06260174798769"
+            },
+            "underwritten": {
+              "sellers": [
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 62.20016666666666,
+              "riskAdjustedCostAda": 94.99792862687791,
+              "arithmetic": "10 + 8.600021333333334 + (0.10000033333333333 * 500 - 0.08000026666666667 * 80) + 0.25 * 131.191047840845"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 22.100040333333332,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 500,
+          "sharedInfrastructure": true,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 60.000166666666665,
+              "riskAdjustedCostAda": 97.50022222215793,
+              "arithmetic": "10 + 0.10000033333333333 * 500 + 0.25 * 150.00022222196503"
+            },
+            "redundant": {
+              "sellers": [
+                "seller-b",
+                "seller-c"
+              ],
+              "expectedTotalCostAda": 58.00007777772634,
+              "riskAdjustedCostAda": 91.91175779604654,
+              "arithmetic": "10 + 8 + 0.08000015555545267 * 500 + 0.25 * 135.64672007328085"
+            },
+            "staggered": {
+              "sellers": [
+                "seller-b",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 54.57604108771652,
+              "riskAdjustedCostAda": 90.34017886799235,
+              "arithmetic": "10 * 0.8999996666666666 + 8 * 0.10000033333333333 * 0.75 + 0.08995208484209971 * 500 + 0.25 * 143.05655112110333"
+            },
+            "underwritten": {
+              "sellers": [
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 62.20016666666666,
+              "riskAdjustedCostAda": 94.99792862687791,
+              "arithmetic": "10 + 8.600021333333334 + (0.10000033333333333 * 500 - 0.08000026666666667 * 80) + 0.25 * 131.191047840845"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 54.57604108771652,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        }
+      ]
+    },
+    {
+      "agentName": "SP Internal: Product Reality Check",
+      "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+      "apiHost": "209.38.247.182:8000",
+      "delivery": {
+        "paid": 56,
+        "refunded": 0,
+        "disputed": 0,
+        "disputeRate": 0
+      },
+      "scenarios": [
+        {
+          "taskValueAtRiskAda": 5,
+          "sharedInfrastructure": false,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 0.15151515151515152,
+              "riskAdjustedCostAda": 0.36578993369289325,
+              "arithmetic": "0 + 0.030303030303030304 * 5 + 0.25 * 0.8570991287109668"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 8.030303030303031,
+              "riskAdjustedCostAda": 8.127320064203529,
+              "arithmetic": "0 + 8 + 0.0060606060606060615 * 5 + 0.25 * 0.3880681356019908"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 0.2196969696969697,
+              "riskAdjustedCostAda": 0.32808260551382196,
+              "arithmetic": "0 * 0.9696969696969697 + 8 * 0.030303030303030304 * 0.75 + 0.007575757575757576 * 5 + 0.25 * 0.433542543267409"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 1.9765151515151516,
+              "riskAdjustedCostAda": 2.073532185415649,
+              "arithmetic": "0 + 1.9462121212121213 + (0.030303030303030304 * 5 - 0.024242424242424246 * 5) + 0.25 * 0.3880681356019907"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 0.2196969696969697,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 5,
+          "sharedInfrastructure": true,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 0.15151515151515152,
+              "riskAdjustedCostAda": 0.36578993369289325,
+              "arithmetic": "0 + 0.030303030303030304 * 5 + 0.25 * 0.8570991287109668"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 8.201722856045224,
+              "riskAdjustedCostAda": 8.447680445069109,
+              "arithmetic": "0 + 8 + 0.040344571209044736 * 5 + 0.25 * 0.9838303560955396"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 0.4333259219151089,
+              "riskAdjustedCostAda": 0.6635246364772316,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.03515005306989046 * 5 + 0.25 * 0.9207948582484909"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 1.9765151515151516,
+              "riskAdjustedCostAda": 2.073532185415649,
+              "arithmetic": "0 + 1.9462121212121213 + (0.030303030303030304 * 5 - 0.024242424242424246 * 5) + 0.25 * 0.3880681356019907"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 0.15151515151515152,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 100,
+          "sharedInfrastructure": false,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 3.0303030303030303,
+              "riskAdjustedCostAda": 7.315798673857865,
+              "arithmetic": "0 + 0.030303030303030304 * 100 + 0.25 * 17.141982574219337"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 8.606060606060606,
+              "riskAdjustedCostAda": 10.54640128407056,
+              "arithmetic": "0 + 8 + 0.0060606060606060615 * 100 + 0.25 * 7.7613627120398165"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 0.7121221212121214,
+              "riskAdjustedCostAda": 2.393788593348538,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.004545464646464647 * 100 + 0.25 * 6.726665888545667"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 5.2303030303030305,
+              "riskAdjustedCostAda": 7.308657963573605,
+              "arithmetic": "0 + 4.13939393939394 + (0.030303030303030304 * 100 - 0.024242424242424246 * 80) + 0.25 * 8.3134197330823"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 0.7121221212121214,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 100,
+          "sharedInfrastructure": true,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 3.0303030303030303,
+              "riskAdjustedCostAda": 7.315798673857865,
+              "arithmetic": "0 + 0.030303030303030304 * 100 + 0.25 * 17.141982574219337"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 12.034457120904474,
+              "riskAdjustedCostAda": 16.95360890138217,
+              "arithmetic": "0 + 8 + 0.040344571209044736 * 100 + 0.25 * 19.67660712191079"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 3.7725809635547027,
+              "riskAdjustedCostAda": 8.376555254797157,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.03515005306989046 * 100 + 0.25 * 18.41589716496982"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 5.2303030303030305,
+              "riskAdjustedCostAda": 7.308657963573605,
+              "arithmetic": "0 + 4.13939393939394 + (0.030303030303030304 * 100 - 0.024242424242424246 * 80) + 0.25 * 8.3134197330823"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 5.2303030303030305,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 500,
+          "sharedInfrastructure": false,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 15.151515151515152,
+              "riskAdjustedCostAda": 36.57899336928932,
+              "arithmetic": "0 + 0.030303030303030304 * 500 + 0.25 * 85.70991287109668"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 11.515156565656566,
+              "riskAdjustedCostAda": 18.3857578103159,
+              "arithmetic": "0 + 10 + 0.003030313131313131 * 500 + 0.25 * 27.482404978637344"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 2.53030797979798,
+              "riskAdjustedCostAda": 10.938640340480065,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.004545464646464647 * 500 + 0.25 * 33.63332944272834"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 17.35151515151515,
+              "riskAdjustedCostAda": 36.08810202818403,
+              "arithmetic": "0 + 4.13939393939394 + (0.030303030303030304 * 500 - 0.024242424242424246 * 80) + 0.25 * 74.94634750667552"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 2.53030797979798,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 500,
+          "sharedInfrastructure": true,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 15.151515151515152,
+              "riskAdjustedCostAda": 36.57899336928932,
+              "arithmetic": "0 + 0.030303030303030304 * 500 + 0.25 * 85.70991287109668"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 24.371662542946325,
+              "riskAdjustedCostAda": 45.25719369974367,
+              "arithmetic": "0 + 10 + 0.02874332508589265 * 500 + 0.25 * 83.54212462718935"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 17.832602191510887,
+              "riskAdjustedCostAda": 40.85247364772316,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.03515005306989046 * 500 + 0.25 * 92.0794858248491"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51"
+              ],
+              "expectedTotalCostAda": 17.35151515151515,
+              "riskAdjustedCostAda": 36.08810202818403,
+              "arithmetic": "0 + 4.13939393939394 + (0.030303030303030304 * 500 - 0.024242424242424246 * 80) + 0.25 * 74.94634750667552"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 17.35151515151515,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        }
+      ]
+    },
+    {
+      "agentName": "Let The Crowd Decide",
+      "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+      "apiHost": "209.38.247.182:8000",
+      "delivery": {
+        "paid": 56,
+        "refunded": 0,
+        "disputed": 0,
+        "disputeRate": 0
+      },
+      "scenarios": [
+        {
+          "taskValueAtRiskAda": 5,
+          "sharedInfrastructure": false,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 0.15151515151515152,
+              "riskAdjustedCostAda": 0.36578993369289325,
+              "arithmetic": "0 + 0.030303030303030304 * 5 + 0.25 * 0.8570991287109668"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 8.030303030303031,
+              "riskAdjustedCostAda": 8.127320064203529,
+              "arithmetic": "0 + 8 + 0.0060606060606060615 * 5 + 0.25 * 0.3880681356019908"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 0.2196969696969697,
+              "riskAdjustedCostAda": 0.32808260551382196,
+              "arithmetic": "0 * 0.9696969696969697 + 8 * 0.030303030303030304 * 0.75 + 0.007575757575757576 * 5 + 0.25 * 0.433542543267409"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 1.9765151515151516,
+              "riskAdjustedCostAda": 2.073532185415649,
+              "arithmetic": "0 + 1.9462121212121213 + (0.030303030303030304 * 5 - 0.024242424242424246 * 5) + 0.25 * 0.3880681356019907"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 0.2196969696969697,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 5,
+          "sharedInfrastructure": true,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 0.15151515151515152,
+              "riskAdjustedCostAda": 0.36578993369289325,
+              "arithmetic": "0 + 0.030303030303030304 * 5 + 0.25 * 0.8570991287109668"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 8.201722856045224,
+              "riskAdjustedCostAda": 8.447680445069109,
+              "arithmetic": "0 + 8 + 0.040344571209044736 * 5 + 0.25 * 0.9838303560955396"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 0.4333259219151089,
+              "riskAdjustedCostAda": 0.6635246364772316,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.03515005306989046 * 5 + 0.25 * 0.9207948582484909"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 1.9765151515151516,
+              "riskAdjustedCostAda": 2.073532185415649,
+              "arithmetic": "0 + 1.9462121212121213 + (0.030303030303030304 * 5 - 0.024242424242424246 * 5) + 0.25 * 0.3880681356019907"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 0.15151515151515152,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 100,
+          "sharedInfrastructure": false,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 3.0303030303030303,
+              "riskAdjustedCostAda": 7.315798673857865,
+              "arithmetic": "0 + 0.030303030303030304 * 100 + 0.25 * 17.141982574219337"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 8.606060606060606,
+              "riskAdjustedCostAda": 10.54640128407056,
+              "arithmetic": "0 + 8 + 0.0060606060606060615 * 100 + 0.25 * 7.7613627120398165"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 0.7121221212121214,
+              "riskAdjustedCostAda": 2.393788593348538,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.004545464646464647 * 100 + 0.25 * 6.726665888545667"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 5.2303030303030305,
+              "riskAdjustedCostAda": 7.308657963573605,
+              "arithmetic": "0 + 4.13939393939394 + (0.030303030303030304 * 100 - 0.024242424242424246 * 80) + 0.25 * 8.3134197330823"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 0.7121221212121214,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 100,
+          "sharedInfrastructure": true,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 3.0303030303030303,
+              "riskAdjustedCostAda": 7.315798673857865,
+              "arithmetic": "0 + 0.030303030303030304 * 100 + 0.25 * 17.141982574219337"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 12.034457120904474,
+              "riskAdjustedCostAda": 16.95360890138217,
+              "arithmetic": "0 + 8 + 0.040344571209044736 * 100 + 0.25 * 19.67660712191079"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 3.7725809635547027,
+              "riskAdjustedCostAda": 8.376555254797157,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.03515005306989046 * 100 + 0.25 * 18.41589716496982"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 5.2303030303030305,
+              "riskAdjustedCostAda": 7.308657963573605,
+              "arithmetic": "0 + 4.13939393939394 + (0.030303030303030304 * 100 - 0.024242424242424246 * 80) + 0.25 * 8.3134197330823"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 5.2303030303030305,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 500,
+          "sharedInfrastructure": false,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 15.151515151515152,
+              "riskAdjustedCostAda": 36.57899336928932,
+              "arithmetic": "0 + 0.030303030303030304 * 500 + 0.25 * 85.70991287109668"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 11.515156565656566,
+              "riskAdjustedCostAda": 18.3857578103159,
+              "arithmetic": "0 + 10 + 0.003030313131313131 * 500 + 0.25 * 27.482404978637344"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 2.53030797979798,
+              "riskAdjustedCostAda": 10.938640340480065,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.004545464646464647 * 500 + 0.25 * 33.63332944272834"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 17.35151515151515,
+              "riskAdjustedCostAda": 36.08810202818403,
+              "arithmetic": "0 + 4.13939393939394 + (0.030303030303030304 * 500 - 0.024242424242424246 * 80) + 0.25 * 74.94634750667552"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 2.53030797979798,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        },
+        {
+          "taskValueAtRiskAda": 500,
+          "sharedInfrastructure": true,
+          "riskAversion": 0.25,
+          "options": {
+            "single": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 15.151515151515152,
+              "riskAdjustedCostAda": 36.57899336928932,
+              "arithmetic": "0 + 0.030303030303030304 * 500 + 0.25 * 85.70991287109668"
+            },
+            "redundant": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 24.371662542946325,
+              "riskAdjustedCostAda": 45.25719369974367,
+              "arithmetic": "0 + 10 + 0.02874332508589265 * 500 + 0.25 * 83.54212462718935"
+            },
+            "staggered": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+                "seller-b"
+              ],
+              "expectedTotalCostAda": 17.832602191510887,
+              "riskAdjustedCostAda": 40.85247364772316,
+              "arithmetic": "0 * 0.9696969696969697 + 10 * 0.030303030303030304 * 0.8499996666666667 + 0.03515005306989046 * 500 + 0.25 * 92.0794858248491"
+            },
+            "underwritten": {
+              "sellers": [
+                "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0"
+              ],
+              "expectedTotalCostAda": 17.35151515151515,
+              "riskAdjustedCostAda": 36.08810202818403,
+              "arithmetic": "0 + 4.13939393939394 + (0.030303030303030304 * 500 - 0.024242424242424246 * 80) + 0.25 * 74.94634750667552"
+            }
+          },
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 17.35151515151515,
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
+        }
+      ]
+    }
+  ]
+}

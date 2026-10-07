@@ -1,5 +1,7 @@
 import { env, loadEnv } from "./config.ts";
-import { betaBinomialRisk } from "../../router/src/risk.ts";
+import { evaluateRoutes, sellerRisk, type RouteQuote, type Seller, type UnderwriterConfig } from "../../router/src/routes.ts";
+import sellersSeed from "../../router/sellers.json" with { type: "json" };
+import underwriterSeed from "../../router/underwriter.json" with { type: "json" };
 import { deliveryHistory, detectNetwork, registryFromChain, type Network } from "./koios.ts";
 import type { CheckInput, Evidence, TrustReport } from "./types.ts";
 
@@ -33,7 +35,7 @@ async function registryEntry(identifier: string): Promise<Evidence> {
 }
 
 // Masumi CIP-25 metadata stores api_base_url as a list of <=64 byte chunks.
-function advertisedUrl(data: unknown): string | null {
+export function advertisedUrl(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
   if (Array.isArray(data)) return data.map(advertisedUrl).find(Boolean) ?? null;
   const record = data as Record<string, unknown>;
@@ -46,6 +48,50 @@ function advertisedUrl(data: unknown): string | null {
     if (found) return found;
   }
   return null;
+}
+
+function recordValue(data: unknown, key: string): unknown {
+  if (!data || typeof data !== "object") return undefined;
+  if (Array.isArray(data)) for (const item of data) { const found = recordValue(item, key); if (found !== undefined) return found; }
+  else {
+    const record = data as Record<string, unknown>;
+    if (key in record) return record[key];
+    for (const value of Object.values(record)) { const found = recordValue(value, key); if (found !== undefined) return found; }
+  }
+  return undefined;
+}
+
+function lovelacePrice(data: unknown): { priceAda: number; note: string } {
+  const pricing = recordValue(data, "agentPricing");
+  const pricingRecord = pricing && typeof pricing === "object" && !Array.isArray(pricing) ? pricing as Record<string, unknown> : undefined;
+  const entries = Array.isArray(pricingRecord?.fixedPricing) ? pricingRecord.fixedPricing : Array.isArray(pricing) ? pricing : pricing && typeof pricing === "object" ? [pricing] : [];
+  const lovelace = entries.find((entry) => {
+    if (!entry || typeof entry !== "object") return false;
+    const item = entry as Record<string, unknown>;
+    const unit = Array.isArray(item.unit) ? item.unit.join("") : item.unit ?? item.currency ?? item.asset ?? "";
+    return String(unit).toLowerCase() === "lovelace";
+  }) as Record<string, unknown> | undefined;
+  if (!lovelace) return { priceAda: 0, note: "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA." };
+  const amount = Number(lovelace.amount ?? lovelace.quantity ?? lovelace.price ?? 0);
+  return Number.isFinite(amount) ? { priceAda: amount / 1_000_000, note: `Registry lovelace quote converted to ${amount / 1_000_000} ADA.` } : { priceAda: 0, note: "Registry lovelace quote was not numeric; router priceAda is 0 ADA." };
+}
+
+function registryName(data: unknown, fallback: string): string {
+  const name = recordValue(data, "name");
+  return typeof name === "string" && name ? name : Array.isArray(name) && typeof name[0] === "string" ? name[0] : fallback;
+}
+
+const routeKinds = ["single", "redundant", "staggered", "underwritten"] as const;
+type Decision = Pick<TrustReport, "recommendation" | "expectedCostAda" | "options" | "pricingNote">;
+const emptyOptions = (): TrustReport["options"] => ({ single: null, redundant: null, staggered: null, underwritten: null });
+
+function cheapestOptions(routes: RouteQuote[]): TrustReport["options"] {
+  const options = emptyOptions();
+  for (const kind of routeKinds) {
+    const quote = routes.filter((route) => route.route === kind).sort((a, b) => a.riskAdjustedCostAda - b.riskAdjustedCostAda)[0];
+    if (quote) options[kind] = { sellers: quote.sellers, expectedTotalCostAda: quote.expectedTotalCostAda, riskAdjustedCostAda: quote.riskAdjustedCostAda, arithmetic: quote.arithmetic };
+  }
+  return options;
 }
 
 const privateHost = (url: string) => /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.0\.0\.0|\[?::1\]?$)/.test(new URL(url).hostname);
@@ -65,18 +111,27 @@ async function gather(input: CheckInput): Promise<Evidence[]> {
 
 type Delivery = { paid: number; refunded: number; disputed: number };
 
-// ponytail: fixed policy bands on the router's Beta(2,8) posterior; tune once buyers report their own loss tolerance.
-export function decide(facts: Evidence[], atRisk: number): { recommendation: TrustReport["recommendation"]; expectedCostAda: number | null } {
+export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput, "agentIdentifier" | "riskAversion" | "sharedInfrastructure"> = { agentIdentifier: "registry-agent" }): Decision {
   const delivery = facts.find((fact) => fact.source === "masumi_delivery_history");
   const record = delivery?.status === "ok" ? delivery.data as Delivery : undefined;
-  if (!record || record.paid + record.refunded + record.disputed === 0) return { recommendation: "insufficient_data", expectedCostAda: null };
-  const { pLoss } = betaBinomialRisk(record.paid, record.refunded + record.disputed);
-  const expectedCostAda = Math.round(pLoss * atRisk * 100) / 100;
+  const pricing = facts.find((fact) => fact.source === "registry" || fact.source === "registry_chain");
+  const registryData = pricing?.data;
+  const registryId = input.agentIdentifier;
+  const price = lovelacePrice(registryData);
+  const registrySeller: Seller = { id: registryId, name: registryName(registryData, registryId), priceAda: price.priceAda, provider: advertisedUrl(registryData) ? new URL(advertisedUrl(registryData)!).host : "unknown", payTo: "registry-agent", endpoint: advertisedUrl(registryData) ?? "", successes: record?.paid ?? 0, failures: (record?.refunded ?? 0) + (record?.disputed ?? 0), evidence: [] };
+  const backups = (sellersSeed as Seller[]).filter((seller) => seller.type === "agent");
+  const underwriter = underwriterSeed as UnderwriterConfig;
+  const routes = record && record.paid + record.refunded + record.disputed > 0
+    ? evaluateRoutes({ downstreamLossAda: atRisk, candidateSellers: [registrySeller, ...backups], constraints: { allowRedundancy: true }, underwriter, riskAversion: input.riskAversion ?? 0.25, sharedInfrastructure: input.sharedInfrastructure ?? false })
+    : null;
+  const options = routes ? cheapestOptions(routes.routes) : emptyOptions();
+  if (!record || record.paid + record.refunded + record.disputed === 0) return { recommendation: "insufficient_data", expectedCostAda: null, options, pricingNote: price.note };
+  const pLoss = sellerRisk(registrySeller, underwriter).pLoss;
   const endpointDown = facts.some((fact) => fact.source === "agent_health" && fact.status !== "ok" && fact.error !== "registry did not advertise an API URL");
-  if (endpointDown || pLoss >= 0.5) return { recommendation: "do_not_hire", expectedCostAda };
-  if (pLoss >= 0.2) return { recommendation: "hire_with_backup_keeper", expectedCostAda };
-  if (pLoss >= 0.1) return { recommendation: "require_coverage", expectedCostAda };
-  return { recommendation: "hire_as_is", expectedCostAda };
+  const selected = routes!.routes.find((route) => route.route === routes!.selectedRoute && route.sellers.join(",") === routes!.selectedSellers.join(","))!;
+  if (endpointDown || pLoss >= 0.5) return { recommendation: "do_not_hire", expectedCostAda: selected.expectedTotalCostAda, options, pricingNote: price.note };
+  const recommendation = routes!.selectedRoute === "single" && routes!.selectedSellers[0] === registryId ? "hire_as_is" : routes!.selectedRoute === "underwritten" ? "require_coverage" : "hire_with_backup_keeper";
+  return { recommendation, expectedCostAda: selected.expectedTotalCostAda, options, pricingNote: price.note };
 }
 
 async function summarize(input: CheckInput, facts: Evidence[], decision: ReturnType<typeof decide>): Promise<string> {
@@ -107,7 +162,7 @@ async function summarize(input: CheckInput, facts: Evidence[], decision: ReturnT
 export async function createReport(input: CheckInput): Promise<TrustReport> {
   if (!input.agentIdentifier || !Number.isFinite(input.taskValueAtRiskAda) || input.taskValueAtRiskAda < 0) throw new Error("agentIdentifier and non-negative taskValueAtRiskAda are required");
   const facts = await gather(input);
-  const decision = decide(facts, input.taskValueAtRiskAda);
+  const decision = decide(facts, input.taskValueAtRiskAda, input);
   let summary: string;
   try { summary = await summarize(input, facts, decision); } catch (error) { summary = `Plain-language summary unavailable because the configured model failed: ${error instanceof Error ? error.message : "request failed"}. Structured facts remain authoritative.`; }
   return { input, ...decision, facts, summary, generatedAt: now() };

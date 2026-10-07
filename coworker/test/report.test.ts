@@ -58,10 +58,15 @@ const delivery = (paid: number, refunded: number): Evidence => ({ source: "masum
 const health = (status: Evidence["status"], error?: string): Evidence => ({ source: "agent_health", status, observedAt: "", error });
 
 test("decision prices the agent's own escrow outcomes", () => {
-  assert.deepEqual(decide([delivery(0, 0)], 100), { recommendation: "insufficient_data", expectedCostAda: null });
-  // Beta(2+4, 8+1): pLoss 6/15.
-  assert.deepEqual(decide([delivery(1, 4), health("ok")], 100), { recommendation: "hire_with_backup_keeper", expectedCostAda: 40 });
-  assert.deepEqual(decide([delivery(20, 0), health("ok")], 100), { recommendation: "hire_as_is", expectedCostAda: 6.67 });
+  assert.equal(decide([delivery(0, 0)], 100).recommendation, "insufficient_data");
+  const input = { agentIdentifier: "registry-agent", riskAversion: 0.25, sharedInfrastructure: false } as const;
+  assert.equal(decide([delivery(1, 4), health("ok")], 5, input).recommendation, "hire_as_is");
+  assert.equal(decide([delivery(1, 4), health("ok")], 500, input).recommendation, "hire_with_backup_keeper");
+  assert.notEqual(decide([delivery(1, 4), health("ok")], 5, input).expectedCostAda, decide([delivery(1, 4), health("ok")], 500, input).expectedCostAda);
+  const independent = decide([delivery(1, 4), health("ok")], 500, input);
+  const shared = decide([delivery(1, 4), health("ok")], 500, { ...input, sharedInfrastructure: true });
+  assert.ok((shared.options.staggered?.riskAdjustedCostAda ?? 0) > (independent.options.staggered?.riskAdjustedCostAda ?? 0));
+  assert.equal(decide([delivery(20, 0), health("ok")], 100, input).recommendation, "hire_with_backup_keeper");
   assert.equal(decide([delivery(1, 12), health("ok")], 100).recommendation, "do_not_hire");
   assert.equal(decide([delivery(20, 0), health("unavailable", "HTTP 502")], 100).recommendation, "do_not_hire");
 });
@@ -88,7 +93,7 @@ test("report flags a loopback api_base_url from chain metadata as unreachable", 
     assert.match(healthFact?.error ?? "", /private API URL \(http:\/\/127\.0\.0\.1:8788\)/);
     assert.ok(!calls.some((call) => call.includes("127.0.0.1")));
     assert.equal(report.recommendation, "do_not_hire");
-    assert.equal(report.expectedCostAda, 25);
+    assert.equal(report.expectedCostAda, report.options.staggered?.expectedTotalCostAda);
   } finally {
     globalThis.fetch = originalFetch;
     for (const [key, value] of Object.entries(original)) if (value === undefined) delete process.env[key]; else process.env[key] = value;
