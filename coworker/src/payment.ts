@@ -61,7 +61,10 @@ export async function submitResult(payment: Payment, result: string): Promise<Pa
 export async function waitForPayment(payment: Payment, timeoutMs = 20 * 60_000, states = ["FundsLocked", "ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]): Promise<Payment> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
-    const current = await mpsJson("/payment/resolve-blockchain-identifier", { method: "POST", body: JSON.stringify({ network: "Preprod", blockchainIdentifier: identifier(payment), includeHistory: "true" }) });
+    // A transient payment-service error is retried until the deadline instead of failing the paid task.
+    let current: Awaited<ReturnType<typeof mpsJson>>;
+    try { current = await mpsJson("/payment/resolve-blockchain-identifier", { method: "POST", body: JSON.stringify({ network: "Preprod", blockchainIdentifier: identifier(payment), includeHistory: "true" }) }); }
+    catch (error) { if (error instanceof Error && /HTTP 4\d\d/.test(error.message)) throw error; console.error(`MPS poll retry: ${error instanceof Error ? error.message : error}`); await new Promise((resolve) => setTimeout(resolve, 10_000)); continue; }
     const data = (current.data ?? current) as Payment;
     const state = String(data.onChainState ?? "");
     if (states.includes(state)) return current;
