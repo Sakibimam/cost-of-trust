@@ -7,6 +7,8 @@ const mps = process.env.MPS_URL ?? "http://127.0.0.1:3012/api/v1";
 const token = process.env.MPS_API_TOKEN;
 const agentIdentifier = process.env[role === "backup" ? "MASUMI_BACKUP_ID" : "MASUMI_PRIMARY_ID"];
 const priceAsset = process.env.MASUMI_PRICE_ASSET ?? "16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d";
+// V2 rule: unlock >= submitResultTime + 15 min. The backup gets a wide submit window so the result tx is built before it closes.
+const windows = { submit: role === "backup" ? 20.5 : 15.5 };
 const jobs = new Map<string, { payment: Record<string, any>; result?: string; status: string }>();
 
 if (!token || !agentIdentifier) throw new Error("MPS_API_TOKEN and the registered agent identifier are required");
@@ -35,7 +37,7 @@ const server = createServer(async (request, response) => {
       if (typeof input.url !== "string" || !/^https?:\/\//.test(input.url)) return send(response, 400, { error: "url is required" });
       const now = Date.now();
       const identifierFromPurchaser = randomBytes(10).toString("hex");
-      const payment = await mpsJson("/payment", { network: "Preprod", paymentSourceType: "Web3CardanoV2", supportedPaymentSourceIndex: 0, agentIdentifier, inputHash: sha256(JSON.stringify(input)), identifierFromPurchaser, payByTime: new Date(now + 8 * 60_000).toISOString(), submitResultTime: new Date(now + 15.5 * 60_000).toISOString(), unlockTime: new Date(now + 30.5 * 60_000).toISOString(), externalDisputeUnlockTime: new Date(now + 45.5 * 60_000).toISOString() });
+      const payment = await mpsJson("/payment", { network: "Preprod", paymentSourceType: "Web3CardanoV2", supportedPaymentSourceIndex: 0, agentIdentifier, inputHash: sha256(JSON.stringify(input)), identifierFromPurchaser, payByTime: new Date(now + 8 * 60_000).toISOString(), submitResultTime: new Date(now + windows.submit * 60_000).toISOString(), unlockTime: new Date(now + (windows.submit + 15) * 60_000).toISOString(), externalDisputeUnlockTime: new Date(now + (windows.submit + 30) * 60_000).toISOString() });
       const jobId = crypto.randomUUID();
       jobs.set(jobId, { payment, status: "awaiting_purchase" });
       if (!(process.env.STALL === "true" && role === "primary")) void (async () => {

@@ -1,11 +1,12 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { createReport, decide } from "../coworker/src/report.ts";
 import { evaluateRoutes, type Seller } from "../router/src/routes.ts";
 import underwriter from "../router/underwriter.json" with { type: "json" };
 import { shouldHireBackup } from "./checkpoint.ts";
 
-const mode = process.argv[2] === "stall" ? "stall" : "healthy";
+const resumed = process.argv[2] === "resume" ? JSON.parse(await readFile(process.argv[3], "utf8")) : null;
+const mode = resumed?.mode ?? (process.argv[2] === "stall" ? "stall" : "healthy");
 const mps = process.env.MPS_URL ?? "http://127.0.0.1:3012/api/v1";
 const token = process.env.MPS_API_TOKEN;
 const primaryId = process.env.MASUMI_PRIMARY_ID;
@@ -21,13 +22,21 @@ const wait = async (identifier: string, predicate: (value: any) => boolean, time
 const txs = (data: any) => [...(data.TransactionHistory ?? []), ...(data.CurrentTransaction ? [data.CurrentTransaction] : [])].filter((tx: any) => tx?.txHash).map((tx: any) => ({ txHash: tx.txHash, state: tx.newOnChainState, status: tx.status }));
 const recordTxStatuses = async (records: any[]) => { for (const record of records) { const response = await fetch("https://preprod.koios.rest/api/v1/tx_status", { method: "POST", headers: { "content-type": "application/json", ...(process.env.KAIOS_KEY ? { authorization: `Bearer ${process.env.KAIOS_KEY}` } : {}) }, body: JSON.stringify({ _tx_hashes: [record.txHash] }) }); record.koios = response.ok ? (await response.json())[0] : { status: `HTTP ${response.status}` }; } };
 const start = async (url: string) => { const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: "https://example.com/" }) }); if (!response.ok) throw new Error(`agent start ${response.status}: ${await response.text()}`); return await response.json() as any; };
-const purchasePayload = (payment: any, agentIdentifier: string) => ({ network: "Preprod", paymentSourceType: "Web3CardanoV2", supportedPaymentSourceIndex: 0, blockchainIdentifier: idOf(payment), sellerVkey: payment.sellerVkey ?? payment.SmartContractWallet?.walletVkey, agentIdentifier, inputHash: sha256(JSON.stringify(input)), Amounts: [{ amount: process.env.MASUMI_PRICE_AMOUNT ?? "1000000", unit: priceAsset }], payByTime: payment.payByTime, submitResultTime: payment.submitResultTime, unlockTime: payment.unlockTime, externalDisputeUnlockTime: payment.externalDisputeUnlockTime, identifierFromPurchaser: payment.identifierFromPurchaser });
+const purchasePayload = (payment: any, agentIdentifier: string) => ({ network: "Preprod", paymentSourceType: "Web3CardanoV2", supportedPaymentSourceIndex: 0, blockchainIdentifier: idOf(payment), sellerVkey: payment.sellerVkey ?? payment.SmartContractWallet?.walletVkey, agentIdentifier, inputHash: sha256(JSON.stringify(input)), Amounts: payment.RequestedFunds?.length ? payment.RequestedFunds.map((fund: any) => ({ amount: String(fund.amount), unit: fund.unit })) : [{ amount: process.env.MASUMI_PRICE_AMOUNT ?? "1000000", unit: priceAsset }], payByTime: payment.payByTime, submitResultTime: payment.submitResultTime, unlockTime: payment.unlockTime, externalDisputeUnlockTime: payment.externalDisputeUnlockTime, identifierFromPurchaser: payment.identifierFromPurchaser });
 
 await mkdir("agents/runs", { recursive: true });
-const startedAt = nowIso();
-const run: any = { mode, startedAt, buyerDeadline: new Date(Date.now() + 20 * 60_000).toISOString(), records: [], primary: { agentIdentifier: primaryId }, backup: { agentIdentifier: backupId } };
+const startedAt = resumed?.startedAt ?? nowIso();
+const run: any = resumed ?? { mode, startedAt, buyerDeadline: new Date(Date.now() + 20 * 60_000).toISOString(), records: [], primary: { agentIdentifier: primaryId }, backup: { agentIdentifier: backupId } };
 const record = (step: string, detail: any) => { run.records.push({ at: nowIso(), step, ...detail }); };
 const input = { url: "https://example.com/" };
+const finish = async (primaryIdentifier: string, primaryUnlockMs: number, backupIdentifier: string, backupUnlockMs: number) => {
+  try { const refunded = await wait(primaryIdentifier, (value) => value.onChainState === "RefundWithdrawn", Math.max(60_000, primaryUnlockMs + 300_000 - Date.now())); record("primary_refund", { state: refunded.onChainState, refundTime: nowIso(), txs: txs(refunded) }); } catch (error) { record("primary_refund_pending", { error: error instanceof Error ? error.message : String(error), refundExpectedAfter: new Date(primaryUnlockMs).toISOString() }); }
+  try { const collected = await wait(backupIdentifier, (value) => value.onChainState === "Withdrawn", Math.max(60_000, backupUnlockMs + 720_000 - Date.now())); record("backup_collection", { state: collected.onChainState, txs: txs(collected) }); } catch (error) { record("backup_collection_pending", { error: error instanceof Error ? error.message : String(error) }); }
+};
+if (resumed) {
+  const find = (step: string) => run.records.find((entry: any) => entry.step === step);
+  await finish(find("primary_escrow_lock_requested").blockchainIdentifier, Number(find("primary_payment_request").unlockTime), find("backup_escrow_lock_requested").blockchainIdentifier, Number(find("backup_funds_locked").unlockTime));
+} else {
 const report = await createReport({ agentIdentifier: primaryId, taskValueAtRiskAda: 1, deadlineMinutes: 10, riskAversion: 0.9, sharedInfrastructure: false });
 const primarySeller: Seller = { id: primaryId, name: "Masumi Backup Primary", priceAda: 0, provider: "localhost", payTo: "mps", endpoint: "", successes: 0, failures: mode === "stall" ? 1 : 0, evidence: [] };
 const backupSeller: Seller = { ...primarySeller, id: backupId, name: "Masumi Backup Fallback", failures: 0 };
@@ -51,10 +60,13 @@ else {
   const backupPayment = backupJob.payment.data ?? backupJob.payment;
   const backupPurchase = await mpsJson("/purchase", purchasePayload(backupPayment, backupId));
   record("backup_escrow_lock_requested", { purchaseId: backupPurchase.id, blockchainIdentifier: idOf(backupPurchase), txs: txs(backupPurchase) });
-  const backupState = await wait(idOf(backupPurchase), (value) => Boolean(value.resultHash || value.onChainState === "ResultSubmitted"), 600_000);
-  record("backup_result_submitted", { resultHash: backupState.resultHash, resultArrivedAt: nowIso(), txs: txs(backupState) });
-  try { const collected = await wait(idOf(backupPurchase), (value) => value.onChainState === "Withdrawn", 1_200_000); record("backup_collection", { state: collected.onChainState, txs: txs(collected) }); } catch (error) { record("backup_collection_pending", { error: error instanceof Error ? error.message : String(error) }); }
-  try { const refunded = await wait(primaryIdValue, (value) => value.onChainState === "RefundWithdrawn", 2_700_000); record("primary_refund", { state: refunded.onChainState, refundTime: nowIso(), txs: txs(refunded) }); } catch (error) { record("primary_refund_pending", { error: error instanceof Error ? error.message : String(error), refundExpectedAfter: primaryPayment.unlockTime }); }
+  const backupLocked = await wait(idOf(backupPurchase), (value) => value.onChainState === "FundsLocked", 600_000);
+  record("backup_funds_locked", { state: backupLocked.onChainState, submitResultTime: backupPayment.submitResultTime, unlockTime: backupPayment.unlockTime, txs: txs(backupLocked) });
+  const backupState = await wait(idOf(backupPurchase), (value) => Boolean(value.resultHash || value.onChainState === "ResultSubmitted"), 900_000);
+  const resultArrivedAt = nowIso();
+  record("backup_result_submitted", { resultHash: backupState.resultHash, resultArrivedAt, buyerDeadline: run.buyerDeadline, buyerDeadlineMet: Date.parse(resultArrivedAt) <= Date.parse(run.buyerDeadline), txs: txs(backupState) });
+  await finish(primaryIdValue, Number(primaryPayment.unlockTime), idOf(backupPurchase), Number(backupPayment.unlockTime));
+}
 }
 run.finishedAt = nowIso(); run.primary.txTotal = run.records.find((entry: any) => entry.step === "primary_escrow_lock_requested")?.txs ?? []; run.backup.txTotal = run.records.find((entry: any) => entry.step === "backup_escrow_lock_requested")?.txs ?? [];
 const file = `agents/runs/${startedAt.replaceAll(":", "-").replaceAll(".", "-")}-masumi-backup-${mode}.json`; await recordTxStatuses([...run.primary.txTotal, ...run.backup.txTotal, ...run.records.flatMap((entry: any) => entry.txs ?? [])]); await writeFile(file, `${JSON.stringify(run, null, 2)}\n`); console.log(JSON.stringify({ file, mode, primary: primaryId, backup: backupId, paid: run.records.filter((entry: any) => /escrow_lock_requested/.test(entry.step)).length }));
