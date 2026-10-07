@@ -111,7 +111,13 @@ export function Board({ runs }: { runs: React.ReactNode }) {
           <div className="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
             <Controls buyer={buyer} onBuyer={setBuyer} shared={shared} onShared={setShared} busy={busy} />
           </div>
-          <p className="m-0 max-w-[58ch] text-[18px] leading-[1.45] lg:col-span-7 lg:row-start-2">When keepers fail independently, Cardano makes a backup keeper safe: a UTxO can only be spent once. When they share infrastructure, backups fail together and coverage is cheaper.</p>
+          <div className="lg:col-span-7 lg:row-start-2">
+            <p className="m-0 max-w-[58ch] text-[18px] leading-[1.45]">Masumi refunds your fee when an agent misses. It cannot refund your deadline. Trust Check decides before you pay whether to buy a backup, and the backup is paid only if the first agent misses its checkpoint.</p>
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-[14px] font-extrabold">
+              <a href="https://preprod.sokosumi.com" className="btn whitespace-nowrap">Hire Trust Check on Sokosumi</a>
+              <a href="/api/x402/trust-check#docs" className="whitespace-nowrap">Read the x402 endpoint</a>
+            </div>
+          </div>
         </div>
       </section>
 

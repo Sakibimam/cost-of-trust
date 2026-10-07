@@ -54,5 +54,5 @@ export async function readRuns(): Promise<{ runs: Run[]; error: string | null }>
       return { runs, error: `${file} is not valid JSON` };
     }
   }
-  return { runs, error: null };
+  return { runs: runs.filter((run) => run.problems.length === 0 && run.txs.length > 0), error: null };
 }
