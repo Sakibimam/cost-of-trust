@@ -31,7 +31,7 @@ function inputFrom(body: RequestBody | null) {
   if (!agentIdentifier || typeof value !== "number" || !Number.isFinite(value) || value < 0) throw new Error("agentIdentifier (or agentName) and non-negative taskValueAtRiskAda are required");
   if (body?.deadlineMinutes !== undefined && (typeof body.deadlineMinutes !== "number" || !Number.isFinite(body.deadlineMinutes) || body.deadlineMinutes <= 0)) throw new Error("deadlineMinutes must be positive");
   if (body?.task !== undefined && typeof body.task !== "string") throw new Error("task must be a string");
-  const parsed = parseTaskInput(JSON.stringify({ agentIdentifier, taskValueAtRiskAda: value, task: body?.task }));
+  const parsed = parseTaskInput(JSON.stringify({ agentIdentifier, taskValueAtRiskAda: value, deadlineMinutes: body?.deadlineMinutes, task: body?.task }));
   if (!parsed) throw new Error("invalid Trust Check input");
   return parsed;
 }
