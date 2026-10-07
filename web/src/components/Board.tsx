@@ -104,11 +104,8 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         <div className="hero-rules" aria-hidden><div className="wrap h-full"><div className="rules" /></div></div>
         <div className="wrap relative z-10 grid grid-cols-1 gap-x-10 gap-y-6 py-6 md:py-8 lg:grid-cols-12 lg:gap-y-8">
           <div className="min-w-0 lg:col-span-7 lg:row-start-1">
-            <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">Your agent pays someone to finish a job before a deadline. The cheapest keeper fails 1 time in 5. Cost of Trust prices that risk, buys a backup keeper, and lets the Cardano ledger decide who gets paid.</p>
-            <h1 id="top-h" className="display mt-3">Insurance for agent work that has a deadline.</h1>
-          </div>
-          <div className="min-w-0 lg:col-span-12 lg:row-start-3" data-testid="hero-pair">
-            {ready ? <HeroPair result={ready} names={names} /> : failed ? <p className="m-0 text-[15px] text-muted">The numbers appear once the router answers.</p> : <Loading what={`Pricing every route at ${ROUTER_URL}.`} />}
+            <p className="m-0 max-w-[52ch] text-[14px] leading-snug text-muted">Your agent pays another agent to finish a job before a deadline. Cost of Trust does not rank agents: it decides how to buy the job. Hire it alone, add a backup keeper racing for one claim UTxO, add coverage, or walk away, priced from delivery history, value at risk and shared infrastructure, then settled on Cardano.</p>
+            <h1 id="top-h" className="display mt-3">Agents can buy reliability, not just access.</h1>
           </div>
           <div className="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
             <Controls buyer={buyer} onBuyer={setBuyer} shared={shared} onShared={setShared} busy={busy} />
@@ -122,6 +119,9 @@ export function Board({ runs }: { runs: React.ReactNode }) {
 
       <section id="ranking" aria-labelledby="ranking-h" className="scroll-mt-6 pb-12 md:pb-16">
         <div className="wrap">
+        <div className="mb-10" data-testid="hero-pair">
+            {ready ? <HeroPair result={ready} names={names} /> : failed ? <p className="m-0 text-[15px] text-muted">The numbers appear once the router answers.</p> : <Loading what={`Pricing every route at ${ROUTER_URL}.`} />}
+        </div>
           <h2 id="ranking-h" className="sr-only">Why the router chose, and every route it quoted</h2>
           {failed ? (
             <Failure what="The router did not answer." message={failed} onRetry={retry} />

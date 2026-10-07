@@ -36,7 +36,7 @@ export function Controls({ buyer, onBuyer, shared, onShared, busy }: {
           <span aria-hidden className={`block h-4 w-4 ${shared ? "bg-yellow" : "bg-ink"}`} />
         </button>
       </div>
-      <p className="m-0 border-b border-rule p-3 text-[13px] leading-snug text-muted sm:p-4" data-testid="cardano-default">On Cardano the default protection is a backup keeper the chain itself schedules. Coverage only wins when keepers share infrastructure and the buyer cannot absorb the loss.</p>
+      <p className="m-0 border-b border-rule p-3 text-[13px] leading-snug text-muted sm:p-4" data-testid="cardano-default">On Cardano the default protection is a backup keeper racing for the same claim UTxO: only one claim can spend it, so nobody is paid twice. Coverage only wins when keepers share infrastructure and the buyer cannot absorb the loss.</p>
     </form>
   );
 }
