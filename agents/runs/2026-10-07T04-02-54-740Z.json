@@ -1,0 +1,64 @@
+{
+  "lane": "fix-cre4",
+  "startedAt": "2026-10-07T04:02:54.740Z",
+  "source": {
+    "creMain": "513df14",
+    "workflow": "4587a17",
+    "binaryHash": "6a5268ca2fb0bb806d183c11997a42b818760936a3663ec22103d8ff6b741c6a",
+    "sdkLayout": "@chainlink/cre-sdk REPORT_METADATA_HEADER_LENGTH=109; workflow cid @45/32, name @77/10, owner @87/20"
+  },
+  "deployment": {
+    "configTx": "f46171f2855035ec7c9a0505b0b4f48cf178f17546476217949d8769d7cf7fc2",
+    "configPolicyId": "10ba9d006664b7d0b12ce49f45eb367b93b16a08c9a67e4d7d09d89c",
+    "taskRef": "cf2a4198860272c11732c732bd18363b45f079217dec79116eead1f67736c79d#0",
+    "coverageRef": "9dc6f13768859de0ab39e36585a9aa660cae7973f39d54440697c4e77de0d704#0",
+    "settleTx": "3e33929dbf296722029680f3ff26676da5b420ebe4e4e34265b9992a8526ff1b"
+  },
+  "config": {
+    "workflowCid": "1111111111111111111111111111111111111111111111111111111111111111",
+    "workflowName": "63396437323261653466",
+    "workflowNameText": "c9d722ae4f",
+    "workflowOwner": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "donConfigDigest": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "signers": [
+      "61161ff5b2901bbd333f6fb895d5f8423b74dcd7",
+      "0f42eb0214b247be1a8130ce45d1132c87e2441d",
+      "654e3cedac8fb438557263b3a988b79a4c2298b8",
+      "a12519619611aa94e5c58158c3b95749fe4cf16e"
+    ],
+    "f": 1
+  },
+  "nativeReport": {
+    "rawBytes": 210,
+    "contextBytes": 96,
+    "signatureCount": 4,
+    "metadata": {
+      "version": 1,
+      "executionId": "fd908075b94b9e3317215cab9b7d9c35ec15b715fecbfe31294e3d58221581f0",
+      "timestamp": 100,
+      "donId": 1,
+      "donConfigVersion": 1,
+      "workflowCid": "1111111111111111111111111111111111111111111111111111111111111111",
+      "workflowName": "63396437323261653466",
+      "workflowOwner": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "reportId": "0001"
+    },
+    "decision": "FAILURE",
+    "metadataUntouched": true,
+    "relayerSignerSet": "configured agents/.signers.json"
+  },
+  "records": [
+    { "step": "config_tx_status", "txHash": "f46171f2855035ec7c9a0505b0b4f48cf178f17546476217949d8769d7cf7fc2", "numConfirmations": 55 },
+    { "step": "task_tx_status", "txHash": "cf2a4198860272c11732c732bd18363b45f079217dec79116eead1f67736c79d", "numConfirmations": 48 },
+    { "step": "coverage_lock", "txHash": "9dc6f13768859de0ab39e36585a9aa660cae7973f39d54440697c4e77de0d704", "numConfirmations": 46 },
+    { "step": "native_report_settle", "txHash": "3e33929dbf296722029680f3ff26676da5b420ebe4e4e34265b9992a8526ff1b", "numConfirmations": 2, "status": "confirmed" },
+    { "step": "flipped_report", "status": "rejected", "surface": "Cardano node validation", "error": "failed script execution Spend[1] the validator crashed / exited prematurely" }
+  ],
+  "verification": {
+    "offchain": "typecheck and 5 tests passed",
+    "agents": "typecheck passed",
+    "cre": "11 tests passed",
+    "aiken": "80 tests passed",
+    "blindSpot": "The CRE simulator supplies deterministic signatures, so the relayer re-signs the unchanged native raw report with the configured local signer set before settlement."
+  }
+}

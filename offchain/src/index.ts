@@ -69,11 +69,11 @@ export async function settle(lucid: LucidEvolution, d: Deployment, ref: OutRef, 
   if (bytes(report.raw_report).length !== 210 || ![64, 96].includes(bytes(report.report_context).length)) throw new Error("CRE report must contain a 210-byte raw report and a 64- or 96-byte context");
   const raw = bytes(report.raw_report), decision = Number(raw[141]);
   if (![0, 1].includes(decision)) throw new Error(`invalid CRE decision ${decision}`);
-  const datum = Data.from(u.datum ?? "") as Constr<any>;
+  const datum = Data.from(u.datum ?? "") as Constr<any>, taskData = datum.fields[4] as Constr<any>, taskRef = { txHash: taskData.fields[0] as string, outputIndex: Number(taskData.fields[1] as bigint) }, taskUtxo = await out(lucid, taskRef);
   const taskExpiry = BigInt(datum.fields[5] as bigint), decideBy = BigInt(datum.fields[6] as bigint), amount = BigInt(datum.fields[3] as bigint);
   if (amount > u.assets.lovelace - 2_000_000n) throw new Error("coverage payout exceeds collateral headroom");
   const underwriterAssets = { ...u.assets, lovelace: u.assets.lovelace - amount };
-  const tx0 = lucid.newTx().readFrom([cfg]).collectFrom([u], Data.to(new Constr(0, [p.raw, p.context, p.sigs, p.pubkeys]))).attach.SpendingValidator(coverageScript(d.configPolicyId)).validFrom(Number(taskExpiry)).validTo(Number(decideBy));
+  const tx0 = lucid.newTx().readFrom([cfg, taskUtxo]).collectFrom([u], Data.to(new Constr(0, [p.raw, p.context, p.sigs, p.pubkeys]))).attach.SpendingValidator(coverageScript(d.configPolicyId)).validFrom(Number(taskExpiry)).validTo(Number(decideBy));
   let tx: any = tx0;
   if (decision === 1) tx = tx.pay.ToAddressWithData(buyerAddress, { kind: "inline", value: Data.to(refData(ref)) }, { lovelace: amount }).pay.ToAddressWithData(underwriterAddress, { kind: "inline", value: Data.to(refData(ref)) }, underwriterAssets);
   else tx = tx.pay.ToAddressWithData(underwriterAddress, { kind: "inline", value: Data.to(refData(ref)) }, u.assets);

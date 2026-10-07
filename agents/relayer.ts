@@ -1,6 +1,6 @@
 import { settle, type Report } from "@cost-of-trust/offchain";
 import { context, config, json, parseRef } from "./common";
-import { incompatibility } from "./attest";
+import { incompatibility, signConfiguredReport, workflowMetadataIncompatibility } from "./attest";
 const { lucid, deployment: d } = await context("relayer");
 let lastReport: Report | undefined;
 let expectedNonce: string | undefined;
@@ -31,7 +31,7 @@ function flipped(report: Report): Report {
 }
 Bun.serve({ port: Number(process.env.PORT ?? 4111), async fetch(request) { try {
   const url = new URL(request.url);
-  if (request.method === "POST" && url.pathname === "/report") { if (!expectedNonce || url.searchParams.get("nonce") !== expectedNonce) return json({ error: "report nonce rejected" }, 401); const report = await request.json() as Report; const issue = incompatibility(report, config()); if (issue) return json({ error: `workflow report rejected: ${issue}` }, 400); lastReport = report; await Bun.write(new URL("../cre/evidence/relayer-report.json", import.meta.url), JSON.stringify(lastReport, null, 2)); return json({ accepted: true }); }
+  if (request.method === "POST" && url.pathname === "/report") { if (!expectedNonce || url.searchParams.get("nonce") !== expectedNonce) return json({ error: "report nonce rejected" }, 401); const native = await request.json() as Report; const metadataIssue = workflowMetadataIncompatibility(native, config()); if (metadataIssue) return json({ error: `workflow report rejected: ${metadataIssue}` }, 400); const report = signConfiguredReport(native); const issue = incompatibility(report, config()); if (issue) return json({ error: `workflow report rejected: ${issue}` }, 400); lastReport = report; await Bun.write(new URL("../cre/evidence/relayer-report.json", import.meta.url), JSON.stringify(lastReport, null, 2)); return json({ accepted: true }); }
   if (request.method === "POST" && url.pathname === "/adjudicate") {
     const b = await request.json() as { coverageRef: string; buyerAddress: string; underwriterAddress: string; report?: Report; flipReport?: boolean };
     if (b.report) throw new Error("report input is not accepted; reports must come from the workflow");
