@@ -12,7 +12,7 @@ const mps = (path: string, init: RequestInit = {}) => fetch(`${env("MPS_URL", "h
 async function mpsJson(path: string, init: RequestInit = {}): Promise<Payment> {
   const response = await mps(path, init);
   const body = await response.json() as Payment;
-  if (!response.ok) throw new Error(`MPS HTTP ${response.status}`);
+  if (!response.ok) throw new Error(`MPS HTTP ${response.status} on ${path}: ${JSON.stringify(body).slice(0, 160)}`);
   return body;
 }
 
