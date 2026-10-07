@@ -6,7 +6,7 @@ const STEPS = [
   { at: "07:39:30 UTC", what: "Buyer checkpoint: A has no result", hash: null },
   { at: "07:39:34 UTC", what: "Backup B hired through Masumi escrow", hash: "d9b06473307dbf9c056bc51a66637d5af2e153c63b770d4650434967ab74c63e" },
   { at: "07:51:08 UTC", what: "B result on chain", hash: "7934f7a085a4c491469994f6c7964f601219487cb6888bcefebce05862189fdf" },
-  { at: "07:56:20 UTC", what: "Buyer deadline met with 5 min 12 s to spare", hash: null },
+  { at: "07:56:20 UTC", what: "Deadline, with 5 min 12 s still left", hash: null },
   { at: "A refund", what: "A refund requested", hash: "b6dde9c1337932dcc5fd28713cf832ccb2788c9a374a55791791da40ae04ab5a" },
   { at: "A refund", what: "A refund withdrawn", hash: "f6445aa1b4a1eae1f69516d215763fe6e4cf20e8d6e4cb94340bd9e206ae9db8" },
 ] as const;

@@ -1,0 +1,9 @@
+mps
+mitm_mcp_traffic.db
+.cursor
+**/.cursor
+.claude
+u.txt
+coworker/result-*.txt
+cre/**/.cre_build_tmp.js
+masumi-backup/node_modules

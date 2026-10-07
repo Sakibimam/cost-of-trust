@@ -40,7 +40,7 @@ export function Stall({ data, run }: SlideProps) {
     { at: lockA, text: "A escrow locked on chain", tx: "masumi-lockA" },
     { at: lockB, text: "B escrow locked on chain", tx: "masumi-lockB" },
     { at: at.bResult, text: `B result on chain, deadline met with ${span(slack)} to spare`, tx: "masumi-resultB", mark: "ok" },
-    { at: at.deadline, text: "Buyer deadline", mark: "loss" },
+    { at: at.deadline, text: "Deadline", mark: "loss" },
     { at: at.refundAsk, text: "A refund requested from the payment service" },
     { at: reqTx, text: "A refund request on chain", tx: "masumi-refundReq" },
     { at: at.refundDone, text: "A refund withdrawn on chain", tx: "masumi-refundDone" },
