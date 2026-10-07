@@ -7,9 +7,11 @@
     "provider": "koios-shared",
     "payTo": "addr_test1qqe0seqy6tvff79kw3md5qdspevu59344rcna6fjsut5npeg2wdkgff976cth4upph2h0g9394tl6n0arnwqs307dyaq5lhh68",
     "endpoint": "preprod keeper (run locally): registry seller-a; payout addr_test1qqe0seqy6tvff79kw3md5qdspevu59344rcna6fjsut5npeg2wdkgff976cth4upph2h0g9394tl6n0arnwqs307dyaq5lhh68",
-    "successes": 0,
+    "successes": 1,
     "failures": 0,
-    "evidence": []
+    "evidence": [
+      "2851e9b2df9bfabb621376f446b2dc2fd79944540b7a415cc3140ee63aec638b"
+    ]
   },
   {
     "id": "seller-b",
