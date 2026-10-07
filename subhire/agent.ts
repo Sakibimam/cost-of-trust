@@ -75,7 +75,7 @@ async function confirmations(txHash: string): Promise<number> {
 
 async function payTrustCheck(client: x402Client, candidate: Candidate): Promise<Payment> {
   const payment: Payment = { orphanedTxs: [], candidate: candidate.name, identifier: candidate.identifier, httpStatuses: [], txHash: null, confirmations: 0, decision: null, expectedCostAda: null, selectedRoute: null, paid: null, refunded: null, summary: null, error: null };
-  const body = JSON.stringify({ agentIdentifier: candidate.identifier, taskValueAtRiskAda: job.taskValueAtRiskAda, deadlineMinutes: job.deadlineMinutes });
+  const body = JSON.stringify({ agentIdentifier: candidate.identifier, taskValueAtRiskAda: job.taskValueAtRiskAda, deadlineMinutes: job.deadlineMinutes, network: "Mainnet" });
   const post = (headers: Record<string, string> = {}) => fetch(TRUST_CHECK, { method: "POST", headers: { "content-type": "application/json", ...headers }, body });
   try {
     let paid!: Response;

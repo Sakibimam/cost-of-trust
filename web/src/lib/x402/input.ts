@@ -11,7 +11,7 @@ export const requirements = {
   extra: { confirmationPolicy: { l1Confirmations: 0 } },
 };
 
-export type RequestBody = { agentIdentifier?: unknown; agentName?: unknown; taskValueAtRiskAda?: unknown; deadlineMinutes?: unknown; task?: unknown };
+export type RequestBody = { agentIdentifier?: unknown; agentName?: unknown; taskValueAtRiskAda?: unknown; deadlineMinutes?: unknown; task?: unknown; network?: unknown };
 
 export function inputFrom(body: RequestBody | null) {
   const agentIdentifier = typeof body?.agentIdentifier === "string" ? body.agentIdentifier.trim() : typeof body?.agentName === "string" ? body.agentName.trim() : "";
@@ -19,14 +19,15 @@ export function inputFrom(body: RequestBody | null) {
   if (!agentIdentifier || typeof value !== "number" || !Number.isFinite(value) || value < 0) throw new Error("agentIdentifier (or agentName) and non-negative taskValueAtRiskAda are required");
   if (body?.deadlineMinutes !== undefined && (typeof body.deadlineMinutes !== "number" || !Number.isFinite(body.deadlineMinutes) || body.deadlineMinutes <= 0)) throw new Error("deadlineMinutes must be positive");
   if (body?.task !== undefined && typeof body.task !== "string") throw new Error("task must be a string");
-  const parsed = parseTaskInput(JSON.stringify({ agentIdentifier, taskValueAtRiskAda: value, deadlineMinutes: body?.deadlineMinutes, task: body?.task }));
+  if (body?.network !== undefined && body.network !== "Mainnet" && body.network !== "Preprod") throw new Error("network must be Mainnet or Preprod");
+  const parsed = parseTaskInput(JSON.stringify({ agentIdentifier, taskValueAtRiskAda: value, deadlineMinutes: body?.deadlineMinutes, task: body?.task, network: body?.network }));
   if (!parsed) throw new Error("invalid Trust Check input");
   return parsed;
 }
 
 // The request a payment was made for, in one fixed key order so the same request always encodes to the same string.
 export function canonicalRequest(input: ReturnType<typeof inputFrom>): string {
-  return JSON.stringify({ agentIdentifier: input.agentIdentifier, taskValueAtRiskAda: input.taskValueAtRiskAda, ...(input.deadlineMinutes === undefined ? {} : { deadlineMinutes: input.deadlineMinutes }), ...(input.task === undefined ? {} : { task: input.task }) });
+  return JSON.stringify({ agentIdentifier: input.agentIdentifier, taskValueAtRiskAda: input.taskValueAtRiskAda, ...(input.deadlineMinutes === undefined ? {} : { deadlineMinutes: input.deadlineMinutes }), ...(input.task === undefined ? {} : { task: input.task }), ...(input.network === undefined ? {} : { network: input.network }) });
 }
 
 export const encodeRequest = (input: ReturnType<typeof inputFrom>) => Buffer.from(canonicalRequest(input), "utf8").toString("base64url");
