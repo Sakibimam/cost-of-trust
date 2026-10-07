@@ -1,0 +1,1 @@
+export const TRUST_CHECK_PAY_TO = "addr_test1qq0zga2cthka4dl7u0earttxkuuqr73acwvqv9gzcykn6h54p6a88g8lnwv8vyy2vl9kraqk2yxdnhkwa2xe0lyjdh4q3c7zyq";
