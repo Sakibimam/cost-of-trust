@@ -9,6 +9,7 @@ import { HeroPair } from "./HeroPair";
 import { Ranking } from "./Ranking";
 import { SelectionMap } from "./SelectionMap";
 import { Proof } from "./Proof";
+import { Showcase } from "./Showcase";
 import { Sellers } from "./Sellers";
 import { Verdict } from "./Verdict";
 
@@ -114,6 +115,7 @@ export function Board({ runs }: { runs: React.ReactNode }) {
         </div>
       </section>
 
+      <Showcase />
       <Proof />
 
 

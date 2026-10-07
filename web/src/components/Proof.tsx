@@ -64,7 +64,7 @@ export function Proof() {
           <div className="min-w-0 lg:col-span-5">
             <p className="label">Chainlink CRE adjudicator</p>
             <h2 id="cover-h" className="mt-2 max-w-[18ch] text-[28px] font-extrabold leading-[1.1] md:text-[32px]">When a job fails, coverage pays. A forged report cannot.</h2>
-            <p className="mt-4 max-w-[52ch] text-[17px] leading-[1.45]">The <span className="fig">cot-adjudicator</span> CRE workflow reads the coverage and claim UTxOs from preprod through Koios, applies deterministic rules to decide whether the job was delivered before expiry, and sends a signed report. The coverage validator releases funds only against a report signed by the configured CRE signer set, so neither the buyer nor the underwriter has to trust our backend. Flip one decision byte and the validator rejects it.</p>
+            <p className="mt-4 max-w-[52ch] text-[17px] leading-[1.45]">The <span className="fig">cot-adjudicator</span> CRE workflow reads the coverage and claim UTxOs from preprod through Koios, applies deterministic rules to decide whether the job was delivered before expiry, and sends a signed report. The coverage validator releases funds only against a report signed by the 2f+1 signer set pinned in its config NFT. Flip one decision byte after signing and the validator rejects it.</p>
           </div>
           <div className="min-w-0 lg:col-span-7"><Steps steps={cover} /></div>
         </div>
