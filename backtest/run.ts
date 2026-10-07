@@ -122,8 +122,8 @@ async function loadAgents(get: CachedRequest): Promise<Agent[]> {
   return agents;
 }
 
-export type PolicyResult = { jobsAttempted: number; jobsSkipped: number; realizedFailures: number; realizedAdaLost: number; feesPaid: number; totalCostPer100Decisions: number; adaSavedVsP0: number; modelledBackupLegs: number };
-export type Backtest = { generatedAt: string; sourcePolicyIds: readonly string[]; agents: number; escrows: number; eligibleDecisions: number; timeWindow: { from: string; to: string }; policies: Record<string, Record<string, PolicyResult>>; calibration: { betaBinomialBrier: number; disputeRateBrier: number; observations: number }; drivers: Array<{ agent: string; name: string; adaSaved: number; decisions: number }>; caveat: string };
+export type PolicyResult = { jobsAttempted: number; jobsSkipped: number; jobsDone: number; jobsDoneRate: number; realizedFailures: number; realizedAdaLost: number; undoneWorkAda: number; feesPaid: number; totalCostAda: number; totalCostPer100Decisions: number; adaSavedVsP0: number; observedBackupLegs: number; modelledBackupLegs: number };
+export type Backtest = { generatedAt: string; sourcePolicyIds: readonly string[]; agents: number; escrows: number; eligibleDecisions: number; agentsWithSameCapabilityAlternative: number; timeWindow: { from: string; to: string }; policies: Record<string, Record<string, PolicyResult>>; calibration: { betaBinomialBrier: number; disputeRateBrier: number; observations: number }; drivers: Array<{ agent: string; name: string; adaSaved: number; decisions: number }>; caveat: string };
 
 const config = underwriter as UnderwriterConfig;
 function seller(agent: Agent, before: readonly Outcome[]): Seller {
@@ -141,38 +141,70 @@ function routeFor(target: Agent, all: Agent[], beforeByAgent: Map<string, Outcom
   const recommendation = quote.route === "single" ? "hire_as_is" : quote.route === "underwritten" ? "require_coverage" : "hire_with_backup";
   return { recommendation, quote, pLoss: sellerRisk(targetSeller, config).pLoss, backupModelled: quote.route === "redundant" || quote.route === "staggered" };
 }
-function onePolicy(name: string, agents: Agent[], loss: number): { result: PolicyResult; savedByAgent: Map<string, number> } {
-  let jobsAttempted = 0, jobsSkipped = 0, realizedFailures = 0, realizedAdaLost = 0, feesPaid = 0, modelledBackupLegs = 0;
+
+function bestAlternative(target: Agent, agents: Agent[], beforeByAgent: Map<string, Outcome[]>, at: number): { agent: Agent; outcome?: Outcome } | undefined {
+  return agents.filter((agent) => agent.id !== target.id && agent.policyId === target.policyId && (beforeByAgent.get(agent.id)?.length ?? 0) > 0)
+    .sort((a, b) => {
+      const historyA = beforeByAgent.get(a.id)!; const historyB = beforeByAgent.get(b.id)!;
+      const failureRate = (history: Outcome[]) => history.filter((item) => item.outcome !== "paid").length / history.length;
+      return failureRate(historyA) - failureRate(historyB) || historyB.length - historyA.length || a.id.localeCompare(b.id);
+    })
+    .map((agent) => ({ agent, outcome: agent.outcomes.find((outcome) => outcome.at > at) }))[0];
+}
+
+function alternativeJob(target: Agent, agents: Agent[], beforeByAgent: Map<string, Outcome[]>, current: Outcome, loss: number) {
+  const alternative = bestAlternative(target, agents, beforeByAgent, current.at);
+  if (!alternative?.outcome) return { cost: loss, fee: 0, done: false, observed: false };
+  const failed = alternative.outcome.outcome !== "paid";
+  return { cost: alternative.agent.priceAda + (failed ? loss : 0), fee: alternative.agent.priceAda, done: !failed, observed: true };
+}
+
+export function skippedJobCost(target: Agent, agents: Agent[], current: Outcome, loss: number): number {
+  const beforeByAgent = new Map(agents.map((agent) => [agent.id, agent.outcomes.filter((outcome) => outcome.at < current.at)]));
+  return alternativeJob(target, agents, beforeByAgent, current, loss).cost;
+}
+
+export function onePolicy(name: string, agents: Agent[], loss: number): { result: PolicyResult; savedByAgent: Map<string, number> } {
+  let jobsAttempted = 0, jobsSkipped = 0, jobsDone = 0, realizedFailures = 0, realizedAdaLost = 0, undoneWorkAda = 0, totalCostAda = 0, feesPaid = 0, observedBackupLegs = 0, modelledBackupLegs = 0;
   const savedByAgent = new Map<string, number>();
   for (const target of agents) for (let k = 5; k < target.outcomes.length; k++) {
     const current = target.outcomes[k];
     const beforeByAgent = new Map(agents.map((agent) => [agent.id, agent.outcomes.filter((outcome) => outcome.at < current.at)]));
     const targetBefore = beforeByAgent.get(target.id) ?? [];
     const failed = current.outcome !== "paid";
-    let cost = 0;
+    let cost = 0, fee = 0;
+    let done = false;
     let skipped = false;
-    if (name === "P0") cost = target.priceAda + (failed ? loss : 0);
-    else if (name === "P1") { skipped = targetBefore.filter((outcome) => outcome.outcome === "disputed").length / targetBefore.length > 0.05; if (!skipped) cost = target.priceAda + (failed ? loss : 0); }
-    else if (name === "P2") { skipped = targetBefore.filter((outcome) => outcome.outcome !== "paid").length / targetBefore.length > 0.2; if (!skipped) cost = target.priceAda + (failed ? loss : 0); }
+    if (name === "P0") { fee = target.priceAda; cost = fee + (failed ? loss : 0); done = !failed; }
+    else if (name === "P1") { skipped = targetBefore.filter((outcome) => outcome.outcome === "disputed").length / targetBefore.length > 0.05; if (!skipped) { fee = target.priceAda; cost = fee + (failed ? loss : 0); done = !failed; } }
+    else if (name === "P2") { skipped = targetBefore.filter((outcome) => outcome.outcome !== "paid").length / targetBefore.length > 0.2; if (!skipped) { fee = target.priceAda; cost = fee + (failed ? loss : 0); done = !failed; } }
     else {
       const route = routeFor(target, agents, beforeByAgent, loss);
       skipped = route.recommendation === "do_not_hire";
       if (!skipped && route.quote) {
-        feesPaid += route.quote.servicePriceAda + route.quote.premiumAda;
-        if (route.recommendation === "require_coverage") cost = route.quote.servicePriceAda + route.quote.premiumAda + (failed ? Math.max(0, loss - route.quote.coverageAda) : 0);
-        else if (route.recommendation === "hire_with_backup") {
-          const backup = agents.find((agent) => agent.id === route.quote!.sellers[1]);
-          const backupRisk = backup ? sellerRisk(seller(backup, beforeByAgent.get(backup.id) ?? []), config).pLoss : 1;
-          cost = route.quote.servicePriceAda + (failed ? backupRisk * loss : 0);
-          modelledBackupLegs++;
-        } else cost = route.quote.servicePriceAda + (failed ? loss : 0);
+        fee = target.priceAda + route.quote.premiumAda;
+        if (route.recommendation === "require_coverage") cost = fee + (failed ? Math.max(0, loss - route.quote.coverageAda) : 0);
+        else if (route.recommendation === "hire_with_backup" && failed) {
+          const backup = alternativeJob(target, agents, beforeByAgent, current, loss);
+          fee += backup.fee; cost = fee + (backup.done ? 0 : loss); done = backup.done; if (backup.observed) observedBackupLegs++; else modelledBackupLegs++;
+        } else cost = fee + (failed ? loss : 0);
+        done ||= !failed;
+      } else if (skipped) {
+        const alternative = alternativeJob(target, agents, beforeByAgent, current, loss);
+        cost = alternative.cost; fee = alternative.fee; done = alternative.done; if (alternative.observed) observedBackupLegs++; else modelledBackupLegs++;
       }
     }
-    if (skipped) jobsSkipped++; else { jobsAttempted++; if (failed) realizedFailures++; if (name !== "P3") feesPaid += target.priceAda; realizedAdaLost += cost; }
+    if (skipped && name !== "P3") {
+      const alternative = alternativeJob(target, agents, beforeByAgent, current, loss);
+      cost = alternative.cost; fee = alternative.fee; done = alternative.done;
+    }
+    if (skipped) jobsSkipped++; else jobsAttempted++;
+    if (!done) { realizedFailures++; undoneWorkAda += loss; }
+    jobsDone += done ? 1 : 0; feesPaid += fee; realizedAdaLost += cost; totalCostAda += cost;
     if (name === "P3") savedByAgent.set(target.id, (savedByAgent.get(target.id) ?? 0) + (target.priceAda + (failed ? loss : 0) - cost));
   }
   const decisions = agents.reduce((sum, agent) => sum + Math.max(0, agent.outcomes.length - 5), 0);
-  return { result: { jobsAttempted, jobsSkipped, realizedFailures, realizedAdaLost, feesPaid, totalCostPer100Decisions: decisions ? realizedAdaLost / decisions * 100 : 0, adaSavedVsP0: 0, modelledBackupLegs }, savedByAgent };
+  return { result: { jobsAttempted, jobsSkipped, jobsDone, jobsDoneRate: decisions ? jobsDone / decisions : 0, realizedFailures, realizedAdaLost, undoneWorkAda, feesPaid, totalCostAda, totalCostPer100Decisions: decisions ? totalCostAda / decisions * 100 : 0, adaSavedVsP0: 0, observedBackupLegs, modelledBackupLegs }, savedByAgent };
 }
 
 export function decisionHistory(outcomes: readonly Outcome[], k: number): readonly Outcome[] { return outcomes.slice(0, k); }
@@ -201,12 +233,12 @@ export async function main(): Promise<Backtest> {
   const p3ForDrivers = onePolicy("P3", agents, 100);
   const drivers = agents.map((agent) => ({ agent: agent.id, name: agent.name, adaSaved: p3ForDrivers.savedByAgent.get(agent.id) ?? 0, decisions: agent.outcomes.length - 5 })).sort((a, b) => b.adaSaved - a.adaSaved).slice(0, 5);
   const all = agents.flatMap((agent) => agent.outcomes);
-  return { generatedAt: new Date().toISOString(), sourcePolicyIds: POLICY_IDS, agents: agents.length, escrows: all.length, eligibleDecisions: decisions, timeWindow: { from: new Date(Math.min(...all.map((item) => item.at)) * 1000).toISOString(), to: new Date(Math.max(...all.map((item) => item.at)) * 1000).toISOString() }, policies, calibration: { betaBinomialBrier: beta / observations, disputeRateBrier: dispute / observations, observations }, drivers, caveat: "Primary outcomes are observed from mainnet Masumi escrow spends in the newest 1,000 transactions per payment contract. P3 backup legs are modelled from qualifying agents' pre-decision beta-binomial risk, not observed backup executions. Registry prices without a lovelace quote are reported as 0 ADA rather than converted by guesswork. Route fees and coverage are router quotes. V1 shared-wallet attribution remains wallet-based when the datum has no agent unit." };
+  return { generatedAt: new Date().toISOString(), sourcePolicyIds: POLICY_IDS, agents: agents.length, escrows: all.length, eligibleDecisions: decisions, agentsWithSameCapabilityAlternative: agents.filter((agent) => agents.some((other) => other.id !== agent.id && other.policyId === agent.policyId)).length, timeWindow: { from: new Date(Math.min(...all.map((item) => item.at)) * 1000).toISOString(), to: new Date(Math.max(...all.map((item) => item.at)) * 1000).toISOString() }, policies, calibration: { betaBinomialBrier: beta / observations, disputeRateBrier: dispute / observations, observations }, drivers, caveat: "Primary outcomes are observed from mainnet Masumi escrow spends in the newest 1,000 transactions per payment contract. Skipped jobs and failed primaries are charged against the buyer's required work. Same-capability alternatives use the same registry policy, are ranked only from outcomes before the decision, and their next escrow is marked observed when available; missing alternative history is modelled as undone work at L. P3 backup fees are charged only when the backup is used. Registry prices without a lovelace quote are reported as 0 ADA rather than converted by guesswork. Route fees and coverage are router quotes. V1 shared-wallet attribution remains wallet-based when the datum has no agent unit." };
 }
 
 function printSummary(result: Backtest): void {
-  console.log("Policy | L ADA | attempted | skipped | failures | lost ADA | fees ADA | cost / 100 decisions | P3 saved vs P0");
-  for (const name of ["P0", "P1", "P2", "P3"] as const) for (const loss of LOSSES) { const row = result.policies[name][String(loss)]; console.log(`${name} | ${loss} | ${row.jobsAttempted} | ${row.jobsSkipped} | ${row.realizedFailures} | ${row.realizedAdaLost.toFixed(2)} | ${row.feesPaid.toFixed(2)} | ${row.totalCostPer100Decisions.toFixed(2)} | ${row.adaSavedVsP0.toFixed(2)}`); }
+  console.log("Policy | L ADA | attempted | skipped | jobs done | done rate | undone ADA | fees ADA | total cost / 100 | P3 saved vs P0");
+  for (const name of ["P0", "P1", "P2", "P3"] as const) for (const loss of LOSSES) { const row = result.policies[name][String(loss)]; console.log(`${name} | ${loss} | ${row.jobsAttempted} | ${row.jobsSkipped} | ${row.jobsDone} | ${(row.jobsDoneRate * 100).toFixed(1)}% | ${row.undoneWorkAda.toFixed(2)} | ${row.feesPaid.toFixed(2)} | ${row.totalCostPer100Decisions.toFixed(2)} | ${row.adaSavedVsP0.toFixed(2)}`); }
 }
 
 if (import.meta.main) {
