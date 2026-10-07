@@ -19,6 +19,12 @@ Demo moment: two keepers race for one claim UTxO, keeper A claims and keeper B i
 - CRE settlement: [3e33929dbf...ff1b](https://preprod.cardanoscan.io/transaction/3e33929dbf296722029680f3ff26676da5b420ebe4e4e34265b9992a8526ff1b)
 - Trust Check result: [0be9fa229a...3f91](https://preprod.cardanoscan.io/transaction/0be9fa229a864ddbaa8847afa84657d535d93d4a26fdbab506e2a2ebde573f91)
 
+## Architecture
+
+![Cost of Trust architecture: buyer agent pays Trust Check over x402, router prices four routes, claim vault on Cardano preprod lets one keeper claim, CRE signs the outcome and the coverage UTxO settles](web/public/deck/architecture.png)
+
+Interactive version with path tracing and zoom: https://cost-of-trust.vercel.app/deck/architecture.html
+
 ## How to run
 
 ```sh
