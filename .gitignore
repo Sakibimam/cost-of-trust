@@ -13,3 +13,9 @@ onchain/build/
 cre/**/secrets.yaml
 .claude
 .progress/
+WIN-CONDITIONS-WAIVER.md
+.vercel
+docs/*
+!docs/BUILDERBASE.md
+!docs/SPEC.md
+!docs/WRITEUP.md
