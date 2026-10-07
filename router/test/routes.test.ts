@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { boundedJointFailureProbability, evaluateRoutes, sellerRisk, type RouteResult, type Seller } from "../src/routes.ts";
+import { boundedJointFailureProbability, decideCapabilityRoute, evaluateRoutes, sellerRisk, type RouteResult, type Seller } from "../src/routes.ts";
 import underwriter from "../underwriter.json" with { type: "json" };
 
 const make = (id: string, priceAda: number, provider: string, extra: Partial<Seller> = {}): Seller => ({ id, name: id, priceAda, provider, payTo: id, endpoint: id, successes: 0, failures: 0, evidence: [], dependencyRiskPenalty: 0, ...extra });
@@ -41,6 +41,16 @@ test("underwritten B premium and covered expected loss", () => {
   expect(q.expectedLossAda).toBeCloseTo(2, 2);
   expect(q.sdLossAda).toBeCloseTo(6, 2);
   expect(q.pClaim).toBeCloseTo(0.1, 4);
+});
+
+test("capability policy ranks the primary and only buys a fee-triggered backup", () => {
+  const weak = make("weak", 2, "one", { successes: 1, failures: 4 });
+  const strong = make("strong", 3, "two", { successes: 9, failures: 1 });
+  const choice = decideCapabilityRoute({ downstreamLossAda: 100, sellers: [weak, strong], prior: { alpha0: 1, beta0: 9 } });
+  expect(choice.primary.id).toBe("strong");
+  expect(choice.route).toBe("backup");
+  expect(choice.backup?.id).toBe("weak");
+  expect(decideCapabilityRoute({ downstreamLossAda: 1, sellers: [weak, strong], prior: { alpha0: 1, beta0: 9 } }).route).toBe("hire_as_is");
 });
 
 test("every route is quoted, none pruned", () => {

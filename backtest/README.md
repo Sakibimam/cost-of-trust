@@ -1,22 +1,49 @@
 # Mainnet walk-forward backtest
 
-Run from the repository root after loading the live Koios key without printing it:
+This benchmark uses the bounded mainnet Masumi sample in `web/src/data/backtest.json`: 30 agents, 433 resolved escrow outcomes, and 283 decisions. It scans the newest 1,000 transactions per payment contract after the earliest registry mint block. Koios responses are cached in `backtest/cache/` and attribution uses the read-only escrow and delivery helpers.
+
+Run it with the repository's existing TypeScript runtime:
 
 ```sh
-cd /Users/user/Desktop/canton/cost-of-trust/coworker
-set -a; source /Users/user/Desktop/canton/recourse/.env.live; set +a
-node --import tsx ../backtest/run.ts
-node --import tsx ../backtest/test.ts
+node --import ../coworker/node_modules/tsx/dist/loader.mjs backtest/run.ts
+node --import ../coworker/node_modules/tsx/dist/loader.mjs backtest/test.ts
 ```
 
-The run enumerates both mainnet Masumi registry policies, reads every registry asset and its holders, then scans the newest 1,000 transactions from each payment contract after the earliest registry mint block. This bounded scan is the measurement window, not a claim of complete chain history. Koios responses are cached under `backtest/cache/`. Escrow spends are attributed with the read-only `escrowParty` and `tallyDelivery` helpers. A V2 datum agent unit is authoritative. A V1 datum agent unit is used when present, otherwise the selling wallet is the documented fallback.
+## Method
 
-An escrow is resolved only when its valid spend redeemer is paid, refunded, or disputed. Outcomes are sorted by transaction timestamp. Agents enter the sample at six resolved escrows. For each agent, decision `k` uses only outcomes `0..k-1`; the first five are warm-up and are not decisions. Refunded and disputed outcomes are non-delivery and expose the buyer to the full loss at risk.
+The time window is split at its timestamp midpoint, `2026-09-26T02:57:07.000Z`. The first half calibrates a Beta prior from first-half outcomes only: `Beta(0.5, 9.6212)`, mean failure probability 3.79%. Every decision uses only outcomes strictly before its decision timestamp. The held-out table contains only second-half decisions, while the full table contains the complete window using the same calibrated prior.
 
-Every decision is a job the buyer still needs completed. A delivered job costs the fees paid. An undelivered job costs those fees plus `L`. A skipped job is routed to the best same-capability alternative in the same registry policy group, ranked by its observed failure rate before the decision, with more prior observations breaking ties. The alternative's next escrow after the decision is used when available. That outcome is marked observed. If no usable alternative history exists, the job is charged `L` and marked modelled. This prevents a never-hire policy from scoring as free work.
+P0 hires the requested agent. P1 skips above a 5% dispute rate. P2 skips above a 20% total failure rate and routes the skipped job to the best observed same-policy alternative. P3 is the old route policy and is retained for diagnosis only. P3-new calls the product capability policy in `router/src/routes.ts`: rank the same-policy capability group by posterior failure probability, select the best primary, and add a staggered backup when primary posterior failure times loss exceeds the backup fee. It never refuses a job.
 
-P0 hires the target agent. P1 skips when the past dispute rate is above 5%. P2 skips when past refunds plus disputes exceed 20%. P3 calls `evaluateRoutes` with the target and qualifying mainnet agents as candidates, using only each candidate's outcomes before that escrow timestamp. A selected target-only route is hire-as-is, an underwritten target route requires coverage, and a target-first backup route hires with backup. Backup success or failure is taken from the best same-capability alternative's next observed escrow when available. Backup fees are charged only when that backup is used. `observedBackupLegs` and `modelledBackupLegs` are reported separately.
+For a selected alternative, the next outcome after the decision is used when observed. Missing primary or backup legs are counted as modelled failures. `observedBackupLegs` and `modelledBackupLegs` stay separate. Costs include fees and undone work. `jobsDoneRate` is completed jobs divided by decisions, not attempted jobs.
 
-The JSON reports jobs done and done rate, ADA lost to undone work, fees, realized total cost, total cost per 100 decisions, skips, and backup provenance for P0, P1, P2, and P3 at `L = 5, 25, 100, 500`. `agentsWithSameCapabilityAlternative` reports how many sampled agents have at least one same-policy alternative. In the current sample, all 30 do, so ranking is not the scarce part. The buy-or-backup decision remains the material choice.
+## Diagnosis of old P3
 
-Calibration uses Brier score against each target's next observed outcome. The beta-binomial probability is `(2 + past failures) / (10 + past resolved)`. The dispute-rate probability is past disputes divided by past resolved. `backtest/test.ts` proves that the walk-forward decision receives a sliced prefix and that always skipping cannot beat hiring when the target failure rate is below 50%. To mutation-test the first guard, replace `outcomes.slice(0, k)` with `outcomes`, run the test and observe failure, then restore it and observe the pass.
+| Decision type | Decisions | Jobs done | Done rate |
+| --- | ---: | ---: | ---: |
+| hire_as_is | 0 | 0 | 0.0% |
+| backup | 8 | 8 | 100.0% |
+| coverage | 0 | 0 | 0.0% |
+| do_not_hire | 275 | 200 | 72.7% |
+| insufficient_data | 0 | 0 | 0.0% |
+
+The drop is refusal, not a bad backup: the old policy marks a route whose winner is not the requested agent as `do_not_hire`. That is 275 of 283 decisions. Its fallback completes 200 of those jobs. P3-new removes that refusal path, uses calibrated evidence for new agents, and shares the routing function with the backtest.
+
+## Held-out second half
+
+| Policy | L | Done rate | Undone ADA | Fees ADA | Total ADA / 100 jobs | Observed backup legs | Modelled backup legs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| P0 | 100 | 88.7% | 2,600 | 0 | 918.73 | 0 | 0 |
+| P2 | 100 | 91.2% | 1,900 | 0 | 671.38 | 0 | 0 |
+| P3-new | 100 | 91.3% | 2,400 | 0 | 866.43 | 53 | 24 |
+| P0 | 500 | 88.7% | 13,000 | 0 | 4,593.64 | 0 | 0 |
+| P2 | 500 | 91.2% | 9,500 | 0 | 3,356.89 | 0 | 0 |
+| P3-new | 500 | 91.3% | 12,000 | 0 | 4,332.13 | 53 | 24 |
+
+P3-new wins the held-out completion rate by 0.2 percentage points over P2, but it does not win total cost. The honest headline is therefore: the root fix repairs P3's refusal failure and slightly improves completion, but this sample does not prove a cost win or justify claiming the policy dominates P2.
+
+## Full window
+
+P0 completes 90.8%, P2 completes 93.3%, and P3-new completes 91.5%. At L=100, total cost per 100 decisions is 918.73 ADA for P0, 671.38 ADA for P2, and 848.06 ADA for P3-new. At L=500, the corresponding totals are 4,593.64, 3,356.89, and 4,240.28 ADA.
+
+The sample is bounded, wallet attribution remains the documented V1 fallback when no agent unit is present, and registry prices without a lovelace quote are reported as zero rather than guessed.

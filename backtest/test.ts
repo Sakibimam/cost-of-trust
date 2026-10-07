@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { decideFromHistory, decisionHistory, skippedJobCost, type Agent, type Outcome } from "./run.ts";
+import { readFileSync } from "node:fs";
+import { calibratedPrior, decideFromHistory, decisionHistory, skippedJobCost, walkForwardHistory, type Agent, type Outcome } from "./run.ts";
 
 const outcomes: Outcome[] = [
   { txHash: "a", at: 1, outcome: "paid", policyId: "p", unit: "u" },
@@ -29,3 +30,24 @@ assert.equal(hireCost, 100);
 assert.equal(skipCost, 300);
 assert.ok(skipCost > hireCost);
 console.log("skip accounting guard: pass");
+
+const split = walkForwardHistory(outcomes, 6);
+assert.deepEqual(split.map((item) => item.txHash), ["a", "b", "c", "d", "e"]);
+assert.equal(split.some((item) => item.at >= 6), false);
+console.log("held-out walk-forward guard: pass");
+
+const implementation = readFileSync(new URL("./run.ts", import.meta.url), "utf8");
+assert.match(implementation, /import \{ decideCapabilityRoute/);
+assert.match(implementation, /decideCapabilityRoute\(\{/);
+console.log("product decision function coupling: pass");
+
+const calibrationAgent: Agent = { ...mostlySuccessful, outcomes: [
+  { txHash: "train-paid", at: 1, outcome: "paid", policyId: "p", unit: "u" },
+  { txHash: "train-fail", at: 2, outcome: "refunded", policyId: "p", unit: "u" },
+  { txHash: "heldout-fail", at: 20, outcome: "refunded", policyId: "p", unit: "u" },
+  { txHash: "heldout-fail-2", at: 21, outcome: "refunded", policyId: "p", unit: "u" },
+], firstAt: 1, lastAt: 21 };
+const prior = calibratedPrior([calibrationAgent], 10);
+assert.equal(prior.observations, 2);
+assert.equal(prior.failureRate, 0.5);
+console.log("held-out calibration guard: pass");

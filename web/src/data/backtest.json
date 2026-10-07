@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T04:49:59.261Z",
+  "generatedAt": "2026-10-07T05:04:56.779Z",
   "sourcePolicyIds": [
     "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9",
     "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b"
@@ -12,67 +12,176 @@
     "from": "2026-09-15T13:37:05.000Z",
     "to": "2026-10-06T16:17:09.000Z"
   },
+  "splitAt": "2026-09-26T02:57:07.000Z",
   "policies": {
     "P0": {
       "5": {
         "jobsAttempted": 283,
         "jobsSkipped": 0,
         "jobsDone": 257,
-        "jobsDoneRate": 0.9081272084805654,
         "realizedFailures": 26,
         "realizedAdaLost": 130,
         "undoneWorkAda": 130,
         "feesPaid": 0,
         "totalCostAda": 130,
-        "totalCostPer100Decisions": 45.936395759717314,
-        "adaSavedVsP0": 0,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 283,
+            "jobsDone": 257,
+            "doneRate": 0.9081272084805654
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9081272084805654,
+        "totalCostPer100Decisions": 45.936395759717314,
+        "adaSavedVsP0": 0
       },
       "25": {
         "jobsAttempted": 283,
         "jobsSkipped": 0,
         "jobsDone": 257,
-        "jobsDoneRate": 0.9081272084805654,
         "realizedFailures": 26,
         "realizedAdaLost": 650,
         "undoneWorkAda": 650,
         "feesPaid": 0,
         "totalCostAda": 650,
-        "totalCostPer100Decisions": 229.68197879858656,
-        "adaSavedVsP0": 0,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 283,
+            "jobsDone": 257,
+            "doneRate": 0.9081272084805654
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9081272084805654,
+        "totalCostPer100Decisions": 229.68197879858656,
+        "adaSavedVsP0": 0
       },
       "100": {
         "jobsAttempted": 283,
         "jobsSkipped": 0,
         "jobsDone": 257,
-        "jobsDoneRate": 0.9081272084805654,
         "realizedFailures": 26,
         "realizedAdaLost": 2600,
         "undoneWorkAda": 2600,
         "feesPaid": 0,
         "totalCostAda": 2600,
-        "totalCostPer100Decisions": 918.7279151943462,
-        "adaSavedVsP0": 0,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 283,
+            "jobsDone": 257,
+            "doneRate": 0.9081272084805654
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9081272084805654,
+        "totalCostPer100Decisions": 918.7279151943462,
+        "adaSavedVsP0": 0
       },
       "500": {
         "jobsAttempted": 283,
         "jobsSkipped": 0,
         "jobsDone": 257,
-        "jobsDoneRate": 0.9081272084805654,
         "realizedFailures": 26,
         "realizedAdaLost": 13000,
         "undoneWorkAda": 13000,
         "feesPaid": 0,
         "totalCostAda": 13000,
-        "totalCostPer100Decisions": 4593.639575971732,
-        "adaSavedVsP0": 0,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 283,
+            "jobsDone": 257,
+            "doneRate": 0.9081272084805654
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9081272084805654,
+        "totalCostPer100Decisions": 4593.639575971732,
+        "adaSavedVsP0": 0
       }
     },
     "P1": {
@@ -80,61 +189,169 @@
         "jobsAttempted": 283,
         "jobsSkipped": 0,
         "jobsDone": 257,
-        "jobsDoneRate": 0.9081272084805654,
         "realizedFailures": 26,
         "realizedAdaLost": 130,
         "undoneWorkAda": 130,
         "feesPaid": 0,
         "totalCostAda": 130,
-        "totalCostPer100Decisions": 45.936395759717314,
-        "adaSavedVsP0": 0,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 283,
+            "jobsDone": 257,
+            "doneRate": 0.9081272084805654
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9081272084805654,
+        "totalCostPer100Decisions": 45.936395759717314,
+        "adaSavedVsP0": 0
       },
       "25": {
         "jobsAttempted": 283,
         "jobsSkipped": 0,
         "jobsDone": 257,
-        "jobsDoneRate": 0.9081272084805654,
         "realizedFailures": 26,
         "realizedAdaLost": 650,
         "undoneWorkAda": 650,
         "feesPaid": 0,
         "totalCostAda": 650,
-        "totalCostPer100Decisions": 229.68197879858656,
-        "adaSavedVsP0": 0,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 283,
+            "jobsDone": 257,
+            "doneRate": 0.9081272084805654
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9081272084805654,
+        "totalCostPer100Decisions": 229.68197879858656,
+        "adaSavedVsP0": 0
       },
       "100": {
         "jobsAttempted": 283,
         "jobsSkipped": 0,
         "jobsDone": 257,
-        "jobsDoneRate": 0.9081272084805654,
         "realizedFailures": 26,
         "realizedAdaLost": 2600,
         "undoneWorkAda": 2600,
         "feesPaid": 0,
         "totalCostAda": 2600,
-        "totalCostPer100Decisions": 918.7279151943462,
-        "adaSavedVsP0": 0,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 283,
+            "jobsDone": 257,
+            "doneRate": 0.9081272084805654
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9081272084805654,
+        "totalCostPer100Decisions": 918.7279151943462,
+        "adaSavedVsP0": 0
       },
       "500": {
         "jobsAttempted": 283,
         "jobsSkipped": 0,
         "jobsDone": 257,
-        "jobsDoneRate": 0.9081272084805654,
         "realizedFailures": 26,
         "realizedAdaLost": 13000,
         "undoneWorkAda": 13000,
         "feesPaid": 0,
         "totalCostAda": 13000,
-        "totalCostPer100Decisions": 4593.639575971732,
-        "adaSavedVsP0": 0,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 283,
+            "jobsDone": 257,
+            "doneRate": 0.9081272084805654
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9081272084805654,
+        "totalCostPer100Decisions": 4593.639575971732,
+        "adaSavedVsP0": 0
       }
     },
     "P2": {
@@ -142,162 +359,1090 @@
         "jobsAttempted": 271,
         "jobsSkipped": 12,
         "jobsDone": 264,
-        "jobsDoneRate": 0.9328621908127208,
         "realizedFailures": 19,
         "realizedAdaLost": 95,
         "undoneWorkAda": 95,
         "feesPaid": 0,
         "totalCostAda": 95,
-        "totalCostPer100Decisions": 33.56890459363957,
-        "adaSavedVsP0": 35,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 271,
+            "jobsDone": 255,
+            "doneRate": 0.940959409594096
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 12,
+            "jobsDone": 9,
+            "doneRate": 0.75
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9328621908127208,
+        "totalCostPer100Decisions": 33.56890459363957,
+        "adaSavedVsP0": 35
       },
       "25": {
         "jobsAttempted": 271,
         "jobsSkipped": 12,
         "jobsDone": 264,
-        "jobsDoneRate": 0.9328621908127208,
         "realizedFailures": 19,
         "realizedAdaLost": 475,
         "undoneWorkAda": 475,
         "feesPaid": 0,
         "totalCostAda": 475,
-        "totalCostPer100Decisions": 167.84452296819788,
-        "adaSavedVsP0": 175,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 271,
+            "jobsDone": 255,
+            "doneRate": 0.940959409594096
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 12,
+            "jobsDone": 9,
+            "doneRate": 0.75
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9328621908127208,
+        "totalCostPer100Decisions": 167.84452296819788,
+        "adaSavedVsP0": 175
       },
       "100": {
         "jobsAttempted": 271,
         "jobsSkipped": 12,
         "jobsDone": 264,
-        "jobsDoneRate": 0.9328621908127208,
         "realizedFailures": 19,
         "realizedAdaLost": 1900,
         "undoneWorkAda": 1900,
         "feesPaid": 0,
         "totalCostAda": 1900,
-        "totalCostPer100Decisions": 671.3780918727915,
-        "adaSavedVsP0": 700,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 271,
+            "jobsDone": 255,
+            "doneRate": 0.940959409594096
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 12,
+            "jobsDone": 9,
+            "doneRate": 0.75
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9328621908127208,
+        "totalCostPer100Decisions": 671.3780918727915,
+        "adaSavedVsP0": 700
       },
       "500": {
         "jobsAttempted": 271,
         "jobsSkipped": 12,
         "jobsDone": 264,
-        "jobsDoneRate": 0.9328621908127208,
         "realizedFailures": 19,
         "realizedAdaLost": 9500,
         "undoneWorkAda": 9500,
         "feesPaid": 0,
         "totalCostAda": 9500,
-        "totalCostPer100Decisions": 3356.8904593639572,
-        "adaSavedVsP0": 3500,
         "observedBackupLegs": 0,
-        "modelledBackupLegs": 0
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 271,
+            "jobsDone": 255,
+            "doneRate": 0.940959409594096
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 12,
+            "jobsDone": 9,
+            "doneRate": 0.75
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9328621908127208,
+        "totalCostPer100Decisions": 3356.8904593639572,
+        "adaSavedVsP0": 3500
       }
     },
-    "P3": {
+    "P3-new": {
       "5": {
-        "jobsAttempted": 8,
-        "jobsSkipped": 275,
-        "jobsDone": 208,
-        "jobsDoneRate": 0.734982332155477,
-        "realizedFailures": 75,
-        "realizedAdaLost": 375,
-        "undoneWorkAda": 375,
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "jobsDone": 259,
+        "realizedFailures": 24,
+        "realizedAdaLost": 120,
+        "undoneWorkAda": 120,
         "feesPaid": 0,
-        "totalCostAda": 375,
-        "totalCostPer100Decisions": 132.5088339222615,
-        "adaSavedVsP0": -245,
-        "observedBackupLegs": 249,
-        "modelledBackupLegs": 26
+        "totalCostAda": 120,
+        "observedBackupLegs": 53,
+        "modelledBackupLegs": 24,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "backup": {
+            "decisions": 283,
+            "jobsDone": 259,
+            "doneRate": 0.9151943462897526
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9151943462897526,
+        "totalCostPer100Decisions": 42.40282685512368,
+        "adaSavedVsP0": 10
       },
       "25": {
-        "jobsAttempted": 8,
-        "jobsSkipped": 275,
-        "jobsDone": 208,
-        "jobsDoneRate": 0.734982332155477,
-        "realizedFailures": 75,
-        "realizedAdaLost": 1875,
-        "undoneWorkAda": 1875,
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "jobsDone": 259,
+        "realizedFailures": 24,
+        "realizedAdaLost": 600,
+        "undoneWorkAda": 600,
         "feesPaid": 0,
-        "totalCostAda": 1875,
-        "totalCostPer100Decisions": 662.5441696113074,
-        "adaSavedVsP0": -1225,
-        "observedBackupLegs": 249,
-        "modelledBackupLegs": 26
+        "totalCostAda": 600,
+        "observedBackupLegs": 53,
+        "modelledBackupLegs": 24,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "backup": {
+            "decisions": 283,
+            "jobsDone": 259,
+            "doneRate": 0.9151943462897526
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9151943462897526,
+        "totalCostPer100Decisions": 212.01413427561837,
+        "adaSavedVsP0": 50
       },
       "100": {
-        "jobsAttempted": 8,
-        "jobsSkipped": 275,
-        "jobsDone": 208,
-        "jobsDoneRate": 0.734982332155477,
-        "realizedFailures": 75,
-        "realizedAdaLost": 7500,
-        "undoneWorkAda": 7500,
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "jobsDone": 259,
+        "realizedFailures": 24,
+        "realizedAdaLost": 2400,
+        "undoneWorkAda": 2400,
         "feesPaid": 0,
-        "totalCostAda": 7500,
-        "totalCostPer100Decisions": 2650.1766784452298,
-        "adaSavedVsP0": -4900,
-        "observedBackupLegs": 249,
-        "modelledBackupLegs": 26
+        "totalCostAda": 2400,
+        "observedBackupLegs": 53,
+        "modelledBackupLegs": 24,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "backup": {
+            "decisions": 283,
+            "jobsDone": 259,
+            "doneRate": 0.9151943462897526
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9151943462897526,
+        "totalCostPer100Decisions": 848.0565371024735,
+        "adaSavedVsP0": 200
       },
       "500": {
-        "jobsAttempted": 8,
-        "jobsSkipped": 275,
-        "jobsDone": 208,
-        "jobsDoneRate": 0.734982332155477,
-        "realizedFailures": 75,
-        "realizedAdaLost": 37500,
-        "undoneWorkAda": 37500,
+        "jobsAttempted": 283,
+        "jobsSkipped": 0,
+        "jobsDone": 259,
+        "realizedFailures": 24,
+        "realizedAdaLost": 12000,
+        "undoneWorkAda": 12000,
         "feesPaid": 0,
-        "totalCostAda": 37500,
-        "totalCostPer100Decisions": 13250.88339222615,
-        "adaSavedVsP0": -24500,
-        "observedBackupLegs": 249,
-        "modelledBackupLegs": 26
+        "totalCostAda": 12000,
+        "observedBackupLegs": 53,
+        "modelledBackupLegs": 24,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "backup": {
+            "decisions": 283,
+            "jobsDone": 259,
+            "doneRate": 0.9151943462897526
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9151943462897526,
+        "totalCostPer100Decisions": 4240.282685512368,
+        "adaSavedVsP0": 1000
+      }
+    }
+  },
+  "heldOut": {
+    "P0": {
+      "5": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 251,
+        "realizedFailures": 26,
+        "realizedAdaLost": 130,
+        "undoneWorkAda": 130,
+        "feesPaid": 0,
+        "totalCostAda": 130,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 277,
+            "jobsDone": 251,
+            "doneRate": 0.9061371841155235
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.8869257950530035,
+        "totalCostPer100Decisions": 45.936395759717314,
+        "adaSavedVsP0": 0
+      },
+      "25": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 251,
+        "realizedFailures": 26,
+        "realizedAdaLost": 650,
+        "undoneWorkAda": 650,
+        "feesPaid": 0,
+        "totalCostAda": 650,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 277,
+            "jobsDone": 251,
+            "doneRate": 0.9061371841155235
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.8869257950530035,
+        "totalCostPer100Decisions": 229.68197879858656,
+        "adaSavedVsP0": 0
+      },
+      "100": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 251,
+        "realizedFailures": 26,
+        "realizedAdaLost": 2600,
+        "undoneWorkAda": 2600,
+        "feesPaid": 0,
+        "totalCostAda": 2600,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 277,
+            "jobsDone": 251,
+            "doneRate": 0.9061371841155235
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.8869257950530035,
+        "totalCostPer100Decisions": 918.7279151943462,
+        "adaSavedVsP0": 0
+      },
+      "500": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 251,
+        "realizedFailures": 26,
+        "realizedAdaLost": 13000,
+        "undoneWorkAda": 13000,
+        "feesPaid": 0,
+        "totalCostAda": 13000,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 277,
+            "jobsDone": 251,
+            "doneRate": 0.9061371841155235
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.8869257950530035,
+        "totalCostPer100Decisions": 4593.639575971732,
+        "adaSavedVsP0": 0
+      }
+    },
+    "P1": {
+      "5": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 251,
+        "realizedFailures": 26,
+        "realizedAdaLost": 130,
+        "undoneWorkAda": 130,
+        "feesPaid": 0,
+        "totalCostAda": 130,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 277,
+            "jobsDone": 251,
+            "doneRate": 0.9061371841155235
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.8869257950530035,
+        "totalCostPer100Decisions": 45.936395759717314,
+        "adaSavedVsP0": 0
+      },
+      "25": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 251,
+        "realizedFailures": 26,
+        "realizedAdaLost": 650,
+        "undoneWorkAda": 650,
+        "feesPaid": 0,
+        "totalCostAda": 650,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 277,
+            "jobsDone": 251,
+            "doneRate": 0.9061371841155235
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.8869257950530035,
+        "totalCostPer100Decisions": 229.68197879858656,
+        "adaSavedVsP0": 0
+      },
+      "100": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 251,
+        "realizedFailures": 26,
+        "realizedAdaLost": 2600,
+        "undoneWorkAda": 2600,
+        "feesPaid": 0,
+        "totalCostAda": 2600,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 277,
+            "jobsDone": 251,
+            "doneRate": 0.9061371841155235
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.8869257950530035,
+        "totalCostPer100Decisions": 918.7279151943462,
+        "adaSavedVsP0": 0
+      },
+      "500": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 251,
+        "realizedFailures": 26,
+        "realizedAdaLost": 13000,
+        "undoneWorkAda": 13000,
+        "feesPaid": 0,
+        "totalCostAda": 13000,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 277,
+            "jobsDone": 251,
+            "doneRate": 0.9061371841155235
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.8869257950530035,
+        "totalCostPer100Decisions": 4593.639575971732,
+        "adaSavedVsP0": 0
+      }
+    },
+    "P2": {
+      "5": {
+        "jobsAttempted": 265,
+        "jobsSkipped": 12,
+        "jobsDone": 258,
+        "realizedFailures": 19,
+        "realizedAdaLost": 95,
+        "undoneWorkAda": 95,
+        "feesPaid": 0,
+        "totalCostAda": 95,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 265,
+            "jobsDone": 249,
+            "doneRate": 0.939622641509434
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 12,
+            "jobsDone": 9,
+            "doneRate": 0.75
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.911660777385159,
+        "totalCostPer100Decisions": 33.56890459363957,
+        "adaSavedVsP0": 35
+      },
+      "25": {
+        "jobsAttempted": 265,
+        "jobsSkipped": 12,
+        "jobsDone": 258,
+        "realizedFailures": 19,
+        "realizedAdaLost": 475,
+        "undoneWorkAda": 475,
+        "feesPaid": 0,
+        "totalCostAda": 475,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 265,
+            "jobsDone": 249,
+            "doneRate": 0.939622641509434
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 12,
+            "jobsDone": 9,
+            "doneRate": 0.75
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.911660777385159,
+        "totalCostPer100Decisions": 167.84452296819788,
+        "adaSavedVsP0": 175
+      },
+      "100": {
+        "jobsAttempted": 265,
+        "jobsSkipped": 12,
+        "jobsDone": 258,
+        "realizedFailures": 19,
+        "realizedAdaLost": 1900,
+        "undoneWorkAda": 1900,
+        "feesPaid": 0,
+        "totalCostAda": 1900,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 265,
+            "jobsDone": 249,
+            "doneRate": 0.939622641509434
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 12,
+            "jobsDone": 9,
+            "doneRate": 0.75
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.911660777385159,
+        "totalCostPer100Decisions": 671.3780918727915,
+        "adaSavedVsP0": 700
+      },
+      "500": {
+        "jobsAttempted": 265,
+        "jobsSkipped": 12,
+        "jobsDone": 258,
+        "realizedFailures": 19,
+        "realizedAdaLost": 9500,
+        "undoneWorkAda": 9500,
+        "feesPaid": 0,
+        "totalCostAda": 9500,
+        "observedBackupLegs": 0,
+        "modelledBackupLegs": 0,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 265,
+            "jobsDone": 249,
+            "doneRate": 0.939622641509434
+          },
+          "backup": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 12,
+            "jobsDone": 9,
+            "doneRate": 0.75
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.911660777385159,
+        "totalCostPer100Decisions": 3356.8904593639572,
+        "adaSavedVsP0": 3500
+      }
+    },
+    "P3-new": {
+      "5": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 253,
+        "realizedFailures": 24,
+        "realizedAdaLost": 120,
+        "undoneWorkAda": 120,
+        "feesPaid": 0,
+        "totalCostAda": 120,
+        "observedBackupLegs": 53,
+        "modelledBackupLegs": 24,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "backup": {
+            "decisions": 277,
+            "jobsDone": 253,
+            "doneRate": 0.9133574007220217
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9133574007220217,
+        "totalCostPer100Decisions": 43.32129963898917,
+        "adaSavedVsP0": 10
+      },
+      "25": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 253,
+        "realizedFailures": 24,
+        "realizedAdaLost": 600,
+        "undoneWorkAda": 600,
+        "feesPaid": 0,
+        "totalCostAda": 600,
+        "observedBackupLegs": 53,
+        "modelledBackupLegs": 24,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "backup": {
+            "decisions": 277,
+            "jobsDone": 253,
+            "doneRate": 0.9133574007220217
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9133574007220217,
+        "totalCostPer100Decisions": 216.60649819494586,
+        "adaSavedVsP0": 50
+      },
+      "100": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 253,
+        "realizedFailures": 24,
+        "realizedAdaLost": 2400,
+        "undoneWorkAda": 2400,
+        "feesPaid": 0,
+        "totalCostAda": 2400,
+        "observedBackupLegs": 53,
+        "modelledBackupLegs": 24,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "backup": {
+            "decisions": 277,
+            "jobsDone": 253,
+            "doneRate": 0.9133574007220217
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9133574007220217,
+        "totalCostPer100Decisions": 866.4259927797834,
+        "adaSavedVsP0": 200
+      },
+      "500": {
+        "jobsAttempted": 277,
+        "jobsSkipped": 0,
+        "jobsDone": 253,
+        "realizedFailures": 24,
+        "realizedAdaLost": 12000,
+        "undoneWorkAda": 12000,
+        "feesPaid": 0,
+        "totalCostAda": 12000,
+        "observedBackupLegs": 53,
+        "modelledBackupLegs": 24,
+        "decisionTypes": {
+          "hire_as_is": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "backup": {
+            "decisions": 277,
+            "jobsDone": 253,
+            "doneRate": 0.9133574007220217
+          },
+          "coverage": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "do_not_hire": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          },
+          "insufficient_data": {
+            "decisions": 0,
+            "jobsDone": 0,
+            "doneRate": 0
+          }
+        },
+        "jobsDoneRate": 0.9133574007220217,
+        "totalCostPer100Decisions": 4332.129963898917,
+        "adaSavedVsP0": 1000
       }
     }
   },
   "calibration": {
-    "betaBinomialBrier": 0.06268531276022733,
+    "alpha0": 0.5,
+    "beta0": 9.621212121212121,
+    "failureRate": 0.03787878787878788,
+    "betaBinomialBrier": 0.06205486358598602,
     "disputeRateBrier": 0.09187279151943463,
     "observations": 283
+  },
+  "diagnosis": {
+    "hire_as_is": {
+      "decisions": 0,
+      "jobsDone": 0,
+      "doneRate": 0
+    },
+    "backup": {
+      "decisions": 8,
+      "jobsDone": 8,
+      "doneRate": 1
+    },
+    "coverage": {
+      "decisions": 0,
+      "jobsDone": 0,
+      "doneRate": 0
+    },
+    "do_not_hire": {
+      "decisions": 275,
+      "jobsDone": 200,
+      "doneRate": 0.7272727272727273
+    },
+    "insufficient_data": {
+      "decisions": 0,
+      "jobsDone": 0,
+      "doneRate": 0
+    }
   },
   "drivers": [
     {
       "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
       "name": "Knight",
-      "adaSaved": 800,
+      "adaSaved": 1000,
       "decisions": 10
     },
     {
-      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b90400955cf54fddbcf102f572621b97268ab645f8f99d56f0780e98d2187865ab",
-      "name": "dpa Research Agent",
-      "adaSaved": 0,
-      "decisions": 8
+      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b91330e9d28bdb0dce69bcfaaba37c93a86ecd7731fe3c7f2a388157d2209d3bf5",
+      "name": "Website Content Clustering (Bansumi)",
+      "adaSaved": 100,
+      "decisions": 10
     },
     {
       "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9208b14ecd7c07f0e4279477bb0a39bb5ee9b82792d6f7dfdcf193e0c71075b7f",
       "name": "Website Traffic Analysis",
-      "adaSaved": 0,
+      "adaSaved": 100,
       "decisions": 8
     },
     {
-      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b984483f2220e868a45ffe8b10b7447c6f3963477ad0c72c90d11707738cfcba5b",
-      "name": "Company Researcher (Bansumi)",
-      "adaSaved": 0,
-      "decisions": 15
+      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b92a2c23f6db7de2769b7268a122fb6b2b7a17350f08a41e5ff3a84c6a863831d5",
+      "name": "Meta Ads Library",
+      "adaSaved": 100,
+      "decisions": 9
     },
     {
-      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b904c641ed08591e6450b74edf33b9aa17f7968e6a1eabb12d15780a5862e0e36b",
-      "name": "Reddit Research",
-      "adaSaved": -100,
+      "agent": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b94d63da3ea8f334920bab2b5adba96a527bc35c532c031b06ae20d7350cc9d159",
+      "name": "Product Reality Check (Bansumi)",
+      "adaSaved": 100,
       "decisions": 9
     }
   ],
-  "caveat": "Primary outcomes are observed from mainnet Masumi escrow spends in the newest 1,000 transactions per payment contract. Skipped jobs and failed primaries are charged against the buyer's required work. Same-capability alternatives use the same registry policy, are ranked only from outcomes before the decision, and their next escrow is marked observed when available; missing alternative history is modelled as undone work at L. P3 backup fees are charged only when the backup is used. Registry prices without a lovelace quote are reported as 0 ADA rather than converted by guesswork. Route fees and coverage are router quotes. V1 shared-wallet attribution remains wallet-based when the datum has no agent unit."
+  "caveat": "Mainnet Masumi escrow spends are observed from the bounded newest 1,000 transactions per payment contract. The time-window midpoint is the held-out split. The prior is calibrated only from first-half outcomes; each decision then uses outcomes strictly before that decision. P3-new never refuses: it ranks same-policy capability alternatives by posterior failure probability and adds a staggered backup only when primary posterior failure times loss exceeds the backup fee. Chosen alternatives use their next observed escrow when available; missing legs are modelled as failed and reported separately. Registry prices without a lovelace quote are 0 ADA rather than guessed. The requested agent remains the decision's sampled job, so selecting another primary is evaluated against that primary's next observed outcome."
 }

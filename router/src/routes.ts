@@ -25,6 +25,15 @@ export type RouteQuote = {
 
 export type RouteResult = { selectedRoute: RouteQuote["route"]; selectedSellers: string[]; reason: string; forcedByConstraints: boolean; routes: RouteQuote[]; alternatives: RouteQuote[]; assumptions: Record<string, unknown> };
 
+export type CapabilityPolicy = { alpha0: number; beta0: number };
+export type CapabilityDecision = {
+  route: "hire_as_is" | "backup";
+  primary: Seller;
+  backup?: Seller;
+  primaryPLoss: number;
+  backupPLoss?: number;
+};
+
 const TIE_ADA = 0.005;
 const label = (route: RouteQuote) => `${route.route} ${route.sellers.join("+")}`;
 
@@ -39,6 +48,27 @@ function riskFor(seller: Seller, underwriter: UnderwriterConfig): Risk {
 
 const byCost = (a: RouteQuote, b: RouteQuote) => a.riskAdjustedCostAda - b.riskAdjustedCostAda;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+export function posteriorFailure(seller: Pick<Seller, "successes" | "failures">, prior: CapabilityPolicy): number {
+  const total = prior.alpha0 + prior.beta0 + seller.successes + seller.failures;
+  return (prior.alpha0 + seller.failures) / total;
+}
+
+export function decideCapabilityRoute(input: {
+  downstreamLossAda: number;
+  sellers: Seller[];
+  prior: CapabilityPolicy;
+}): CapabilityDecision {
+  if (input.downstreamLossAda < 0 || input.sellers.length === 0) throw new Error("loss must be non-negative and sellers are required");
+  if (!(input.prior.alpha0 > 0 && input.prior.beta0 > 0)) throw new Error("prior must be positive");
+  const ranked = input.sellers.map((seller) => ({ seller, pLoss: posteriorFailure(seller, input.prior) }))
+    .sort((a, b) => a.pLoss - b.pLoss || a.seller.priceAda - b.seller.priceAda || a.seller.id.localeCompare(b.seller.id));
+  const primary = ranked[0]!;
+  const backup = ranked.find(({ seller }) => seller.id !== primary.seller.id && seller.priceAda < primary.pLoss * input.downstreamLossAda);
+  return backup
+    ? { route: "backup", primary: primary.seller, backup: backup.seller, primaryPLoss: primary.pLoss, backupPLoss: backup.pLoss }
+    : { route: "hire_as_is", primary: primary.seller, primaryPLoss: primary.pLoss };
+}
 
 export function boundedJointFailureProbability(pa: number, pb: number, correlation: number): number {
   const rho = clamp(correlation, -1, 1);
