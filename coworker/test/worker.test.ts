@@ -19,3 +19,24 @@ test("worker journal persists an in-flight payment across reload", async () => {
 test("worker failure result gives an in-flight escrow a submit-result path", () => {
   assert.match(failedResult("task-1", new Error("report failed")), /could not complete task task-1: report failed/);
 });
+
+test("paid task: the first RUNNING event carries the escrow terms", async () => {
+  const { processTask } = await import("../src/worker.ts");
+  const saved = { ...process.env };
+  Object.assign(process.env, { ENABLE_MPS_PAYMENTS: "true", MPS_URL: "http://mps.test/api/v1", SOKOSUMI_API_URL: "http://soko.test/v1", WORKER_STATE_FILE: `/tmp/worker-order-${process.pid}.json` });
+  const real = globalThis.fetch;
+  const events: Array<Record<string, unknown>> = [];
+  globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
+    const url = String(input);
+    if (url.startsWith("http://mps.test") && url.endsWith("/payment")) return Response.json({ data: { blockchainIdentifier: "bid-1", RequestedFunds: [] } });
+    if (url.includes("/events")) { events.push(JSON.parse(String(init?.body))); return Response.json({ data: { id: "e" } }); }
+    throw new Error("stop after RUNNING");
+  }) as typeof fetch;
+  try {
+    const task = { id: "t1", input: JSON.stringify({ agentIdentifier: "asset1h6lypyuwtgjqjf9wd4wmg53pgk7gtv08nk40pn", taskValueAtRiskAda: 5, task: "x" }), payment: null, runningPosted: false };
+    await processTask(task, [task]).catch(() => undefined);
+    const running = events.find((event) => event.status === "RUNNING");
+    assert.ok(running, "a RUNNING event was posted");
+    assert.ok(running.masumiPayment, "RUNNING carries masumiPayment");
+  } finally { globalThis.fetch = real; process.env = saved; }
+});

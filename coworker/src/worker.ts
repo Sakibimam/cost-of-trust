@@ -43,13 +43,14 @@ async function markRunning(task: InFlightTask): Promise<void> {
   task.runningPosted = true;
 }
 
-async function processTask(task: InFlightTask, journal: InFlightTask[]): Promise<void> {
+export async function processTask(task: InFlightTask, journal: InFlightTask[]): Promise<void> {
   try {
     const reportInput = parseTaskInput(task.input);
+    // Sokosumi accepts one RUNNING event, so the escrow terms must exist before it is posted.
+    if (reportInput && env("ENABLE_MPS_PAYMENTS") === "true" && !task.payment) { task.payment = await createPayment(task.input); await saveJournal(journal); }
     await markRunning(task);
     await saveJournal(journal);
     if (!reportInput) { await taskEvent(task.id, { status: "COMPLETED", comment: USAGE_RESULT }); journal.splice(journal.indexOf(task), 1); await saveJournal(journal); return; }
-    if (env("ENABLE_MPS_PAYMENTS") === "true" && !task.payment) { task.payment = await createPayment(task.input); await saveJournal(journal); }
     if (task.payment) await waitForPayment(task.payment);
     const report = await createReport(reportInput);
     const result = JSON.stringify(report, null, 2);
