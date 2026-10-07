@@ -31,7 +31,7 @@ async function main() {
   const candidates = requestedCandidates.length ? discovered.filter((seller) => requestedCandidates.includes(seller.id)).map((seller) => seller.id) : discovered.map((seller) => seller.id);
   if (!candidates.length) throw new Error("CANDIDATE_SELLERS did not match router sellers");
   const localPort = (seller: string) => seller === "seller-a" ? 4101 : seller === "seller-b" ? 4102 : 4103;
-  const keeperUrl = (seller: string) => { const configured = process.env[`${seller.replace("-", "_").toUpperCase()}_URL`]; const endpoint = discovered.find((item) => item.id === seller)?.endpoint; return configured ?? (endpoint && !endpoint.includes(".example/") ? endpoint.replace(/\/$/, "") : `http://127.0.0.1:${localPort(seller)}`); };
+  const keeperUrl = (seller: string) => { const configured = process.env[`${seller.replace("-", "_").toUpperCase()}_URL`]; const endpoint = discovered.find((item) => item.id === seller)?.endpoint; return configured ?? (endpoint && /^https?:\/\//.test(endpoint) ? endpoint.replace(/\/$/, "") : `http://127.0.0.1:${localPort(seller)}`); };
   const routeRes = await fetch(`${router}/best-route`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ task: "claim before expiry", serviceType: "cardano_deadline_execution", deadline: new Date(Number(expiry)).toISOString(), downstreamLossAda: lossAda, candidateSellers: candidates, riskAversion, sharedInfrastructure, constraints: { allowRedundancy: true, ...(process.env.REQUIRE_COVERAGE === "true" ? { requireCoverage: true } : {}) } }) });
   if (!routeRes.ok) throw new Error(`router quote failed ${routeRes.status}: ${await routeRes.text()}`);
   const quote = await routeRes.json() as any; run.selectedRoute = quote;
