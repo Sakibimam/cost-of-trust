@@ -1,0 +1,26 @@
+{
+  "mode": "stall",
+  "status": "blocked",
+  "startedAt": "2026-10-07T05:47:33Z",
+  "finishedAt": "2026-10-07T05:47:33Z",
+  "records": [
+    {
+      "step": "buyer_credit_gate",
+      "error": "MPS 400: {\"status\":\"error\",\"error\":{\"message\":\"Insufficient funds\"}}",
+      "creditUnit": "16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d",
+      "creditRequired": "1000000",
+      "creditAvailableBeforeTopUp": "0",
+      "walletLovelace": "132000000",
+      "walletAsset": "2000000",
+      "walletAssetUnit": "16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d"
+    },
+    {
+      "step": "funding_confirmation",
+      "txHash": "533d0c72d45534944cceba479621e9d3c0dd87b4de9e5f272bb1b7b53aaf8a7a",
+      "amountLovelace": "30000000",
+      "koios": {"num_confirmations": 141}
+    }
+  ],
+  "paid": [],
+  "refunded": []
+}

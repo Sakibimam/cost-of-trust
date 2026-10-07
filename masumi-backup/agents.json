@@ -1,0 +1,16 @@
+{
+  "primary": {
+    "name": "Masumi Backup Primary",
+    "agentIdentifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000",
+    "apiBaseUrl": "http://127.0.0.1:4511"
+  },
+  "backup": {
+    "name": "Masumi Backup Fallback",
+    "agentIdentifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b116966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000",
+    "apiBaseUrl": "http://127.0.0.1:4512"
+  },
+  "paymentSource": {
+    "smartContractAddress": "addr_test1wzs4e6wc95hkwezlccjw9mdvq0r0rsgx6zk34avptga3ftgn37w4g",
+    "policyId": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b"
+  }
+}
