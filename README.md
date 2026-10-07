@@ -4,6 +4,12 @@ Agents can buy reliability, not just access.
 
 Live: https://cost-of-trust.vercel.app/
 
+Cost of Trust does not rank agents. Most Masumi registry capabilities have one or two agents, so a ranking has nothing to choose between. The buyer still has a decision: how to pay for this job. For one registry agent, Trust Check prices four purchases from that agent's own on-chain escrow outcomes (paid, refunded, disputed, results submitted before or after the escrow deadline) and the value at risk: hire it alone, hire it with a backup that is paid only if it misses a checkpoint, hire it plus a backup up front, or hire it with coverage.
+
+- Live mainnet example (`web/src/data/showcase.json`): dpa Research Agent, 13 paid escrows, 13 results on time, 4 distinct buyers. At 5 ADA at risk: hire it alone. At 100 and 500 ADA: hire it with a backup.
+- The agent named Knight has 0 disputes, so a dispute rate ranks it as flawless; all 15 of its escrows ended in refunds. Trust Check answers do not hire.
+- The backup is paid only if it is needed, executed on preprod: keeper A delivers and keeper B is never paid ([8650e923c2...](https://preprod.cardanoscan.io/transaction/8650e923c2e2fcc0684976a062079c6cea4a3fa809e1f14db1f64cf96b188cb1)); keeper A stalls, the vault is still unspent at the checkpoint, keeper B is paid and claims ([2851e9b2df...](https://preprod.cardanoscan.io/transaction/2851e9b2df9bfabb621376f446b2dc2fd79944540b7a415cc3140ee63aec638b)).
+
 Demo moment: two keepers race for one claim UTxO, keeper A claims and keeper B is rejected by Cardano with `BadInputsUTxO`; then the CRE workflow settles coverage and Trust Check returns a paid counterparty decision.
 
 - Race lock: [c0c104a07e...f814](https://preprod.cardanoscan.io/transaction/c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814)
