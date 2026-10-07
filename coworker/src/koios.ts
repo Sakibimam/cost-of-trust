@@ -34,7 +34,8 @@ export const request = async (path: string, init: RequestInit = {}, network: Net
     signal: AbortSignal.timeout(20_000),
   });
   if (response.status === 429 && attempt < 4) {
-    const wait = Number(response.headers.get("retry-after")) * 1000 || 2_000 * 2 ** attempt;
+    // A spent quota answers retry-after in hours; honouring it froze the worker with a task RUNNING.
+    const wait = Math.min(Number(response.headers.get("retry-after")) * 1000 || 2_000 * 2 ** attempt, 5_000);
     await new Promise((resolve) => setTimeout(resolve, wait));
     return request(path, init, network, attempt + 1);
   }
