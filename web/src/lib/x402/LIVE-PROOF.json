@@ -1,0 +1,15 @@
+{
+  "endpoint": "https://cost-of-trust.vercel.app/api/x402/trust-check",
+  "network": "cardano:preprod",
+  "agent": "dpa Research Agent",
+  "taskValueAtRiskAda": 100,
+  "tx": {
+    "hash": "1e6a571ab3546c04eae4f15922b4667b9dc000fa543971308952f8321d74b70d",
+    "blockHeight": 5263099,
+    "blockHash": "cdcd3dc4a3a347c3ff87ffe0cf3fb96f7e1760437dc610761bd79df3789723d0",
+    "koios": "https://preprod.koios.rest/api/v1/tx_info"
+  },
+  "paidStatus": 200,
+  "replayStatus": 409,
+  "decision": "hire_with_backup_keeper"
+}
