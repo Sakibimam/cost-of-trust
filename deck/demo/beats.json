@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "text": "Agents can buy reliability, not just access. Cost of Trust prices the successful outcome before an agent pays. It compares one seller, redundant execution, a staggered fallback, and an underwritten route.",
+    "scenes": [
+      {"url": "https://cost-of-trust.vercel.app/", "target": "Agents can buy reliability, not just access.", "share": 1}
+    ]
+  },
+  {
+    "id": 2,
+    "text": "The buyer locks one claim vault for the job. The recorded run executes the route redundantly. Keeper A claims the UTxO first. Keeper B submits against the same input, and the Cardano ledger rejects it with BadInputsUTxO. One claim is enforced before expiry, one winner is paid, and the sponsor refund path is available after expiry when nobody claims.",
+    "scenes": [
+      {"url": "https://cost-of-trust.vercel.app/", "target": "Two keepers. One claim. One winner.", "share": 0.45},
+      {"url": "https://preprod.cardanoscan.io/transaction/c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814", "share": 0.25},
+      {"url": "https://preprod.cardanoscan.io/transaction/43b27058c91abc30ff560251cc7997a0ca0343df4432319c265b4f140163de9b", "share": 0.30}
+    ]
+  },
+  {
+    "id": 3,
+    "text": "The router does not choose the lowest seller quote. In the recorded run, Seller A is 8 ADA, Seller B is 10 ADA, and the selected staggered route has a risk-adjusted cost of 8.83 ADA. The router weighs price, measured failure probability, downstream loss, correlated infrastructure, and the buyer's risk aversion. That is the answer to the judge who asks why an agent needs a router instead of buying from the cheapest seller.",
+    "scenes": [
+      {"url": "https://cost-of-trust.vercel.app/", "target": "Why the router chose, and every route it quoted", "share": 0.55},
+      {"url": "https://cost-of-trust.vercel.app/", "target": "underwritten seller-b", "share": 0.45}
+    ]
+  },
+  {
+    "id": 4,
+    "text": "Some delivery facts are outside the ledger. The Chainlink CRE workflow reads the claim and coverage state, signs an adjudication report, and sends it to the validator. Cardano checks the report binding before releasing coverage.",
+    "scenes": [
+      {"url": "https://cost-of-trust.vercel.app/", "target": "When a job fails, coverage pays. A forged report cannot.", "share": 0.40},
+      {"url": "https://preprod.cardanoscan.io/transaction/0646c8af88359bb10b13fdddc67dcc4258f54efa59572ddd84564be69099bcf9", "share": 0.20},
+      {"url": "https://preprod.cardanoscan.io/transaction/4afb027dfc182ac65b854bcdb4bee0eb07775fe194edf49cef1c7b98060a775f", "share": 0.15},
+      {"url": "https://preprod.cardanoscan.io/transaction/3c20440b7419f5c8da18910af0c6fd2b8a40dae0b4d22cacccf8ef0fddf41abb", "share": 0.25}
+    ]
+  },
+  {
+    "id": 5,
+    "text": "Trust Check is the paid counterparty check inside the same agent loop. Masumi escrow funds the task, Trust Check submits its result hash, and the seller collects. The answer to the judge is one agent, four ways to buy it: a single seller, redundant execution, staggered fallback, or an underwritten route. Cost of Trust selects the route, Cardano enforces the claim, CRE settles the external outcome, and Trust Check supplies the counterparty evidence.",
+    "scenes": [
+      {"url": "https://cost-of-trust.vercel.app/", "target": "Due diligence on an agent before you hire it.", "share": 0.70},
+      {"url": "https://cost-of-trust.vercel.app/", "target": "Agents can buy reliability, not just access.", "share": 0.30}
+    ]
+  }
+]

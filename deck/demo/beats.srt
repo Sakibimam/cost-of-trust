@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:12,930
+Agents can buy reliability, not just access. Cost of Trust prices the successful outcome before an agent pays. It compares one seller, redundant execution, a staggered fallback, and an underwritten route.
+
+2
+00:00:12,930 --> 00:00:34,757
+The buyer locks one claim vault for the job. The recorded run executes the route redundantly. Keeper A claims the UTxO first. Keeper B submits against the same input, and the Cardano ledger rejects it with BadInputsUTxO. One claim is enforced before expiry, one winner is paid, and the sponsor refund path is available after expiry when nobody claims.
+
+3
+00:00:34,757 --> 00:01:00,218
+The router does not choose the lowest seller quote. In the recorded run, Seller A is 8 ADA, Seller B is 10 ADA, and the selected staggered route has a risk-adjusted cost of 8.83 ADA. The router weighs price, measured failure probability, downstream loss, correlated infrastructure, and the buyer's risk aversion. That is the answer to the judge who asks why an agent needs a router instead of buying from the cheapest seller.
+
+4
+00:01:00,218 --> 00:01:13,480
+Some delivery facts are outside the ledger. The Chainlink CRE workflow reads the claim and coverage state, signs an adjudication report, and sends it to the validator. Cardano checks the report binding before releasing coverage.
+
+5
+00:01:13,480 --> 00:01:41,216
+Trust Check is the paid counterparty check inside the same agent loop. Masumi escrow funds the task, Trust Check submits its result hash, and the seller collects. The answer to the judge is one agent, four ways to buy it: a single seller, redundant execution, staggered fallback, or an underwritten route. Cost of Trust selects the route, Cardano enforces the claim, CRE settles the external outcome, and Trust Check supplies the counterparty evidence.
