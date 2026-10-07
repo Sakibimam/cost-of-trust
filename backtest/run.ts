@@ -19,7 +19,7 @@ const CHUNK = 50;
 const LOSSES = [5, 25, 100, 500] as const;
 
 export type Outcome = { txHash: string; at: number; outcome: "paid" | "refunded" | "disputed"; policyId: string; unit: string };
-export type Agent = { id: string; policyId: string; unit: string; name: string; priceAda: number; provider: string; outcomes: Outcome[]; firstAt: number; lastAt: number };
+export type Agent = { id: string; policyId: string; unit: string; name: string; priceAda: number; provider: string; capability?: string; tags?: string[]; outcomes: Outcome[]; firstAt: number; lastAt: number };
 type Row = Record<string, unknown>;
 type Tx = { tx_hash: string; tx_timestamp: number; inputs?: Row[]; outputs?: Row[]; plutus_contracts?: Row[] };
 type CachedRequest = (path: string, init?: RequestInit) => Promise<unknown>;
@@ -62,6 +62,9 @@ function priceAda(data: unknown): number {
   return Number.isFinite(amount) ? amount / 1_000_000 : 0;
 }
 function nameOf(data: unknown, fallback: string): string { const name = recordValue(data, "name"); return typeof name === "string" && name ? name : Array.isArray(name) && typeof name[0] === "string" ? name[0] : fallback; }
+const joined = (value: unknown): string => (Array.isArray(value) ? value.join("") : typeof value === "string" ? value : "").trim().toLowerCase();
+function capabilityOf(data: unknown): string { const cap = recordValue(data, "capability"); return cap && typeof cap === "object" ? joined((cap as Row).name) : ""; }
+function tagsOf(data: unknown): string[] { const tags = recordValue(data, "tags"); return Array.isArray(tags) ? tags.map(joined).filter(Boolean) : []; }
 function providerOf(data: unknown): string { const url = recordValue(data, "api_base_url"); const value = Array.isArray(url) ? url.join("") : url; return typeof value === "string" ? new URL(value).host : "unknown"; }
 
 async function policyAssets(get: CachedRequest, policyId: string): Promise<Row[]> {
@@ -101,7 +104,7 @@ async function loadAgents(get: CachedRequest): Promise<Agent[]> {
     const [info] = await get("/asset_info", { method: "POST", body: JSON.stringify({ _asset_policy: policyId, _asset_name: name }) }) as Row[];
     const holders = await get(`/asset_addresses?_asset_policy=${policyId}&_asset_name=${name}`) as Row[];
     const sellers = new Set(holders.map((holder) => paymentCredential(String(holder.payment_address ?? ""))).filter((value): value is string => Boolean(value)));
-    return { policyId, unit, name: nameOf(info, unit), priceAda: priceAda(info), provider: providerOf(info), sellers };
+    return { policyId, unit, name: nameOf(info, unit), priceAda: priceAda(info), provider: providerOf(info), capability: capabilityOf(info), tags: tagsOf(info), sellers };
   }));
   const mintBlocks = await Promise.all(metadata.map(async (agent) => {
     const [info] = await get("/asset_info", { method: "POST", body: JSON.stringify({ _asset_policy: agent.policyId, _asset_name: agent.unit.slice(56) }) }) as Row[];
@@ -116,7 +119,7 @@ async function loadAgents(get: CachedRequest): Promise<Agent[]> {
     for (const contract of CONTRACTS) tallyDelivery(txs.filter((tx) => tx.tx_timestamp >= 0), meta.sellers, meta.unit, contract, tally);
     const outcomes = tally.events.filter((event): event is typeof event & { action: Outcome["outcome"] } => event.action === "paid" || event.action === "refunded" || event.action === "disputed")
       .map((event) => ({ txHash: event.txHash, at: event.blockTime, outcome: event.action, policyId: meta.policyId, unit: meta.unit })).sort((a, b) => a.at - b.at || a.txHash.localeCompare(b.txHash));
-    if (outcomes.length >= 6) agents.push({ id: meta.unit, policyId: meta.policyId, unit: meta.unit, name: meta.name, priceAda: meta.priceAda, provider: meta.provider, outcomes, firstAt: outcomes[0].at, lastAt: outcomes.at(-1)!.at });
+    if (outcomes.length >= 6) agents.push({ id: meta.unit, policyId: meta.policyId, unit: meta.unit, name: meta.name, priceAda: meta.priceAda, provider: meta.provider, capability: meta.capability, tags: meta.tags, outcomes, firstAt: outcomes[0].at, lastAt: outcomes.at(-1)!.at });
     process.stdout.write(`agent ${index + 1}/${metadata.length}: ${outcomes.length} resolved\n`);
   }
   return agents;
@@ -144,8 +147,14 @@ function routeFor(target: Agent, all: Agent[], beforeByAgent: Map<string, Outcom
   return { recommendation, quote, pLoss: sellerRisk(targetSeller, config).pLoss, backupModelled: quote.route === "redundant" || quote.route === "staggered" };
 }
 
+const MATCH_CAPABILITY = process.env.BACKTEST_MATCH === "capability";
+// capability.name equality; agents without it fall back to tag overlap; neither present means no matched alternative
+export function sameCapability(a: Agent, b: Agent): boolean {
+  if (a.capability && b.capability) return a.capability === b.capability;
+  return !!a.tags?.length && !!b.tags?.some((tag) => a.tags!.includes(tag));
+}
 function bestAlternative(target: Agent, agents: Agent[], beforeByAgent: Map<string, Outcome[]>, at: number): { agent: Agent; outcome?: Outcome } | undefined {
-  return agents.filter((agent) => agent.id !== target.id && agent.policyId === target.policyId && (beforeByAgent.get(agent.id)?.length ?? 0) > 0)
+  return agents.filter((agent) => agent.id !== target.id && (MATCH_CAPABILITY ? sameCapability(target, agent) : agent.policyId === target.policyId) && (beforeByAgent.get(agent.id)?.length ?? 0) > 0)
     .sort((a, b) => {
       const historyA = beforeByAgent.get(a.id)!; const historyB = beforeByAgent.get(b.id)!;
       const failureRate = (history: Outcome[]) => history.filter((item) => item.outcome !== "paid").length / history.length;
@@ -321,8 +330,9 @@ function printSummary(result: Backtest): void {
 
 if (import.meta.main) {
   const result = await main();
-  await mkdir(new URL("../web/src/data/", import.meta.url), { recursive: true });
-  await writeFile(new URL("../web/src/data/backtest.json", import.meta.url), JSON.stringify(result, null, 2) + "\n");
+  const outDir = MATCH_CAPABILITY ? "./out/" : "../web/src/data/";
+  await mkdir(new URL(outDir, import.meta.url), { recursive: true });
+  await writeFile(new URL(MATCH_CAPABILITY ? `${outDir}capability-matched.json` : `${outDir}backtest.json`, import.meta.url), JSON.stringify(result, null, 2) + "\n");
   printSummary(result);
   console.log(JSON.stringify({ agents: result.agents, escrows: result.escrows, decisions: result.eligibleDecisions, timeWindow: result.timeWindow, splitAt: result.splitAt, calibration: result.calibration, diagnosis: result.diagnosis, drivers: result.drivers }, null, 2));
 }
