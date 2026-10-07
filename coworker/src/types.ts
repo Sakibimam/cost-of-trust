@@ -2,6 +2,7 @@ export type CheckInput = {
   agentIdentifier: string;
   taskValueAtRiskAda: number;
   task?: string;
+  deadlineMinutes?: number;
   sellerId?: string;
   network?: "Preprod" | "Mainnet";
   riskAversion?: number;
@@ -27,7 +28,10 @@ export type TrustReport = {
     arithmetic: string;
   } | null>;
   pricingNote: string;
+  deadlineStats?: { within: number; total: number; deadlineSeconds: number; median: number | null; p90: number | null };
+  alternateAgents?: string[];
   facts: Evidence[];
   summary: string;
   generatedAt: string;
+  markdown?: string;
 };

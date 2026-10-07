@@ -131,7 +131,7 @@ test("MIP-003 agent with /availability up and no /health route is not vetoed", (
   assert.equal(decide([delivery(28, 0), down, noHealth], 100).recommendation, "do_not_hire");
 });
 
-test("V1 escrows on a shared selling wallet are attributed per agent, with on-time delivery from the datum deadline", () => {
+test("V1 escrows on a shared selling wallet are attributed per agent with response times", () => {
   const POLICY = "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9";
   const unitA = POLICY + "a".repeat(64), unitB = POLICY + "b".repeat(64);
   const contract = "addr1escrow", seller = "f0".repeat(28), buyer = "e5".repeat(28);
@@ -145,12 +145,14 @@ test("V1 escrows on a shared selling wallet are attributed per agent, with on-ti
   const tally: DeliveryTally = { escrowsOpened: 0, resultsSubmitted: 0, paid: 0, refunded: 0, disputed: 0, events: [] };
   tallyDelivery([submit("t1", unitA, 2_000_000, 1_000), submit("t2", unitA, 2_000_000, 3_000), submit("t3", unitB, 2_000_000, 1_000)] as never, new Set([seller]), unitA, contract, tally);
   assert.equal(tally.resultsSubmitted, 2);
-  assert.equal(tally.onTime, 1);
-  assert.equal(tally.late, 1);
+  assert.deepEqual(tally.responseSeconds, undefined);
 });
 
-test("late result submissions raise the price of hiring the agent alone", () => {
-  const onTime = decide([{ source: "masumi_delivery_history", status: "ok", observedAt: "", data: { paid: 10, refunded: 0, disputed: 0, late: 0 } }], 100);
-  const lateOnes = decide([{ source: "masumi_delivery_history", status: "ok", observedAt: "", data: { paid: 10, refunded: 0, disputed: 0, late: 6 } }], 100);
-  assert.ok((lateOnes.options.single?.riskAdjustedCostAda ?? 0) > (onTime.options.single?.riskAdjustedCostAda ?? 0));
+test("buyer deadline changes the route cost from the same response history", () => {
+  const facts = [{ source: "masumi_delivery_history", status: "ok" as const, observedAt: "", data: { paid: 10, refunded: 0, disputed: 0, responseSeconds: [60, 120] } }];
+  const oneMinute = decide(facts, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 1 });
+  const thirtyMinutes = decide(facts, 100, { agentIdentifier: "registry-agent", deadlineMinutes: 30 });
+  assert.notEqual(oneMinute.options.single?.riskAdjustedCostAda, thirtyMinutes.options.single?.riskAdjustedCostAda);
+  assert.equal(oneMinute.deadlineStats?.within, 1);
+  assert.equal(thirtyMinutes.deadlineStats?.within, 2);
 });

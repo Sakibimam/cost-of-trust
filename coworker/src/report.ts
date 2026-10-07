@@ -4,7 +4,7 @@ import { isIP } from "node:net";
 import { evaluateRoutes, sellerRisk, type RouteQuote, type Seller, type UnderwriterConfig } from "../../router/src/routes.ts";
 import sellersSeed from "../../router/sellers.json" with { type: "json" };
 import underwriterSeed from "../../router/underwriter.json" with { type: "json" };
-import { deliveryHistory, detectNetwork, registryFromChain, type Network } from "./koios.ts";
+import { deliveryHistory, detectNetwork, registryFromChain, registryMatchesByName, type Network } from "./koios.ts";
 import type { CheckInput, Evidence, TrustReport } from "./types.ts";
 
 loadEnv();
@@ -68,15 +68,45 @@ export async function getJson(source: string, url: string, init?: RequestInit, r
   }
 }
 
-async function registryEntry(identifier: string): Promise<Evidence> {
+async function registryEntry(identifier: string, network: Network = "Preprod"): Promise<Evidence> {
   if (!env("REGISTRY_API_KEY")) return registryFromChain(identifier);
-  const url = `${env("REGISTRY_URL")}/registry-entry/`;
+  const url = `${env(network === "Mainnet" ? "REGISTRY_URL_MAINNET" : "REGISTRY_URL", network === "Mainnet" ? "https://registry.masumi.network/api/v1" : env("REGISTRY_URL"))}/registry-entry/`;
   const registryKey = env("REGISTRY_API_KEY");
   return getJson("registry", url, {
     method: "POST",
     headers: { "content-type": "application/json", ...(registryKey ? { token: registryKey } : {}) },
-    body: JSON.stringify({ network: "Preprod", filter: { assetIdentifier: identifier }, limit: 1 }),
+    body: JSON.stringify({ network, filter: { assetIdentifier: identifier }, limit: 1 }),
   });
+}
+
+function rows(data: unknown): Array<Record<string, unknown>> {
+  if (Array.isArray(data)) return data.filter((item): item is Record<string, unknown> => Boolean(item && typeof item === "object"));
+  if (data && typeof data === "object") {
+    const record = data as Record<string, unknown>;
+    for (const key of ["data", "entries", "items", "registryEntries"]) if (Array.isArray(record[key])) return rows(record[key]);
+  }
+  return [];
+}
+
+async function resolveNamedAgent(name: string): Promise<{ identifier: string; alternateAgents: string[] } | null> {
+  const matches: Array<{ identifier: string; network: Network }> = env("REGISTRY_API_KEY") ? [] : await registryMatchesByName(name);
+  if (env("REGISTRY_API_KEY")) for (const network of ["Mainnet", "Preprod"] as const) {
+    const base = env(network === "Mainnet" ? "REGISTRY_URL_MAINNET" : "REGISTRY_URL", network === "Mainnet" ? "https://registry.masumi.network/api/v1" : env("REGISTRY_URL"));
+    const response = await getJson("registry_name_search", `${base}/registry-entry/`, { method: "POST", headers: { token: env("REGISTRY_API_KEY") }, body: JSON.stringify({ network, filter: { name }, limit: 100 }) });
+    for (const row of rows(response.data)) {
+      const identifier = String(row.agentIdentifier ?? row.assetIdentifier ?? row.agent_identifier ?? "");
+      const rowName = String(row.name ?? "");
+      if (identifier && rowName.toLowerCase() === name.toLowerCase() && !matches.some((match) => match.identifier === identifier)) matches.push({ identifier, network });
+    }
+  }
+  if (!matches.length) return null;
+  const scored = await Promise.all(matches.map(async (match) => {
+    const history = await deliveryHistory(match.identifier, match.network);
+    const data = history.status === "ok" ? history.data as { paid?: number; refunded?: number; disputed?: number } : {};
+    return { ...match, score: (data.paid ?? 0) + (data.refunded ?? 0) + (data.disputed ?? 0) };
+  }));
+  scored.sort((a, b) => b.score - a.score);
+  return { identifier: scored[0].identifier, alternateAgents: scored.slice(1).map((match) => match.identifier) };
 }
 
 // Masumi CIP-25 metadata stores api_base_url as a list of <=64 byte chunks.
@@ -127,7 +157,7 @@ function registryName(data: unknown, fallback: string): string {
 }
 
 const routeKinds = ["single", "redundant", "staggered", "underwritten"] as const;
-type Decision = Pick<TrustReport, "recommendation" | "expectedCostAda" | "options" | "pricingNote">;
+type Decision = Pick<TrustReport, "recommendation" | "expectedCostAda" | "options" | "pricingNote" | "deadlineStats">;
 const emptyOptions = (): TrustReport["options"] => ({ single: null, redundant: null, staggered: null, underwritten: null });
 
 function cheapestOptions(routes: RouteQuote[]): TrustReport["options"] {
@@ -143,7 +173,7 @@ const privateHost = (url: string) => /^(localhost|127\.|10\.|192\.168\.|172\.(1[
 
 async function gather(input: CheckInput): Promise<Evidence[]> {
   const network: Network = input.network ?? await detectNetwork(input.agentIdentifier);
-  const registryFact = env("REGISTRY_API_KEY") ? await registryEntry(input.agentIdentifier) : await registryFromChain(input.agentIdentifier, network);
+  const registryFact = env("REGISTRY_API_KEY") ? await registryEntry(input.agentIdentifier, network) : await registryFromChain(input.agentIdentifier, network);
   const endpoint = advertisedUrl(registryFact.data);
   const unreachable = (error: string) => ["agent_availability", "agent_health"].map((source) => ({ source, status: "unavailable", observedAt: now(), error } as Evidence));
   const endpointFacts = !endpoint
@@ -154,17 +184,19 @@ async function gather(input: CheckInput): Promise<Evidence[]> {
   return [registryFact, ...endpointFacts, await deliveryHistory(input.agentIdentifier, network)];
 }
 
-// A result submitted after the escrow submitResultTime is a missed deadline, so it counts as a failure for deadline work.
-type Delivery = { paid: number; refunded: number; disputed: number; late?: number };
+type Delivery = { paid: number; refunded: number; disputed: number; responseSeconds?: number[]; responseSecondsMedian?: number | null; responseSecondsP90?: number | null };
 
-export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput, "agentIdentifier" | "riskAversion" | "sharedInfrastructure"> = { agentIdentifier: "registry-agent" }): Decision {
+export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput, "agentIdentifier" | "riskAversion" | "sharedInfrastructure" | "deadlineMinutes"> = { agentIdentifier: "registry-agent" }): Decision {
   const delivery = facts.find((fact) => fact.source === "masumi_delivery_history");
   const record = delivery?.status === "ok" ? delivery.data as Delivery : undefined;
   const pricing = facts.find((fact) => fact.source === "registry" || fact.source === "registry_chain");
   const registryData = pricing?.data;
   const registryId = input.agentIdentifier;
   const price = lovelacePrice(registryData);
-  const registrySeller: Seller = { id: registryId, name: registryName(registryData, registryId), priceAda: price.priceAda, provider: advertisedUrl(registryData) ? new URL(advertisedUrl(registryData)!).host : "unknown", payTo: "registry-agent", endpoint: advertisedUrl(registryData) ?? "", successes: record?.paid ?? 0, failures: (record?.refunded ?? 0) + (record?.disputed ?? 0) + (record?.late ?? 0), evidence: [] };
+  const responseSeconds = record?.responseSeconds ?? [];
+  const deadlineSeconds = input.deadlineMinutes === undefined ? undefined : input.deadlineMinutes * 60;
+  const missedDeadlineCount = deadlineSeconds === undefined ? 0 : responseSeconds.filter((seconds) => seconds > deadlineSeconds).length;
+  const registrySeller: Seller = { id: registryId, name: registryName(registryData, registryId), priceAda: price.priceAda, provider: advertisedUrl(registryData) ? new URL(advertisedUrl(registryData)!).host : "unknown", payTo: "registry-agent", endpoint: advertisedUrl(registryData) ?? "", successes: record?.paid ?? 0, failures: (record?.refunded ?? 0) + (record?.disputed ?? 0) + missedDeadlineCount, evidence: [] };
   const backups = (sellersSeed as Seller[]).filter((seller) => seller.type === "agent");
   const underwriter = underwriterSeed as UnderwriterConfig;
   const routes = record && record.paid + record.refunded + record.disputed > 0
@@ -185,39 +217,40 @@ export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput
   const selected = routes!.routes.find((route) => route.route === routes!.selectedRoute && route.sellers.join(",") === routes!.selectedSellers.join(","))!;
   if (endpointDown || pLoss >= 0.5) return { recommendation: "do_not_hire", expectedCostAda: selected.expectedTotalCostAda, options, pricingNote: price.note };
   const recommendation = routes!.selectedRoute === "single" && routes!.selectedSellers[0] === registryId ? "hire_as_is" : routes!.selectedRoute === "underwritten" ? "require_coverage" : "hire_with_backup_keeper";
-  return { recommendation, expectedCostAda: selected.expectedTotalCostAda, options, pricingNote: price.note };
+  return { recommendation, expectedCostAda: selected.expectedTotalCostAda, options, pricingNote: price.note, ...(deadlineSeconds === undefined ? {} : { deadlineStats: { within: responseSeconds.length - missedDeadlineCount, total: responseSeconds.length, deadlineSeconds, median: record?.responseSecondsMedian ?? null, p90: record?.responseSecondsP90 ?? null } }) };
 }
 
 async function summarize(input: CheckInput, facts: Evidence[], decision: ReturnType<typeof decide>): Promise<string> {
-  const key = env("OPENROUTER_API_KEY") || env("ZAI_API_KEY") || env("OPENAI_API_KEY") || env("ANTHROPIC_API_KEY");
-  if (!key) return "Plain-language summary unavailable: no model credential is configured. The structured facts and recommendation are authoritative.";
-  const endpoint = env("OPENROUTER_API_KEY") ? `${env("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")}/chat/completions` : env("ZAI_API_KEY") ? "https://api.z.ai/api/paas/v4/chat/completions" : "https://api.openai.com/v1/chat/completions";
-  const evidence = JSON.stringify({ input, decision, facts });
-  const models = [env("MODEL", "nvidia/nemotron-3-ultra-550b-a55b:free"), env("MODEL_FALLBACK", "nvidia/nemotron-3-super-120b-a12b:free")];
-  let lastError = "model returned no summary";
-  for (const model of [...new Set(models)]) {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
-      body: JSON.stringify({ model, temperature: 0, max_tokens: 800, messages: [
-        { role: "system", content: "Write one concise due-diligence summary. Use only the supplied facts. Cite facts inline as [source]. Never invent numbers or fill missing values." },
-        { role: "user", content: evidence },
-      ] }),
-      signal: AbortSignal.timeout(30_000),
-    });
-    const body = await response.json() as { choices?: Array<{ message?: { content?: string } }>; error?: { message?: string } };
-    const content = body.choices?.[0]?.message?.content?.trim();
-    if (response.ok && content) return content;
-    lastError = body.error?.message || `model HTTP ${response.status}`;
-  }
-  throw new Error(lastError);
+  const registry = facts.find((fact) => fact.source === "registry" || fact.source === "registry_chain");
+  const delivery = facts.find((fact) => fact.source === "masumi_delivery_history")?.data as Delivery | undefined;
+  const available = facts.find((fact) => fact.source === "agent_availability")?.status ?? "unavailable";
+  const name = registryName(registry?.data, input.agentIdentifier);
+  const outcomes = delivery ? `${delivery.paid} paid, ${delivery.refunded} refunded, ${delivery.disputed} disputed` : "delivery history unavailable";
+  const deadline = decision.deadlineStats ? ` ${decision.deadlineStats.within} of ${decision.deadlineStats.total} recorded responses met the ${decision.deadlineStats.deadlineSeconds}-second buyer deadline.` : "";
+  return `${name} is ${available} in the registry evidence and has ${outcomes}.${deadline} Recommendation: ${decision.recommendation.replaceAll("_", " ")} with expected cost ${decision.expectedCostAda === null ? "unknown" : `${decision.expectedCostAda} ADA`}.`;
 }
 
 export async function createReport(input: CheckInput): Promise<TrustReport> {
   if (!input.agentIdentifier || !Number.isFinite(input.taskValueAtRiskAda) || input.taskValueAtRiskAda < 0) throw new Error("agentIdentifier and non-negative taskValueAtRiskAda are required");
-  const facts = await gather(input);
-  const decision = decide(facts, input.taskValueAtRiskAda, input);
+  const resolved = /^[0-9a-f]{56,120}$/i.test(input.agentIdentifier) || /^asset1/i.test(input.agentIdentifier) ? null : await resolveNamedAgent(input.agentIdentifier);
+  const resolvedInput = resolved ? { ...input, agentIdentifier: resolved.identifier } : input;
+  const facts = await gather(resolvedInput);
+  const decision = decide(facts, resolvedInput.taskValueAtRiskAda, resolvedInput);
   let summary: string;
-  try { summary = await summarize(input, facts, decision); } catch (error) { summary = `Plain-language summary unavailable because the configured model failed: ${error instanceof Error ? error.message : "request failed"}. Structured facts remain authoritative.`; }
-  return { input, ...decision, facts, summary, generatedAt: now() };
+  try { summary = await summarize(resolvedInput, facts, decision); } catch (error) { summary = `Plain-language summary unavailable because the configured model failed: ${error instanceof Error ? error.message : "request failed"}. Structured facts remain authoritative.`; }
+  return { input: resolvedInput, ...decision, facts, summary, generatedAt: now(), ...(resolved?.alternateAgents.length ? { alternateAgents: resolved.alternateAgents } : {}) };
+}
+
+export function renderReportMarkdown(report: TrustReport): string {
+  const delivery = report.facts.find((fact) => fact.source === "masumi_delivery_history")?.data as Record<string, unknown> | undefined;
+  const registry = report.facts.find((fact) => fact.source === "registry" || fact.source === "registry_chain");
+  const availability = report.facts.find((fact) => fact.source === "agent_availability");
+  const total = Number(delivery?.escrowsOpened ?? 0);
+  const response = Array.isArray(delivery?.responseSeconds) ? delivery.responseSeconds.join(", ") : "none recorded";
+  const scanNetwork = String(delivery?.network ?? "Mainnet").toLowerCase() === "preprod" ? "preprod.cardanoscan.io" : "cardanoscan.io";
+  const links = Array.isArray(delivery?.events) ? delivery.events.filter((event): event is { txHash: string; action: string } => Boolean(event && typeof event === "object" && "txHash" in event)).filter((event) => event.action !== "escrowOpened").slice(0, 2).map((event) => `https://${scanNetwork}/transaction/${event.txHash}`).join(", ") : "none";
+  const selected = report.options.single?.sellers.join(", ") ?? "none";
+  const deadline = report.deadlineStats ? `${report.deadlineStats.within} of ${report.deadlineStats.total} past results arrived within your deadline (median ${report.deadlineStats.median ?? "n/a"} s, p90 ${report.deadlineStats.p90 ?? "n/a"} s).` : "No buyer deadline was supplied.";
+  const json = JSON.stringify({ ...report, markdown: undefined }, null, 2);
+  return `## Decision\n${report.recommendation.replaceAll("_", " ")} with expected cost ${report.expectedCostAda === null ? "unknown" : `${report.expectedCostAda} ADA`}.\n\n| Way to buy | Risk-adjusted ADA | Chosen |\n| --- | ---: | :---: |\n| Single | ${report.options.single?.riskAdjustedCostAda ?? "n/a"} | ${selected === report.input.agentIdentifier ? "yes" : "no"} |\n| Redundant | ${report.options.redundant?.riskAdjustedCostAda ?? "n/a"} | ${report.recommendation === "hire_with_backup_keeper" ? "yes" : "no"} |\n| Staggered | ${report.options.staggered?.riskAdjustedCostAda ?? "n/a"} | ${report.recommendation === "hire_with_backup_keeper" ? "yes" : "no"} |\n| Underwritten | ${report.options.underwritten?.riskAdjustedCostAda ?? "n/a"} | ${report.recommendation === "require_coverage" ? "yes" : "no"} |\n\nEvidence:\n- Registry entry: ${registry?.status ?? "unavailable"}; resolved agent: ${report.input.agentIdentifier}.\n- /availability: ${availability?.status ?? "unavailable"}.\n- Escrows: ${total}; result txs: ${links}.\n- Response times (newest up to 200): ${response} s. ${deadline}\n${report.alternateAgents?.length ? `- Other exact name matches: ${report.alternateAgents.join(", ")}.\n` : ""}\n\n${report.summary}\n\n\`\`\`json\n${json}\n\`\`\``;
 }

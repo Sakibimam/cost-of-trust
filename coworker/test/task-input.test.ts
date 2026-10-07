@@ -12,3 +12,8 @@ test("accepts JSON and returns help for unaddressed text", () => {
   assert.equal(parseTaskInput("what can you do for me?"), null);
   assert.match(USAGE_RESULT, /agent identifier/);
 });
+
+test("accepts a named agent, ADA value, and buyer deadline", () => {
+  assert.deepEqual(parseTaskInput("Should I hire dpa Research Agent for a 100 ADA job due in 15 minutes?"), { agentIdentifier: "dpa Research Agent", taskValueAtRiskAda: 100, deadlineMinutes: 15 });
+  assert.equal(parseTaskInput("Should I hire Knight for a 500 ADA job within 2 hours?")?.taskValueAtRiskAda, 500);
+});

@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { env, loadEnv } from "./config.ts";
-import { createReport } from "./report.ts";
+import { createReport, renderReportMarkdown } from "./report.ts";
 import { createPayment, submitResult, waitForPayment } from "./payment.ts";
 import { parseTaskInput, USAGE_RESULT } from "./task-input.ts";
 loadEnv();
@@ -53,7 +53,7 @@ export async function processTask(task: InFlightTask, journal: InFlightTask[]): 
     if (!reportInput) { await taskEvent(task.id, { status: "COMPLETED", comment: USAGE_RESULT }); journal.splice(journal.indexOf(task), 1); await saveJournal(journal); return; }
     if (task.payment) await waitForPayment(task.payment);
     const report = await createReport(reportInput);
-    const result = JSON.stringify(report, null, 2);
+    const result = renderReportMarkdown(report);
     await writeFile(`result-${task.id}.txt`, result);
     if (task.payment) { await submitResult(task.payment, result); await waitForPayment(task.payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]); }
     await taskEvent(task.id, { status: "COMPLETED", comment: result });

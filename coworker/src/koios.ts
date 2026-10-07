@@ -91,6 +91,37 @@ async function assetInfo(identifier: string, network: Network): Promise<Row[]> {
   return await post("/asset_info", { _asset_policy: asset.policy, _asset_name: asset.name }, network) as Row[];
 }
 
+function containsName(value: unknown, name: string): boolean {
+  if (!value || typeof value !== "object") return false;
+  if (Array.isArray(value)) return value.some((item) => containsName(item, name));
+  const record = value as Row;
+  if (typeof record.name === "string" && record.name.toLowerCase() === name.toLowerCase()) return true;
+  if (Array.isArray(record.name) && record.name.some((item) => typeof item === "string" && item.toLowerCase() === name.toLowerCase())) return true;
+  return Object.values(record).some((item) => containsName(item, name));
+}
+
+export async function registryMatchesByName(name: string): Promise<Array<{ identifier: string; network: Network }>> {
+  const scan = async (network: Network): Promise<Array<{ identifier: string; network: Network }>> => {
+    const matches: Array<{ identifier: string; network: Network }> = [];
+    for (const policy of policies(network)) {
+      const assets = await policyAssets(policy, network);
+      for (let i = 0; i < assets.length; i += 100) {
+        const batch = await Promise.all(assets.slice(i, i + 100).map(async (asset) => {
+          const assetName = String(asset.asset_name ?? "");
+          if (!assetName) return null;
+          try {
+            const info = await post("/asset_info", { _asset_policy: policy, _asset_name: assetName }, network) as Row[];
+            return info.some((row) => containsName(row, name)) ? { identifier: policy + assetName, network } : null;
+          } catch { return null; }
+        }));
+        matches.push(...batch.filter((match): match is { identifier: string; network: Network } => Boolean(match)));
+      }
+    }
+    return matches;
+  };
+  return (await Promise.all((["Mainnet", "Preprod"] as const).map(scan))).flat();
+}
+
 // A task that omits the network is looked up on Preprod first, then Mainnet.
 export async function detectNetwork(identifier: string): Promise<Network> {
   for (const network of ["Preprod", "Mainnet"] as const) {
@@ -123,7 +154,7 @@ export async function registryFromChain(identifier: string, network: Network = "
 type PlutusJson = { constructor?: number; fields?: PlutusJson[]; bytes?: string; int?: number };
 
 // Escrow datum layouts from the Masumi vested_pay validators: V2 has 19 fields (seller at 2, agent_identifier at 8), V1 has 16 (seller at 1).
-export function escrowParty(datum: PlutusJson | undefined): { seller: string; buyer?: string; agent?: string; submitResultTime?: number; state: number } | null {
+export function escrowParty(datum: PlutusJson | undefined): { seller: string; buyer?: string; agent?: string; state: number } | null {
   const fields = datum?.fields;
   if (!fields || (fields.length !== 19 && fields.length !== 16)) return null;
   const sellerAt = fields.length === 19 ? 2 : 1;
@@ -131,9 +162,9 @@ export function escrowParty(datum: PlutusJson | undefined): { seller: string; bu
   const state = fields[fields.length - 1]?.constructor;
   if (!seller || state === undefined) return null;
   if (fields.length === 19) return { seller, agent: fields[8]?.bytes, state };
-  // V1 (16 fields): buyer at 0, blockchainIdentifier at 4 = 32-byte hash || agent registry unit (28-byte policy + 32-byte name), submitResultTime at 10.
+  // V1 (16 fields): buyer at 0, blockchainIdentifier at 4 = 32-byte hash || agent registry unit (28-byte policy + 32-byte name).
   const identifier = fields[4]?.bytes ?? "";
-  return { seller, buyer: fields[0]?.fields?.[0]?.fields?.[0]?.bytes, agent: identifier.length === 184 ? identifier.slice(64) : undefined, submitResultTime: fields[10]?.int, state };
+  return { seller, buyer: fields[0]?.fields?.[0]?.fields?.[0]?.bytes, agent: identifier.length === 184 ? identifier.slice(64) : undefined, state };
 }
 
 // Redeemer constructors shared by V1 and V2 vested_pay: Withdraw 0, WithdrawRefund 3, WithdrawDisputed 4, SubmitResult 5.
@@ -147,7 +178,7 @@ type TxInfo = {
   plutus_contracts?: Array<{ valid_contract?: boolean; spends_input?: { tx_hash: string; tx_index: number } | null; input?: { redeemer?: { datum?: { value?: PlutusJson } } } }>;
 };
 
-export type DeliveryTally = { escrowsOpened: number; resultsSubmitted: number; paid: number; refunded: number; disputed: number; walletOnly?: number; onTime?: number; late?: number; buyers?: string[]; submissions?: Array<{ openTx: string; at: number }>; responseSecondsMedian?: number | null; events: Array<{ txHash: string; blockTime: number; action: string; contract: string }> };
+export type DeliveryTally = { escrowsOpened: number; resultsSubmitted: number; paid: number; refunded: number; disputed: number; walletOnly?: number; buyers?: string[]; submissions?: Array<{ openTx: string; at: number }>; responseSeconds?: number[]; responseSecondsMedian?: number | null; responseSecondsP90?: number | null; events: Array<{ txHash: string; blockTime: number; action: string; contract: string }> };
 
 export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: string, contract: string, tally: DeliveryTally): void {
   const ours = (datum: PlutusJson | undefined) => {
@@ -168,9 +199,6 @@ export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: st
       tally[action] += 1;
       const party = escrowParty(spent.inline_datum?.value);
       if (action === "resultsSubmitted" && spend.spends_input?.tx_hash) (tally.submissions ??= []).push({ openTx: spend.spends_input.tx_hash, at: tx.tx_timestamp });
-      if (action === "resultsSubmitted" && party?.submitResultTime !== undefined) {
-        if (tx.tx_timestamp * 1000 <= party.submitResultTime) tally.onTime = (tally.onTime ?? 0) + 1; else tally.late = (tally.late ?? 0) + 1;
-      }
       // V1 escrow datums carry no agent identifier, so the outcome belongs to the selling wallet, which several registry agents can share.
       if (action !== "resultsSubmitted" && escrowParty(spent.inline_datum?.value)?.agent === undefined) tally.walletOnly = (tally.walletOnly ?? 0) + 1;
       tally.events.push({ txHash: tx.tx_hash, blockTime: tx.tx_timestamp, action, contract });
@@ -220,8 +248,11 @@ export async function deliveryHistory(identifier: string, network: Network = "Pr
     tally.events.sort((a, b) => b.blockTime - a.blockTime);
     // Time to respond: escrow opened -> result submitted, for submissions whose opening tx is inside the scanned window.
     const opened = new Map(tally.events.filter((event) => event.action === "escrowOpened").map((event) => [event.txHash, event.blockTime]));
-    const waits = (tally.submissions ?? []).flatMap((s) => opened.has(s.openTx) ? [s.at - opened.get(s.openTx)!] : []).sort((a, b) => a - b);
-    tally.responseSecondsMedian = waits.length ? waits[Math.floor(waits.length / 2)] : null;
+    const waits = (tally.submissions ?? []).filter((s) => opened.has(s.openTx)).sort((a, b) => b.at - a.at).slice(0, 200).map((s) => s.at - opened.get(s.openTx)!);
+    const sortedWaits = [...waits].sort((a, b) => a - b);
+    tally.responseSeconds = waits;
+    tally.responseSecondsMedian = sortedWaits.length ? sortedWaits[Math.floor(sortedWaits.length / 2)] : null;
+    tally.responseSecondsP90 = sortedWaits.length ? sortedWaits[Math.ceil(sortedWaits.length * 0.9) - 1] : null;
     delete tally.submissions;
     return { source: "masumi_delivery_history", status: "ok", observedAt: observedAt(), data: { identifier, unit, network, sellerCredentials: [...sellers], registeredAtBlock, coverage, ...tally, events: tally.events.slice(0, 20) } };
   } catch (error) {
