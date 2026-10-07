@@ -28,7 +28,7 @@ type Fact = { source: string; status: string; data?: Record<string, unknown> };
 type Report = { recommendation: string; expectedCostAda: number | null; selectedRoute?: string; summary?: string; facts?: Fact[] };
 type Payment = { orphanedTxs: string[]; candidate: string; identifier: string; httpStatuses: number[]; txHash: string | null; confirmations: number; decision: string | null; expectedCostAda: number | null; selectedRoute: string | null; paid: number | null; refunded: number | null; summary: string | null; error: string | null };
 
-const koiosHeaders = (): Record<string, string> => ({ "content-type": "application/json", ...(process.env.KAIOS_KEY ? { authorization: `Bearer ${process.env.KAIOS_KEY}` } : {}) });
+const koiosHeaders = (): Record<string, string> => ({ "content-type": "application/json", ...(process.env.X402_KOIOS_TOKEN ? { authorization: `Bearer ${process.env.X402_KOIOS_TOKEN}` } : {}) });
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const asText = (value: unknown): string => (Array.isArray(value) ? value.join("") : String(value ?? ""));
 
@@ -142,7 +142,7 @@ async function hireRequest(candidate: Candidate) {
 async function main() {
   const seed = (JSON.parse(readFileSync(WALLETS, "utf8")) as Record<string, { seed: string }>).buyer?.seed;
   if (!seed) throw new Error("buyer wallet missing from wallets file");
-  const signer = toClientCardanoSigner({ mnemonic: seed, network: "cardano:preprod", provider: { koios: { baseUrl: KOIOS_PREPROD, token: process.env.KAIOS_KEY } } });
+  const signer = toClientCardanoSigner({ mnemonic: seed, network: "cardano:preprod", provider: { koios: { baseUrl: KOIOS_PREPROD, token: process.env.X402_KOIOS_TOKEN } } });
   const client = new x402Client().setSpendControls(false).register("cardano:preprod", new ExactCardanoScheme(signer));
 
   console.log(`Job: ${job.title}, ${job.taskValueAtRiskAda} ADA at risk, buyer deadline ${job.deadlineMinutes} minutes.`);

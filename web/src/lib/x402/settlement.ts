@@ -38,7 +38,7 @@ async function saveDelivery(txId: string, delivery: StoredDelivery) {
 const facilitator = (() => {
   const signer = toFacilitatorCardanoSigner({
     network: "cardano:preprod",
-    provider: { koios: { baseUrl: process.env.KOIOS_URL ?? "https://preprod.koios.rest/api/v1", token: process.env.KAIOS_KEY }, requestTimeoutMs: 20_000 },
+    provider: { koios: { baseUrl: process.env.KOIOS_URL ?? "https://preprod.koios.rest/api/v1", token: process.env.X402_KOIOS_TOKEN }, requestTimeoutMs: 20_000 },
     awaitConfirmation: true,
   });
   return new x402Facilitator().register("cardano:preprod", new ExactCardanoScheme(signer));
@@ -53,7 +53,7 @@ export function txIdFromPayment(header: string): string {
 
 async function koiosPost(path: string, body: unknown): Promise<Response> {
   const baseUrl = process.env.KOIOS_URL ?? "https://preprod.koios.rest/api/v1";
-  const headers = { "content-type": "application/json", ...(process.env.KAIOS_KEY ? { authorization: `Bearer ${process.env.KAIOS_KEY}` } : {}) };
+  const headers = { "content-type": "application/json", ...(process.env.X402_KOIOS_TOKEN ? { authorization: `Bearer ${process.env.X402_KOIOS_TOKEN}` } : {}) };
   const request = koiosFetch ?? fetch;
   for (let attempt = 0; ; attempt++) {
     const response = await request(`${baseUrl}${path}`, { method: "POST", headers, body: JSON.stringify(body) });
