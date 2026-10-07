@@ -54,8 +54,22 @@ function identifier(payment: Payment): string {
   return value;
 }
 
-export async function submitResult(payment: Payment, result: string): Promise<Payment> {
-  return mpsJson("/payment/submit-result", { method: "POST", body: JSON.stringify({ network: "Preprod", blockchainIdentifier: identifier(payment), submitResultHash: sha256(result) }) });
+// MPS accepts a result only while the payment's next action is WaitingForExternalAction, which can lag
+// FundsLocked by a few ticks; a payment already past FundsLocked has its result on chain.
+export async function submitResult(payment: Payment, result: string, timeoutMs = 8 * 60_000): Promise<Payment> {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    try {
+      return await mpsJson("/payment/submit-result", { method: "POST", body: JSON.stringify({ network: "Preprod", blockchainIdentifier: identifier(payment), submitResultHash: sha256(result) }) });
+    } catch (error) {
+      if (!(error instanceof Error && /invalid state/.test(error.message))) throw error;
+      const current = await mpsJson("/payment/resolve-blockchain-identifier", { method: "POST", body: JSON.stringify({ network: "Preprod", blockchainIdentifier: identifier(payment) }) });
+      const state = String(((current.data ?? current) as Payment).onChainState ?? "");
+      if (["ResultSubmitted", "WithdrawAuthorized", "Withdrawn"].includes(state)) return current;
+      if (Date.now() >= deadline) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 20_000));
+    }
+  }
 }
 
 export async function waitForPayment(payment: Payment, timeoutMs = 20 * 60_000, states = ["FundsLocked", "ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]): Promise<Payment> {

@@ -99,6 +99,8 @@ export async function once(): Promise<void> {
 
 if (process.argv[1]?.endsWith("/worker.ts")) {
   // A failed poll must never stop the worker: log it and poll again.
-  const tick = () => once().catch((error) => console.error(error instanceof Error ? error.message : error));
+  // A paid task can wait 20+ minutes on escrow; overlapping polls would reload the journal and run it twice.
+  let busy = false;
+  const tick = () => { if (busy) return; busy = true; once().catch((error) => console.error(error instanceof Error ? error.message : error)).finally(() => { busy = false; }); };
   void tick(); setInterval(tick, Number(env("POLL_SECONDS", "60")) * 1000);
 }
