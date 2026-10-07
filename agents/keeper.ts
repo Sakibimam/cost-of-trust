@@ -81,7 +81,7 @@ Bun.serve({ port, async fetch(request) {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/koios/")) {
       const path = url.pathname.slice("/koios".length);
-      const allowed = new Set(["GET /tip", "POST /tx_info", "POST /tx_status", "POST /tx_utxos", "POST /address_utxos", "POST /epoch_params", "POST /submittx"]);
+      const allowed = new Set(["GET /tip", "GET /epoch_params", "POST /address_info", "POST /tx_info", "POST /tx_status", "POST /tx_utxos", "POST /submittx"]);
       if (!allowed.has(`${request.method} ${path}`)) return json({ error: "koios path not allowed" }, 404);
       const raw = path === "/submittx" ? "" : await request.text();
       let body: BodyInit | undefined = path === "/submittx" ? await request.arrayBuffer() : raw;
