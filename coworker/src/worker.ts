@@ -55,7 +55,12 @@ export async function processTask(task: InFlightTask, journal: InFlightTask[]): 
     const report = await createReport(reportInput);
     const result = renderReportMarkdown(report);
     await writeFile(`result-${task.id}.txt`, result);
-    if (task.payment) { await submitResult(task.payment, result); await waitForPayment(task.payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]); }
+    if (task.payment) {
+      await submitResult(task.payment, result);
+      // The result is accepted for submission; a later lookup error must not turn delivered work into FAILED.
+      try { await waitForPayment(task.payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]); }
+      catch (error) { console.error(`Task ${task.id}: result submitted, confirmation lookup failed: ${error instanceof Error ? error.message : error}`); }
+    }
     await taskEvent(task.id, { status: "COMPLETED", comment: result });
     journal.splice(journal.indexOf(task), 1); await saveJournal(journal);
   } catch (error) {
