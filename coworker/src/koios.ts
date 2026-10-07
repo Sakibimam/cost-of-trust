@@ -1,3 +1,4 @@
+import registryNames from "./registry-names.json" with { type: "json" };
 import { env, loadEnv } from "./config.ts";
 import type { Evidence } from "./types.ts";
 import escrowIndexFile from "../../web/src/data/escrow-index.json" with { type: "json" };
@@ -116,6 +117,10 @@ function containsName(value: unknown, name: string): boolean {
 }
 
 export async function registryMatchesByName(name: string): Promise<Array<{ identifier: string; network: Network }>> {
+  // Bundled snapshot of registry names first: listing whole registry policies per task is what Koios rate-limits.
+  const known = (registryNames.names as Record<string, Array<{ identifier: string; network: Network }>>)[name.trim().toLowerCase()];
+  if (known?.length) return known.map(({ identifier, network }) => ({ identifier, network }));
+
   const scan = async (network: Network): Promise<Array<{ identifier: string; network: Network }>> => {
     const matches: Array<{ identifier: string; network: Network }> = [];
     for (const policy of policies(network)) {

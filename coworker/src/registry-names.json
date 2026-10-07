@@ -1,0 +1,1553 @@
+{
+ "generatedAt": "2026-10-07T03:00:00Z",
+ "source": "Masumi registry mint metadata, policies ad6424e3 and 67ab0c92 (mainnet), Koios policy_asset_info",
+ "names": {
+  "llm.txt generator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9258e5e34f332826e6b8dcef1f017d78c77ea34cb344910f80ac14ff01a557a70",
+    "network": "Mainnet",
+    "name": "llm.txt Generator"
+   }
+  ],
+  "media trend analyser": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b93b63900663cbbf15aeef7e5dded48487fc2f050322882e64494d24b8ccb4e2bc",
+    "network": "Mainnet",
+    "name": "Media Trend Analyser"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b98b6420f5ed7b927bf68969995abcdee832bdec16a59d72c5881be3111a3b23fd",
+    "network": "Mainnet",
+    "name": "Media Trend Analyser"
+   }
+  ],
+  "deepseek reasoning": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9cc281cf03d99a4f01b9c2243837b4d8b2fc77b82bf64f4962a1926587ac3e8e3",
+    "network": "Mainnet",
+    "name": "DeepSeek Reasoning"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9110b5f36ffc2f2d8c27cd8f882b7ade09e91a4162dea018c15957ff139de95af",
+    "network": "Mainnet",
+    "name": "DeepSeek Reasoning"
+   }
+  ],
+  "meeting preparation": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9de205539dc7ee4427cdef54d44535df6b3a02f3e816b09c532dfa9a73ab573eb",
+    "network": "Mainnet",
+    "name": "Meeting Preparation"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d9108ff355ca1cc79cf1c26dfd9d31db851411f1915411c4ca80fd6391ae5cd1",
+    "network": "Mainnet",
+    "name": "Meeting Preparation"
+   }
+  ],
+  "meme creator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b97a44d5d795fa5a8ed30e03966e48f66d5bbc13205bade30374668a4d7f8467b1",
+    "network": "Mainnet",
+    "name": "Meme Creator"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b99ff93d8d3fefa6bcae0d3dc0d64e20b9ee1ffc849275c3cc036fa9c4e222c43d",
+    "network": "Mainnet",
+    "name": "Meme Creator"
+   }
+  ],
+  "simple seo analyser beta": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b997be51333e5efdd1179688f961844dc7633fc313224d9149573debe01f5f6dc2",
+    "network": "Mainnet",
+    "name": "Simple SEO Analyser BETA"
+   }
+  ],
+  "presentation creator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b955fd73df8b6acb2a20c3e91ee66ba3a4a8f6a1426de63cf7bd048756c5a2356e",
+    "network": "Mainnet",
+    "name": "Presentation Creator"
+   }
+  ],
+  "veo3 video generator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9fb689290f54354636195aea667accc77fcea4cfcbcee64f6de24841905e68bb5",
+    "network": "Mainnet",
+    "name": "Veo3 Video Generator"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b906f0f70bf4933ab26b9443cb279b36f06db3fe21ea604fc2e43a15c9a2eec09c",
+    "network": "Mainnet",
+    "name": "Veo3 Video Generator"
+   }
+  ],
+  "youtube channel analysis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9b19d50033247fad1afcda379eee47cf924482e30c031d2375f311a9df037093a",
+    "network": "Mainnet",
+    "name": "YouTube Channel Analysis"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9328111067778760222e83cab850261e624ece3cf13fdc7ab03540d9aa3d4bb68",
+    "network": "Mainnet",
+    "name": "YouTube Channel Analysis"
+   }
+  ],
+  "advanced web research": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9526e362a66435ea7d0364f5ef61cfc041cc4b35322edabdc693917e5dcc1289d",
+    "network": "Mainnet",
+    "name": "Advanced Web Research"
+   }
+  ],
+  "basic news research": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e83e2170170cee6a00d499e81c255168f2da0293db7f29777579595ebbcf182f",
+    "network": "Mainnet",
+    "name": "Basic News Research"
+   }
+  ],
+  "statista single answer": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9a1acea293f1890da9fa75c62f12f1d837a7ab56782f3b695ff5f3ae979bbf754",
+    "network": "Mainnet",
+    "name": "Statista Single Answer"
+   }
+  ],
+  "web single answer": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b95075ebac0446063ba674b7b142e2ea46774c1092d97416189c11d3d6c6102a54",
+    "network": "Mainnet",
+    "name": "Web Single Answer"
+   }
+  ],
+  "page content identifier beta": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9097f5e39492af1badfb5ec7261049998a13ceb7fe731c3aad0d5ec4b13d1f08e",
+    "network": "Mainnet",
+    "name": "Page Content Identifier BETA"
+   }
+  ],
+  "page design analysis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b95333dad7a3e0addf7a7feefadec8f88147e05f9da9b14d7c86d98fa60fe124b1",
+    "network": "Mainnet",
+    "name": "Page Design Analysis"
+   }
+  ],
+  "prompt engineering coach": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b947bbd1566b5ab8f7aa0d22b2f0704e2b1d28e0b4d362a596f45934cdef4e1d6f",
+    "network": "Mainnet",
+    "name": "Prompt Engineering Coach"
+   }
+  ],
+  "instagram page analysis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b982aaceddf5ac4d07100d5b2c21dae1c15c3e1b81fec4020f1aff2c688168613e",
+    "network": "Mainnet",
+    "name": "Instagram Page Analysis"
+   }
+  ],
+  "basic company researcher": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b96eb3cdd263f59293a870ea336f3c69b31dba1b0a30fa4d7eb71747d7b92b069d",
+    "network": "Mainnet",
+    "name": "Basic Company Researcher"
+   }
+  ],
+  "llms.txt generator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9eb8266e5dcbded387d3d40a353c053347caa218a65c2f3901f9273b38a555302",
+    "network": "Mainnet",
+    "name": "LLMs.txt Generator"
+   }
+  ],
+  "movie ideation helper": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b981d847d04b89e562096baf9d696017a77887a0b3d04e422853987efc377237b1",
+    "network": "Mainnet",
+    "name": "Movie Ideation Helper"
+   }
+  ],
+  "presentation creation": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b960fbf13d09d5b4c47e7e962e1837df9f704bdb1aa23cfa99f3ebced494be1914",
+    "network": "Mainnet",
+    "name": "Presentation Creation"
+   }
+  ],
+  "simple seo analysis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9c2853c68592ebfb166bd29c2c611c0688158f773d3db2f98525d601d626af3a9",
+    "network": "Mainnet",
+    "name": "Simple SEO Analysis"
+   }
+  ],
+  "health & fitness plan creation": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f033e61f4ca048d11bd88a22688c750e0560347783608d2e9e54c66472d37857",
+    "network": "Mainnet",
+    "name": "Health & Fitness Plan Creation"
+   }
+  ],
+  "x account analyzer": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b968eee886ea644d1ea89d67f8de819a068025a7eb578220f584ef769a95e5bfc6",
+    "network": "Mainnet",
+    "name": "X Account Analyzer"
+   }
+  ],
+  "ask the crowd": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9801e0c78c7e23ab0dc3f69ed038bbf489f2402e728143022eb99e2df48d87d88",
+    "network": "Mainnet",
+    "name": "Ask The Crowd"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d1fb4edd2575d65d86ae678589f09fbf5458fff9b28c0faa7efc98cce05a5d86",
+    "network": "Mainnet",
+    "name": "Ask The Crowd"
+   }
+  ],
+  "emotional sensing": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9273955c952099a8ff44635947206cde7dd940d8a56323167af5c3d086a807939",
+    "network": "Mainnet",
+    "name": "Emotional Sensing"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9c083279f52f61ebfbc1ba38c20514a89a9ffcfdde2400203879a69c7daa84f53",
+    "network": "Mainnet",
+    "name": "Emotional Sensing"
+   }
+  ],
+  "agent name": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9ad93a5193bc1c287209163716c19f6d81c1885bba5c5a7d3b455f87257f74720",
+    "network": "Mainnet",
+    "name": "Agent Name"
+   }
+  ],
+  "product reality check": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b91a8a7abbc0228db77d9dc8422fe81504b1362e15eb2cfc5aaf4aed6a0a20f0ad",
+    "network": "Mainnet",
+    "name": "Product Reality Check"
+   }
+  ],
+  "attention insight": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9c3d7bb2ef6a35d06b98700aebff51b54d3127ed905cfa5db028772013a632e15",
+    "network": "Mainnet",
+    "name": "Attention Insight"
+   }
+  ],
+  "sp internal: page content identifier beta": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e1e2d51eb1deedbbeceaf3de294f850cf020460466e17aa205e2de90662e3716",
+    "network": "Mainnet",
+    "name": "SP Internal: Page Content Identifier BETA"
+   }
+  ],
+  "sp internal: prompt engineering coach": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9efd8f4e8b078b12a20be570c9902d774ad756617fd4a1efd5b547e085aa7a64c",
+    "network": "Mainnet",
+    "name": "SP Internal: Prompt Engineering Coach"
+   }
+  ],
+  "sp internal: basic news research": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9c075efeeebf5826e52380dbae3930e3bce8f4df5939d6403367c605b1c5eab6a",
+    "network": "Mainnet",
+    "name": "SP Internal: Basic News Research"
+   }
+  ],
+  "sp internal: youtube channel analysis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9be05d315729a4233cef53a5c1ab05e3857c7f94baacf187407b98845025abd5e",
+    "network": "Mainnet",
+    "name": "SP Internal: YouTube Channel Analysis"
+   }
+  ],
+  "sp internal: page design analysis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b955834b508168b06b4dbb8158a0bbf19ca2463a106f318a037640cac552e126fa",
+    "network": "Mainnet",
+    "name": "SP Internal: Page Design Analysis"
+   }
+  ],
+  "sp internal: basic company researcher": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b93543d43e0d129fe049ea0a0aec7028a10c586563a706fc9d4febcdf041acbc58",
+    "network": "Mainnet",
+    "name": "SP Internal: Basic Company Researcher"
+   }
+  ],
+  "sp internal: product reality check": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2fd9dd94a1d5360ce830fb38c912b3aa46898cd2da74e36bc75713156fc0e51",
+    "network": "Mainnet",
+    "name": "SP Internal: Product Reality Check"
+   }
+  ],
+  "let the crowd decide": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9569d28cc25ac5072c42383a3a9c5ba2fad6892b66a68282472309572230208a0",
+    "network": "Mainnet",
+    "name": "Let The Crowd Decide"
+   }
+  ],
+  "gwi spark": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b92eab9d694cbd496a8feb167f059a85a9b0c8896914ffab868f169aec168271a1",
+    "network": "Mainnet",
+    "name": "GWI Spark"
+   }
+  ],
+  "knight": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+    "network": "Mainnet",
+    "name": "Knight"
+   }
+  ],
+  "agent t": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b95293a1a5785bd7e8f75c42d75787d19d21899a1eea8bbed9d1faa41db6cd3e14",
+    "network": "Mainnet",
+    "name": "Agent T"
+   }
+  ],
+  "extended audience profiles": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9c64339def14d95480faa2fcb38564a6846c63e75746299620fc7cb104c7e7ab1",
+    "network": "Mainnet",
+    "name": "Extended Audience Profiles"
+   }
+  ],
+  "page ranking insights": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b92b05f8ca250e868417d53d34ee98448f19bc01003515b1632c9b09a0c33348e2",
+    "network": "Mainnet",
+    "name": "Page Ranking Insights"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e6809b724cdc52b91f3f899908a4c9c341fb5b20ba4cd757bd0307ad3b7bd77b",
+    "network": "Mainnet",
+    "name": "Page Ranking Insights"
+   }
+  ],
+  "x analyst for businesses": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b98ed137313cec63ff32a38cadb364ff922aeacb3da172b1969c050d4e73a7c380",
+    "network": "Mainnet",
+    "name": "X Analyst For Businesses"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b94f53c013b3b7ed77e79ac608c31db41cf657532c684ad1f1474e9f6295b5fa3d",
+    "network": "Mainnet",
+    "name": "X Analyst For Businesses"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9067fa9ee2cbbf26aa40c09ec475eb16649aa991426c0c7f59d23aba9cbc3f216",
+    "network": "Mainnet",
+    "name": "X Analyst For Businesses"
+   }
+  ],
+  "fred economic data agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9735933f6945687f6c5d762f6db7ed022d4f0dfd979437bcc8c56b252d86af8ed",
+    "network": "Mainnet",
+    "name": "FRED Economic Data Agent"
+   }
+  ],
+  "candi": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b962169f10bef63ac271fc296602e090fd41d295781440ad2e72e6624f05e4f8b8",
+    "network": "Mainnet",
+    "name": "CANDI"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b99f41649579808f74ef0a62074b8de1c5cee8972821b04b6ebdd17ee5fd2efc02",
+    "network": "Mainnet",
+    "name": "CANDI"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b99fb12edbc330c356a7d5880661213e167d69dbd3e29940e7be48060d43a9014e",
+    "network": "Mainnet",
+    "name": "CANDI"
+   }
+  ],
+  "metaflow": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9ef683eb787fcfe50f7e3069e8cebdc51af2ed37d1d793c42cf4f03dc0be4c0b6",
+    "network": "Mainnet",
+    "name": "MetaFlow"
+   }
+  ],
+  "stock photos agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b925a855f25d1fe1835caca09af61f514cf8e59d67d5ec797903914d10edee0ff2",
+    "network": "Mainnet",
+    "name": "Stock Photos Agent"
+   }
+  ],
+  "dpa research agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9130aef218189f42447e06c1571eb6a039ea387a3c020490d34d5514b68c55fbe",
+    "network": "Mainnet",
+    "name": "dpa Research Agent"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b90400955cf54fddbcf102f572621b97268ab645f8f99d56f0780e98d2187865ab",
+    "network": "Mainnet",
+    "name": "dpa Research Agent"
+   }
+  ],
+  "ask the crowd hitl": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e7ae91b7ff09157c94b01a612d3199018a6a03acf3aa4d41af67974bf14a8680",
+    "network": "Mainnet",
+    "name": "Ask the Crowd HITL"
+   }
+  ],
+  "ad visuals generator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b967728f2e4ceaffb03383b45ac1795805a3c133cd3fcbb170440636e3f765ba31",
+    "network": "Mainnet",
+    "name": "Ad Visuals Generator"
+   }
+  ],
+  "one pompt -> 100+ image models": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b95dd47cca890197cf97dac86c70393bfaeed7f3d42647905d66a58f11cae3c303",
+    "network": "Mainnet",
+    "name": "One Pompt -> 100+ Image Models"
+   }
+  ],
+  "midesk market intelligence": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9bb212cb040d852ee3046182d08b455597205e393ef431e00206d453b0acf3933",
+    "network": "Mainnet",
+    "name": "Midesk Market Intelligence"
+   }
+  ],
+  "catalyst analysis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b973071002099ff8ba0773baf69a8255f2a0ca14a31fffedc098da8c874564572f",
+    "network": "Mainnet",
+    "name": "Catalyst Analysis"
+   }
+  ],
+  "quote extractor agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9da9bb61661a2c0de2219fb08e3afc8de4a7ce1947725321175a7f0fd74a21304",
+    "network": "Mainnet",
+    "name": "Quote Extractor Agent"
+   }
+  ],
+  "multi-image video animation": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b96260a2c61d9ba65557c82bfa5ed930f30321b1c1248fb56dac201d6152cd66f8",
+    "network": "Mainnet",
+    "name": "Multi-Image Video Animation"
+   }
+  ],
+  "mass video generator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b95f41e90a6f957e5eed1f00957af8ba18bae5b4130e64be775256ced9652f9a99",
+    "network": "Mainnet",
+    "name": "Mass Video Generator"
+   }
+  ],
+  "nexus ai services": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b93cde93666a2da9645802afbb37f332864c57d65bc2a831b16153ad99d1288106",
+    "network": "Mainnet",
+    "name": "NEXUS AI Services"
+   }
+  ],
+  "velvoite eu financial regulation monitor": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9be239e7f32109fb571abdc17c0c39dd22caf771c83528a9aed610728e2c882cc",
+    "network": "Mainnet",
+    "name": "Velvoite EU Financial Regulation Monitor"
+   }
+  ],
+  "usdcx test agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b94f5a4521a0662261894648c394ec17d5ccaba575f9f9175b07b6dcf9bd9d1515",
+    "network": "Mainnet",
+    "name": "USDCx Test Agent"
+   }
+  ],
+  "advanced web research (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b912a448bc17e2c5a1c26be038ee0e9758edac58074f74d8c942e9cade397fee37",
+    "network": "Mainnet",
+    "name": "Advanced Web Research (bansumi)"
+   }
+  ],
+  "gwi spark (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b95ec4b8066456db20fcb58a2b7c9e6d2e569a4730a242f4f0006c9672a31322bc",
+    "network": "Mainnet",
+    "name": "GWI Spark (Bansumi)"
+   }
+  ],
+  "company researcher (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b984483f2220e868a45ffe8b10b7447c6f3963477ad0c72c90d11707738cfcba5b",
+    "network": "Mainnet",
+    "name": "Company Researcher (Bansumi)"
+   }
+  ],
+  "emotional sensing (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9aa7e9ce696ff09b5711693e2cf7966c68437fc6000d79cde66e61b991a635b0b",
+    "network": "Mainnet",
+    "name": "Emotional Sensing (Bansumi)"
+   }
+  ],
+  "facebook page analysis (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b931e6828f3288687ed613e907d2b97e1e687e6fa4958792dbbf6adf2d24999146",
+    "network": "Mainnet",
+    "name": "Facebook Page Analysis (Bansumi)"
+   }
+  ],
+  "instagram page analysis (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e06329ce26be6a906813d9eefafd6839e7033d2ecbb1873995815360f5bcb894",
+    "network": "Mainnet",
+    "name": "Instagram Page Analysis (bansumi)"
+   }
+  ],
+  "let the crowd decide (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9a2f378c3147d7b9625429422c2aa3aa3c6953a02db1b2116570466196539e6cf",
+    "network": "Mainnet",
+    "name": "Let The Crowd Decide (Bansumi)"
+   }
+  ],
+  "news research (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9fe0951ce662dd5567f817aafba360a775c82b1835d9015036926f87e094f0a2e",
+    "network": "Mainnet",
+    "name": "News Research (Bansumi)"
+   }
+  ],
+  "page design analysis (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9c9208ac6d0b260ce75f4733b3c7c80f54a9e7185577f139158675198b6182ba0",
+    "network": "Mainnet",
+    "name": "Page Design Analysis (Bansumi)"
+   }
+  ],
+  "page copy assessment (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9cde00483fdcacff04e0569a3093b5fa3499e78fd1eb2c0fba160fff4aeda055f",
+    "network": "Mainnet",
+    "name": "Page Copy Assessment (Bansumi)"
+   }
+  ],
+  "website content clustering (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b91330e9d28bdb0dce69bcfaaba37c93a86ecd7731fe3c7f2a388157d2209d3bf5",
+    "network": "Mainnet",
+    "name": "Website Content Clustering (Bansumi)"
+   }
+  ],
+  "product reality check (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b94d63da3ea8f334920bab2b5adba96a527bc35c532c031b06ae20d7350cc9d159",
+    "network": "Mainnet",
+    "name": "Product Reality Check (Bansumi)"
+   }
+  ],
+  "prompt engineering coach (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9eeb0f98fc4777fc69ac834bf7fb84f2101f647222c6a45da77b3c8e4e16622cd",
+    "network": "Mainnet",
+    "name": "Prompt Engineering Coach (Bansumi)"
+   }
+  ],
+  "statista research (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d547ff609fad6c0f30a2c9ee3a4f13c8cfd8314b42e21bed935a45350f54dcf8",
+    "network": "Mainnet",
+    "name": "Statista Research (Bansumi)"
+   }
+  ],
+  "tiktok profile analysis (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b98a7cc1867bb23e672be4763ebc665f78f10245b303336523e2f45d41798615f4",
+    "network": "Mainnet",
+    "name": "TikTok Profile Analysis (Bansumi)"
+   }
+  ],
+  "web single answer (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9ef78dfab88a2e9dadd2b07e5486b2eef27c26b0a7ff8c132daec246d029c79dd",
+    "network": "Mainnet",
+    "name": "Web Single Answer (bansumi)"
+   }
+  ],
+  "youtube channel analysis (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b93eeefdb610e67a89b48867eabe8f0db59055b549cc2ecac6bd94a362d1c5eb09",
+    "network": "Mainnet",
+    "name": "YouTube Channel Analysis (Bansumi)"
+   }
+  ],
+  "ask the crowd - opinion (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9ffe41be72ccc8b8de4423e3c1277dedb5db86b2abd6c0469bbbbf8e990bfa7e6",
+    "network": "Mainnet",
+    "name": "Ask the Crowd - Opinion (Bansumi)"
+   }
+  ],
+  "ask the crowd - survey (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b967aa109817364ff7b5f69f944426f0c457932b39e5ea5a8c597e6c9a5991f71b",
+    "network": "Mainnet",
+    "name": "Ask the Crowd - Survey (Bansumi)"
+   }
+  ],
+  "extended audience profiles (bansumi)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e6efd84cd6ad3ca8a237b5d951a570502637f617cc244cfeb3a84c916fbde9bb",
+    "network": "Mainnet",
+    "name": "Extended Audience Profiles (Bansumi)"
+   }
+  ],
+  "truesource ai": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b93bac65d87228cbda4bd4ca4fcdcc9ed3121e7889564c3237d6b5a7f79c93430c",
+    "network": "Mainnet",
+    "name": "TrueSource AI"
+   }
+  ],
+  "website traffic analysis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9208b14ecd7c07f0e4279477bb0a39bb5ee9b82792d6f7dfdcf193e0c71075b7f",
+    "network": "Mainnet",
+    "name": "Website Traffic Analysis"
+   }
+  ],
+  "google maps intelligence": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f3cb97995ff5b41c6513ab0133f711edff9366601b05ee428c933f73576ac2ce",
+    "network": "Mainnet",
+    "name": "Google Maps Intelligence"
+   }
+  ],
+  "reddit research": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b904c641ed08591e6450b74edf33b9aa17f7968e6a1eabb12d15780a5862e0e36b",
+    "network": "Mainnet",
+    "name": "Reddit Research"
+   }
+  ],
+  "geo sniffer": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b995d4c275cdb5caa73f345c0c8387ed8822f701bfa58782c589dbd1e6c7cd8039",
+    "network": "Mainnet",
+    "name": "GEO Sniffer"
+   }
+  ],
+  "hepha coding agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b91225c82439c351d5c6b83bc139802b8484736c7438d62c99ee6989738591f75d",
+    "network": "Mainnet",
+    "name": "Hepha Coding Agent"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b965d5c45321ea08eaa35b741e55dcf0ef051087ecd639965cb02e36991d20dea2",
+    "network": "Mainnet",
+    "name": "Hepha Coding Agent"
+   }
+  ],
+  "headline finder": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b91c37d6f945cac4c7024475575fc2058779bf567ee99bde9f83ef44b2dac6e0d2",
+    "network": "Mainnet",
+    "name": "Headline Finder"
+   }
+  ],
+  "organization analysis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2124fefec901e6aaaff021ff6e863323465612de6a51c81c73e7163e7825ab8",
+    "network": "Mainnet",
+    "name": "Organization Analysis"
+   }
+  ],
+  "ad-visual animator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d1734b4fcd54742edb9b4cd57aa68bebe11cb464a66d26f059f4dbb1c9bae3f6",
+    "network": "Mainnet",
+    "name": "Ad-Visual Animator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1085d00753f704b341bc7229d43ba5c0c7480e96938dab4df03ab42fdb000000",
+    "network": "Mainnet",
+    "name": "Ad-Visual Animator"
+   }
+  ],
+  "ad-campaign generator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d5695038238298a25c951887a8a3974ad079c56956d9e0cc1b7ba5627f837045",
+    "network": "Mainnet",
+    "name": "Ad-Campaign Generator"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9321aac76bb5bcab2cc15adde7e25c2cc10393aa5f5102b30684563f057d90b32",
+    "network": "Mainnet",
+    "name": "Ad-Campaign Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1389587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Ad-Campaign Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1389587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Ad-Campaign Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1389587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Ad-Campaign Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1389587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Ad-Campaign Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1389587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Ad-Campaign Generator"
+   }
+  ],
+  "attentioninsight analysis agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9aee9e7a82ef30a95f7c68411d81df20e689bf65da22f997ba80b80049743b431",
+    "network": "Mainnet",
+    "name": "AttentionInsight Analysis Agent"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b946fb4e6a3c289bd0c7e25b59e1714c7792ded4a70e56f2747c8c24f5021eec64",
+    "network": "Mainnet",
+    "name": "AttentionInsight Analysis Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1489587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "AttentionInsight Analysis Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1489587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "AttentionInsight Analysis Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1489587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "AttentionInsight Analysis Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1489587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "AttentionInsight Analysis Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1489587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "AttentionInsight Analysis Agent"
+   }
+  ],
+  "mass image generator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9930322401ccb08ee2d7e544904ef3e942ea254fb19335180243c6afd86d1a775",
+    "network": "Mainnet",
+    "name": "Mass Image Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1189587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Mass Image Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1189587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Mass Image Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1189587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Mass Image Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1189587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Mass Image Generator"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1189587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Mass Image Generator"
+   }
+  ],
+  "quote extractor": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d812a4bf90f30fccb0d02b5e6602b9b8f10d98c73cd15c1713ef7dd15f65be05",
+    "network": "Mainnet",
+    "name": "Quote Extractor"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1089587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Quote Extractor"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1089587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Quote Extractor"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1089587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Quote Extractor"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1089587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Quote Extractor"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1089587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "Quote Extractor"
+   }
+  ],
+  "movie production agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9885a5741c45bb38c258c7260ceadecc6abedef7c1048af20a1d4cf9c4e07a089",
+    "network": "Mainnet",
+    "name": "Movie Production Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1007a95195eaf5c2f23f83308837e157a55cf62809c5cc9397c800acc8000000",
+    "network": "Mainnet",
+    "name": "Movie Production Agent"
+   }
+  ],
+  "llm.txt generator agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9a11c55faa7f473e66a257a018390540be32d87220c5f5dccfafe1556ce5ed188",
+    "network": "Mainnet",
+    "name": "LLM.txt Generator Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1289587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "LLM.txt Generator Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1289587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "LLM.txt Generator Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1289587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "LLM.txt Generator Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1289587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "LLM.txt Generator Agent"
+   },
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1289587575b6b7d8f7f4a2ff376ddab260bdcbed195b8141514a443d3e000000",
+    "network": "Mainnet",
+    "name": "LLM.txt Generator Agent"
+   }
+  ],
+  "albina nikiforova": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e44ebf4832ae1434dbbc7bb9f0ea9c23b20cc000e06ff8616e1f4d224bcea38f",
+    "network": "Mainnet",
+    "name": "Albina Nikiforova"
+   }
+  ],
+  "sebastian kuepers": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b93344eabf82f2f5939712eb7e8de759421fcfa0fdf548cf35cf29208999f5df51",
+    "network": "Mainnet",
+    "name": "Sebastian Kuepers"
+   }
+  ],
+  "lisa": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b94716a91486fa7c22476e913526b2af97a82c4c199162c6ab241fb8fe2f9fee14",
+    "network": "Mainnet",
+    "name": "Lisa"
+   }
+  ],
+  "elena": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9144b9c1ce076000d9d1cd11773f8ce425bad0050903bce3df8562ff1dea4b387",
+    "network": "Mainnet",
+    "name": "Elena"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9c317a990e7ed8c7e6490dec1f89b2611710a612e995e43feb67bdae58f5d310c",
+    "network": "Mainnet",
+    "name": "Elena"
+   }
+  ],
+  "elena (staging)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b96eb194c0bd50db9c1be00c6134ce526552af49394ef050d99e5c707c5a89b258",
+    "network": "Mainnet",
+    "name": "Elena (Staging)"
+   }
+  ],
+  "patrick": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f9bdb7e0e8471021ee953f9ed108455cd8ecb6c9ffcebd8cc495c21044396797",
+    "network": "Mainnet",
+    "name": "Patrick"
+   }
+  ],
+  "elena staging": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9b618880c0a767d08fa3a7ced32396b55b90855dd8f04780edcfa339f3eadc94e",
+    "network": "Mainnet",
+    "name": "Elena Staging"
+   }
+  ],
+  "francisluz": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b933d3fa8ba70061413cfa3d13e9bdfa5ec0767b6994af1b9e45a87ba389b9420a",
+    "network": "Mainnet",
+    "name": "Francisluz"
+   }
+  ],
+  "francis agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9ccddc54f9d107290ed804644bb746a2854851030ea8f6641b492c1861acf34f9",
+    "network": "Mainnet",
+    "name": "Francis Agent"
+   }
+  ],
+  "andreas osberghaus": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b989fb1c55d23c96d662307a3142b6ac75a0e5468e8a767a5014c7452f1d36a5f4",
+    "network": "Mainnet",
+    "name": "Andreas Osberghaus"
+   }
+  ],
+  "andreas": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9edd2cf109da2ccbc22d2b1771461652e4c79639d89009648d0c639b58555e83f",
+    "network": "Mainnet",
+    "name": "Andreas"
+   }
+  ],
+  "francis": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b906d9482b3b303ddaab901395f57a164152e00a28829b00ff3e81dc5bafe5ea74",
+    "network": "Mainnet",
+    "name": "Francis"
+   }
+  ],
+  "alexknotts": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9912335bcf5a65711af2094d338441d0277a7258b3cc925a9fba639e2ac3d0053",
+    "network": "Mainnet",
+    "name": "Alexknotts"
+   }
+  ],
+  "jonah": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9fd511997370afe5acd10ee3085e36382069607d52174e56c00a33f7aa24d33e0",
+    "network": "Mainnet",
+    "name": "Jonah"
+   }
+  ],
+  "baxter-jonah-clawbot": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9c4222cca3b9d602872001d8e3630b54060e49456048dd1ad0c413d20fafbc59b",
+    "network": "Mainnet",
+    "name": "baxter-jonah-clawbot"
+   }
+  ],
+  "test": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f9032f5498cf677a0c1f2cb511c2275b14b13f3e702d88a7f0a160b2e1f5da6b",
+    "network": "Mainnet",
+    "name": "test"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b92b8ad790237ee8a1252663a6c4368604f5a9178574dadb6d93f575b92241eaf1",
+    "network": "Mainnet",
+    "name": "test"
+   }
+  ],
+  "nexus": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b93009fa0967d221c57d92a08a749ebc1f875c421da4e068bab3b8a8c5e76d8d76",
+    "network": "Mainnet",
+    "name": "Nexus"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b99b7dd5e02622d4346a2e37438662234b4ed28be70e9d953a2913c3cbc556bab6",
+    "network": "Mainnet",
+    "name": "Nexus"
+   }
+  ],
+  "sentinel": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9b8b7b716e7fe1e6d200d08dcb407e8d97925c5d823ff8458d49fd5407e52d4b0",
+    "network": "Mainnet",
+    "name": "Sentinel"
+   }
+  ],
+  "echo": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b988bee87fc95627ce12e38bbdc5d3ce7db93c39058cf781c4a6a39bdf37f549b0",
+    "network": "Mainnet",
+    "name": "Echo"
+   }
+  ],
+  "circuit": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b902b2bcc377bd2236c73e813bc1dc5845bd20ec316a9c3dc530ec6dd8ec87824e",
+    "network": "Mainnet",
+    "name": "Circuit"
+   }
+  ],
+  "auditor": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9542bbfc2280af3399052d107ebf7a09650b5ff4808864288bc0886508ff6d2a5",
+    "network": "Mainnet",
+    "name": "Auditor"
+   }
+  ],
+  "compass": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9aec403b3680521634124eeb1ed9c5764c489da5993d52c4239573730f71043af",
+    "network": "Mainnet",
+    "name": "Compass"
+   }
+  ],
+  "forge": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9282027bde841b367baaa3a4438a4350231810af1bfb5581917a6f084351cb50d",
+    "network": "Mainnet",
+    "name": "Forge"
+   }
+  ],
+  "sarthi borkar": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9b31240c7dc97427c4d01a26321dcd5a087156effff0036332435b42619b682a2",
+    "network": "Mainnet",
+    "name": "Sarthi Borkar"
+   }
+  ],
+  "nori-devrel": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9a347388f02b0caea1e3e2ed957642ba1f63dc1a85734e16dd99c863e9538b641",
+    "network": "Mainnet",
+    "name": "nori-devrel"
+   }
+  ],
+  "albina-personal": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b94cf3bd03b7d9365a298b76f8dc31172aa8afa222303c28c836b67f896c814fef",
+    "network": "Mainnet",
+    "name": "albina-personal"
+   }
+  ],
+  "bytegenlabs": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9bf22cbb0b56cfdb1bd16555d48d8eb90cade8ec8374da9d0bdda5c168364daa6",
+    "network": "Mainnet",
+    "name": "Bytegenlabs"
+   }
+  ],
+  "sandro schaier": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9b586f00bdd8c182de75687984055069bd6708f4c7d91359e5b4b60e71e6f5510",
+    "network": "Mainnet",
+    "name": "Sandro Schaier"
+   }
+  ],
+  "cli test bot": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9a40d990418b9db76030c2225062a3cbee604c81fa4651c649638b2c162cab0be",
+    "network": "Mainnet",
+    "name": "CLI Test Bot"
+   }
+  ],
+  "thyme": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e7fb8ae7cc55b1727f43fb5e7230a79e5a5897b54a7b1b484e2456274f18839f",
+    "network": "Mainnet",
+    "name": "Thyme"
+   }
+  ],
+  "masumi-data-agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b921e2dd94561b3357e7d02e337425990fb4a4da908dcde54ff05c88a20ee3b5a4",
+    "network": "Mainnet",
+    "name": "masumi-data-agent"
+   }
+  ],
+  "connect": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9ad628c92544d9807a2cda6892f56df3e25179f009f9788cc4bdf1dfd50ad9caf",
+    "network": "Mainnet",
+    "name": "Connect"
+   }
+  ],
+  "connect concierge (staging)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b91dbfd4fc34e59885e22d532fa5705992c174e116d687eaac78266d87963c657b",
+    "network": "Mainnet",
+    "name": "Connect Concierge (staging)"
+   }
+  ],
+  "elena (connect, staging)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b911c0fd0402f83125c23863dce9334af9ecc127e60ef89439696c67e71ae94101",
+    "network": "Mainnet",
+    "name": "Elena (Connect, staging)"
+   }
+  ],
+  "peter jaschkowske": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f638d5e6132b8026907625f5721c7f858164f0df2e26b2b5a84a92d4d7985bfc",
+    "network": "Mainnet",
+    "name": "Peter Jaschkowske"
+   }
+  ],
+  "hannah by serviceplan": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9358a8f301629c9f8294995e036dec15948b6f26e564ee75482a53d562e42c4a7",
+    "network": "Mainnet",
+    "name": "Hannah by Serviceplan"
+   }
+  ],
+  "connect staging": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b91916d71158d0e3777c1a8ad4aeeecc5918cb700b6cd5f7810dbd94f82eb85922",
+    "network": "Mainnet",
+    "name": "Connect Staging"
+   }
+  ],
+  "auto agent builder": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b965a48d06125b3001a75bdc92a36d560df5d6deefc1e7fcf38d1ef3b5311531e1",
+    "network": "Mainnet",
+    "name": "Auto Agent Builder"
+   }
+  ],
+  "agent builder loop": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d0414d63279fef2d51f7cf8c24873022f525d34c096b2720e2f43e76f16a6626",
+    "network": "Mainnet",
+    "name": "Agent Builder Loop"
+   }
+  ],
+  "alex by serviceplan": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9145683007cec98e1eaed4255a740e04927524a62660fdbe52e206609e2829092",
+    "network": "Mainnet",
+    "name": "Alex by Serviceplan"
+   }
+  ],
+  "elena by serviceplan": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b95a9473bf51995093e85d2fa466f0bf6629c7e3bd84c2a0aede4ed1ed89279ae5",
+    "network": "Mainnet",
+    "name": "Elena by Serviceplan"
+   }
+  ],
+  "statista key insight": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d279d1c7823e4d0a47413a517256250ee420b459cb4bbfbb153a8e83aca58562",
+    "network": "Mainnet",
+    "name": "Statista Key Insight"
+   }
+  ],
+  "sandro": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9a31bff9b4899edcd8b942ff5ab9ea65543de63cdbc414364d1abd205fa36ea0c",
+    "network": "Mainnet",
+    "name": "Sandro"
+   }
+  ],
+  "seo & geo researcher": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9097b4963aec6e661c66f7a47872eeaa75ce39ed2148984209ebc20e422b60bbe",
+    "network": "Mainnet",
+    "name": "SEO & GEO Researcher"
+   }
+  ],
+  "test agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9ed2d7b2ab230de4693f0726f6f9b8d306859a8aca396f190116d2e08c96d9f2f",
+    "network": "Mainnet",
+    "name": "test agent"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9028703c4abb205f91b0cccd61f1fbae002b6b4e97169a1b07d210f26f2374d1f",
+    "network": "Mainnet",
+    "name": "test agent"
+   }
+  ],
+  "developer intelligence": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9cfa03398fccb1f58e49d7b8e1126d2e578f221d4722d9567eded2d97e8576a82",
+    "network": "Mainnet",
+    "name": "Developer Intelligence"
+   }
+  ],
+  "codex bundlewatch": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9eb03378a1d96b886dda37cf36bb63dbdca46af25f8f2315c80fbd270d9d44206",
+    "network": "Mainnet",
+    "name": "Codex BundleWatch"
+   }
+  ],
+  "codex spark": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d504b0eeef39a05c981a85db4a00a3fc5435ed359e9930145e1c4ba49d74209d",
+    "network": "Mainnet",
+    "name": "codex spark"
+   }
+  ],
+  "vulc coding agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b99a4be1281960f7cb63e0079ed71cd5cd99931b0191c700207a0165ec9f506797",
+    "network": "Mainnet",
+    "name": "Vulc Coding Agent"
+   }
+  ],
+  "igni coding agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e7c1206dcf214e1383ce683decdeaff2555c394afd37de69340ff72795c7b4f2",
+    "network": "Mainnet",
+    "name": "Igni Coding Agent"
+   }
+  ],
+  "pheme": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b98d4eaa3df02a28ace1c741be5d8f21323eb4882b19666f65811391eadd4532ba",
+    "network": "Mainnet",
+    "name": "Pheme"
+   }
+  ],
+  "hotfries brief service": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b93f7f01cd91782da0e6feb49f389afbbd36c1c2508b508971ee4a34e4fe404495",
+    "network": "Mainnet",
+    "name": "HotFries Brief Service"
+   }
+  ],
+  "florian schmieg": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b969eea0ed595c8f3adc266a290b134b5df53b67bd4db5d4caf3e1dec9b7ff8648",
+    "network": "Mainnet",
+    "name": "Florian Schmieg"
+   }
+  ],
+  "flo-nmkr": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e51404a71b61030ad9ae04fbae92ef60e915b655f593f4e3fa80bfae6c68ba9f",
+    "network": "Mainnet",
+    "name": "flo-nmkr"
+   }
+  ],
+  "gront coding agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b94da61ce09286eaaa2403a16dd7960e424bd360a3f85c580542bb9fb7f7b97822",
+    "network": "Mainnet",
+    "name": "Gront Coding Agent"
+   }
+  ],
+  "devint 233": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9abb37d287712e3d60aa674494e82fb936ea5bfc60579d17410b9f6203ab17db3",
+    "network": "Mainnet",
+    "name": "devint 233"
+   }
+  ],
+  "hermes orchestrator": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9abf8a041b2e839fbe799cbb16bbefb445e07e4635df6c871fa718a080070ab80",
+    "network": "Mainnet",
+    "name": "Hermes Orchestrator"
+   }
+  ],
+  "codex chain smoke 20260706": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9ff45234b7c9968ff9b9eaa24ae6bf8a43ac4328e11daa8f8cbb13077bad17f7e",
+    "network": "Mainnet",
+    "name": "Codex Chain Smoke 20260706"
+   }
+  ],
+  "meta ads library": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b92a2c23f6db7de2769b7268a122fb6b2b7a17350f08a41e5ff3a84c6a863831d5",
+    "network": "Mainnet",
+    "name": "Meta Ads Library"
+   }
+  ],
+  "apol": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9b7ed2f4675c1209f391f1c4885449b2de6e6233f3e0ba1fcbb4da0ecced4c2a2",
+    "network": "Mainnet",
+    "name": "Apol"
+   }
+  ],
+  "utxo ag channel viewer": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b99aea9556af64de7066d26b8bd808cf29a8ed5cfe6d46de301599ea27d1ab33b6",
+    "network": "Mainnet",
+    "name": "utxo AG Channel Viewer"
+   }
+  ],
+  "hepha (coding agent)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b92bd0295ef3703133d59da3b8d2c9fcc13aceb5d109e080f8606f9c62cf17c510",
+    "network": "Mainnet",
+    "name": "Hepha (Coding Agent)"
+   },
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9e8db3f7cd3c6475b0c7d2902a2683f518bcbe3034d7324055a622f26071f0da9",
+    "network": "Mainnet",
+    "name": "Hepha (Coding Agent)"
+   }
+  ],
+  "jaden": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9cb2d25c2a76efce218df82d288d95f9d6759e66c965b57b70ec1bafa6084a06c",
+    "network": "Mainnet",
+    "name": "Jaden"
+   }
+  ],
+  "sasaki": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b922ce91a4c72f6100589a554da5e25037be923931417c56b477d3ede7ba8944be",
+    "network": "Mainnet",
+    "name": "Sasaki"
+   }
+  ],
+  "tojakebroski": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b98e9eb36dcf02f5dd8d8cd30f04b6efba6dfe9c50a02e95ef1c0b01eb7169ba1c",
+    "network": "Mainnet",
+    "name": "Tojakebroski"
+   }
+  ],
+  "prakk": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9a70a3f8707273fc3979a17e2a93f2249097702fdc911241e65ceb639b626f2fc",
+    "network": "Mainnet",
+    "name": "Prakk"
+   }
+  ],
+  "luo data & creative agent": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f6991d762e2f6e7e35447d74e570791adfc7f70ce8159232199f941e3579cad3",
+    "network": "Mainnet",
+    "name": "Luo Data & Creative Agent"
+   }
+  ],
+  "eth sarthi": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9a25e2961886b565b9e7c707b397464f239d8e787d190f790eb225ad175e15bf3",
+    "network": "Mainnet",
+    "name": "Eth Sarthi"
+   }
+  ],
+  "claude (citadel)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b950e096aaad3254bd0860372165a67fd8691176e6cee9d63e953c582287939cb5",
+    "network": "Mainnet",
+    "name": "Claude (Citadel)"
+   }
+  ],
+  "codex (citadel)": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b92fa31b2c71205563c3b60849d2337871d256710c57f8b3c572a3d6a948ab116b",
+    "network": "Mainnet",
+    "name": "Codex (Citadel)"
+   }
+  ],
+  "dooj0209": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9ff29658792bb93f3ff4557c02461e5b9c1e408bcaf72941a03f226e7cd8ddc0e",
+    "network": "Mainnet",
+    "name": "Dooj0209"
+   }
+  ],
+  "ming-41": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9577547121d46cd0f530d9c3d69fb1b74c73f21a323e886047f6b39fbe6a1db02",
+    "network": "Mainnet",
+    "name": "ming-41"
+   }
+  ],
+  "ariley": [
+   {
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9a99d6a5146186b1955efc9fb92f8df674ea31951c8dd6979dab5190b77fef7c2",
+    "network": "Mainnet",
+    "name": "Ariley"
+   }
+  ],
+  "meme creator agent": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10330b70ca8294fd97a856b8b6fcd5cf57a103e354ad3a1a8778722f88000000",
+    "network": "Mainnet",
+    "name": "Meme Creator Agent"
+   }
+  ],
+  "digital mockup generator": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10baa34057fb9428184a7aef72d2e8a6f257c9ec148bc2374fe4e1298b000000",
+    "network": "Mainnet",
+    "name": "Digital Mockup Generator"
+   }
+  ],
+  "research": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10580b501971e1e7383e26fc84fea98a25fd941e759c9f6e75e22a447e000000",
+    "network": "Mainnet",
+    "name": "research"
+   }
+  ],
+  "test research": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1067c9206686223f5a3a5011425b8e68e9d08e007438b15ea44e42464f000000",
+    "network": "Mainnet",
+    "name": "test research"
+   }
+  ],
+  "isaac alt": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b105fdb5788d95788179cba691999730647ed4442e6e9f5f6a82fa2d283000000",
+    "network": "Mainnet",
+    "name": "Isaac Alt"
+   }
+  ],
+  "rich records": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b109ec35e837a61d1c36355bb27e114797581a3333115e55561c83b77f5000000",
+    "network": "Mainnet",
+    "name": "Rich Records"
+   }
+  ],
+  "mb": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10f5e4352a39b2bc626755059a61d0b89442c0c7021abd408149869371000000",
+    "network": "Mainnet",
+    "name": "MB"
+   }
+  ],
+  "name": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b104edb0884fe885a903d99823774f4c5f7f1d21845e57ed80a3a82ae0c000000",
+    "network": "Mainnet",
+    "name": "Name"
+   }
+  ],
+  "my research agent": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1072b9a49eae1045f6f4702cf0378a35f2d04aea30c06866d3f3247a59000000",
+    "network": "Mainnet",
+    "name": "My Research Agent"
+   }
+  ],
+  "test register": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10c1d9f47a526780ad6857ddc9a9f24f5b300b0d7fe8871d8435c55d18000000",
+    "network": "Mainnet",
+    "name": "test register"
+   }
+  ],
+  "reg probe": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10832741e7e5b438c7309bbbf941e15ae8520a496ba4eae9a0bef0b921000000",
+    "network": "Mainnet",
+    "name": "Reg probe"
+   }
+  ],
+  "new agent 01": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10b969af2ccdb5e74607f09b1b9e728fc84b3521d10200e11ec94055f9000000",
+    "network": "Mainnet",
+    "name": "new agent 01"
+   }
+  ],
+  "lord slugard": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10809aee9ca24c62005831eae97e90f01b46c05a1441b003126443b20d000000",
+    "network": "Mainnet",
+    "name": "lord slugard"
+   }
+  ],
+  "slugw2": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10bc9099e57672794323a5b3783c38a2a0eb7645263363cb767f75c3b5000000",
+    "network": "Mainnet",
+    "name": "slugw2"
+   }
+  ],
+  "slug v3": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10cc3e716812e8ed3a23a2166d2f8ea5f30d5c1c122303c8651cd30c90000000",
+    "network": "Mainnet",
+    "name": "slug v3"
+   }
+  ],
+  "slug 8": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b109cc509be93542be8f9b48cfd789a8126e0d03a3b568033da87a6777d000000",
+    "network": "Mainnet",
+    "name": "slug 8"
+   }
+  ],
+  "ian": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1082f0a5c6e1f2d7938adb2e9d86a5ae1d5d0875e776eae23c6e021787000000",
+    "network": "Mainnet",
+    "name": "Ian"
+   }
+  ],
+  "vibesprings.net \u00b7 btc usd": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10b220ceca543a22f2e5aa20ff0315232e23b766a8b029af463cf3a0fe000000",
+    "network": "Mainnet",
+    "name": "vibesprings.net \u00b7 Btc Usd"
+   }
+  ],
+  "api.onesource.io \u00b7 erc20 balance": [
+   {
+    "identifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10fe4dafdf13477cef2ee02afe08192f3c809abe30875a90c9c9ad6f5a000000",
+    "network": "Mainnet",
+    "name": "api.onesource.io \u00b7 Erc20 Balance"
+   }
+  ]
+ }
+}
