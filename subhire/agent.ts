@@ -87,10 +87,19 @@ async function payTrustCheck(client: x402Client, candidate: Candidate): Promise<
       paid = await post({ "PAYMENT-SIGNATURE": encodePaymentSignatureHeader(payload) });
       payment.httpStatuses.push(paid.status);
       if (paid.status !== 202) break;
-      // 202: the endpoint took the payment but did not deliver the report in time. Replaying that signature is
-      // answered 409 once the tx confirms, so the tx is recorded as paid without a report and a fresh payment is made.
-      const pending = (await paid.json()) as { txId?: string };
-      if (pending.txId) payment.orphanedTxs.push(pending.txId);
+      // 202: the endpoint took the payment and is still settling. Its poll URL checks the tx on chain and delivers the
+      // report for this request, so the paid tx is redeemed instead of paying again.
+      const pending = (await paid.json()) as { txId?: string; poll?: string };
+      if (!pending.poll) throw new Error("202 without a poll URL");
+      const pollDeadline = Date.now() + 180_000;
+      for (;;) {
+        await new Promise((resolve) => setTimeout(resolve, 10_000));
+        paid = await fetch(pending.poll);
+        payment.httpStatuses.push(paid.status);
+        if (paid.status !== 202) break;
+        if (Date.now() > pollDeadline) { payment.orphanedTxs.push(pending.txId ?? "unknown"); throw new Error(`poll still 202 after 180 s for ${pending.txId}`); }
+      }
+      break;
     }
     const header = paid.headers.get("payment-response");
     if (header) payment.txHash = (decodePaymentResponseHeader(header) as { transaction?: string }).transaction ?? null;
