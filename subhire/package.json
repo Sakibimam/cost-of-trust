@@ -1,0 +1,12 @@
+{
+  "name": "cost-of-trust-subhire",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun agent.ts"
+  },
+  "dependencies": {
+    "@x402/cardano": "2.28.0",
+    "@x402/core": "2.28.0"
+  }
+}

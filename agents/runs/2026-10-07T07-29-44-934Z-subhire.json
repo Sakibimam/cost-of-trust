@@ -1,0 +1,152 @@
+{
+  "kind": "subhire",
+  "startedAt": "2026-10-07T07:29:44.934Z",
+  "job": {
+    "title": "market research brief",
+    "query": "Brief on the European market for AI agent marketplaces: main players, pricing, and the last 90 days of news.",
+    "taskValueAtRiskAda": 100,
+    "deadlineMinutes": 15,
+    "capabilityTags": [
+      "research",
+      "news",
+      "analysis",
+      "strategy",
+      "ai"
+    ]
+  },
+  "trustCheckEndpoint": "https://cost-of-trust.vercel.app/api/x402/trust-check",
+  "paymentNetwork": "cardano:preprod",
+  "registry": {
+    "network": "Mainnet",
+    "policies": [
+      "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9",
+      "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b"
+    ],
+    "scanned": 291,
+    "matchedTags": 80,
+    "candidates": [
+      {
+        "name": "dpa Research Agent",
+        "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b90400955cf54fddbcf102f572621b97268ab645f8f99d56f0780e98d2187865ab",
+        "tags": [
+          "research",
+          "news"
+        ],
+        "apiBase": "https://api.iq.dpa.com/masumi/research-agent/v1"
+      },
+      {
+        "name": "Organization Analysis",
+        "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2124fefec901e6aaaff021ff6e863323465612de6a51c81c73e7163e7825ab8",
+        "tags": [
+          "organization",
+          "analysis",
+          "consulting",
+          "ai",
+          "strategy",
+          "cell-framework"
+        ],
+        "apiBase": "https://agent.resomnium.com"
+      },
+      {
+        "name": "Knight",
+        "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+        "tags": [
+          "ai"
+        ],
+        "apiBase": "https://v2.api.nuauthzk.nucast.io"
+      }
+    ]
+  },
+  "payments": [
+    {
+      "orphanedTxs": [],
+      "candidate": "dpa Research Agent",
+      "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b90400955cf54fddbcf102f572621b97268ab645f8f99d56f0780e98d2187865ab",
+      "httpStatuses": [
+        402,
+        200
+      ],
+      "txHash": "034c5542caa34b73d524199c0ddef2e3b99c043f78f8efc7ab8096e0a9f9e2f5",
+      "confirmations": 1,
+      "decision": "hire_with_backup_keeper",
+      "expectedCostAda": 4.272732727272728,
+      "selectedRoute": "staggered",
+      "paid": 1,
+      "refunded": 0,
+      "summary": "dpa Research Agent is ok in the registry evidence and has 1 paid, 0 refunded, 0 disputed. 1 of 1 recorded responses met the 900-second buyer deadline. Recommendation: hire with backup keeper with expected cost 4.272732727272728 ADA.",
+      "error": null
+    },
+    {
+      "orphanedTxs": [],
+      "candidate": "Organization Analysis",
+      "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9d2124fefec901e6aaaff021ff6e863323465612de6a51c81c73e7163e7825ab8",
+      "httpStatuses": [
+        402,
+        200
+      ],
+      "txHash": "b7997bbe7fb4d75fc274c7be74804b19b0a11891a6cba7aacf1d8067f9aa13b3",
+      "confirmations": 1,
+      "decision": "hire_with_backup_keeper",
+      "expectedCostAda": 4.272732727272728,
+      "selectedRoute": "staggered",
+      "paid": 1,
+      "refunded": 0,
+      "summary": "Organization Analysis is ok in the registry evidence and has 1 paid, 0 refunded, 0 disputed. 2 of 2 recorded responses met the 900-second buyer deadline. Recommendation: hire with backup keeper with expected cost 4.272732727272728 ADA.",
+      "error": null
+    },
+    {
+      "orphanedTxs": [],
+      "candidate": "Knight",
+      "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495",
+      "httpStatuses": [
+        402,
+        200
+      ],
+      "txHash": "bc97e7915c136fe13cd075937d46284959221d9de963c0f14b664d98b63244ac",
+      "confirmations": 1,
+      "decision": "hire_with_backup_keeper",
+      "expectedCostAda": 7.8333433333333335,
+      "selectedRoute": "staggered",
+      "paid": 0,
+      "refunded": 2,
+      "summary": "Knight is ok in the registry evidence and has 0 paid, 2 refunded, 0 disputed. 0 of 0 recorded responses met the 900-second buyer deadline. Recommendation: hire with backup keeper with expected cost 7.8333433333333335 ADA.",
+      "error": null
+    }
+  ],
+  "refused": [],
+  "choice": {
+    "agent": "dpa Research Agent",
+    "decision": "hire_with_backup_keeper",
+    "expectedCostAda": 4.272732727272728
+  },
+  "hire": {
+    "agent": "dpa Research Agent",
+    "identifier": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b90400955cf54fddbcf102f572621b97268ab645f8f99d56f0780e98d2187865ab",
+    "sent": false,
+    "note": "The hire leg is the request only. Mainnet agents cannot be paid from the preprod buyer wallet, so no start_job call or payment was made.",
+    "request": {
+      "method": "POST",
+      "url": "https://api.iq.dpa.com/masumi/research-agent/v1/start_job",
+      "body": {
+        "identifier_from_purchaser": "subhire-coworker-01",
+        "input_data": [
+          {
+            "key": "query",
+            "value": "Brief on the European market for AI agent marketplaces: main players, pricing, and the last 90 days of news."
+          }
+        ]
+      }
+    },
+    "availability": {
+      "url": "https://api.iq.dpa.com/masumi/research-agent/v1/availability",
+      "httpStatus": 200,
+      "status": "available",
+      "message": "DPA Research Agent is ready to receive questions.",
+      "ms": 631
+    }
+  },
+  "verification": {
+    "koios": "https://preprod.koios.rest/api/v1/tx_status",
+    "allConfirmed": true
+  }
+}
