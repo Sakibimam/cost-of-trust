@@ -15,7 +15,8 @@ export const onTrigger = (runtime: TeeRuntime<Config>, payload: HTTPPayload): st
   const trigger = decodeJson(payload.input) as Trigger;
   const bearer = runtime.getSecret({ id: runtime.config.koiosKeySecret }).result().value;
   const don = runtime.usingTheDons();
-  const outcome = don.runInNodeMode((node) => adjudicate(postFor(node, bearer), trigger, node.now().getTime(), node.config.claimVaultHash), consensusIdenticalAggregation<ReturnType<typeof adjudicate>>())().result();
+  // CRE Values cannot hold null or undefined, and the outcome has optional fields, so nodes agree on its canonical JSON.
+  const outcome = JSON.parse(don.runInNodeMode((node) => JSON.stringify(adjudicate(postFor(node, bearer), trigger, node.now().getTime(), node.config.claimVaultHash)), consensusIdenticalAggregation<string>())().result()) as ReturnType<typeof adjudicate>;
   const decision = outcome.decision;
   // Settle is only open from task_expiry to decide_by and never takes INCONCLUSIVE: no report is cut outside that, the underwriter recovers through Expire.
   if (decision === "INCONCLUSIVE" || outcome.facts.now > outcome.facts.decideBy) return JSON.stringify({ report: false, decision, delivered: false });
