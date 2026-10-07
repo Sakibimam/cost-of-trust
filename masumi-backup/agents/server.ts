@@ -35,14 +35,19 @@ const server = createServer(async (request, response) => {
       if (typeof input.url !== "string" || !/^https?:\/\//.test(input.url)) return send(response, 400, { error: "url is required" });
       const now = Date.now();
       const identifierFromPurchaser = randomBytes(10).toString("hex");
-      const payment = await mpsJson("/payment", { network: "Preprod", paymentSourceType: "Web3CardanoV2", supportedPaymentSourceIndex: 0, agentIdentifier, inputHash: sha256(JSON.stringify(input)), identifierFromPurchaser, payByTime: new Date(now + 5 * 60_000).toISOString(), submitResultTime: new Date(now + 20 * 60_000).toISOString(), unlockTime: new Date(now + 40 * 60_000).toISOString(), externalDisputeUnlockTime: new Date(now + 55 * 60_000).toISOString() });
+      const payment = await mpsJson("/payment", { network: "Preprod", paymentSourceType: "Web3CardanoV2", supportedPaymentSourceIndex: 0, agentIdentifier, inputHash: sha256(JSON.stringify(input)), identifierFromPurchaser, payByTime: new Date(now + 8 * 60_000).toISOString(), submitResultTime: new Date(now + 15.5 * 60_000).toISOString(), unlockTime: new Date(now + 30.5 * 60_000).toISOString(), externalDisputeUnlockTime: new Date(now + 45.5 * 60_000).toISOString() });
       const jobId = crypto.randomUUID();
       jobs.set(jobId, { payment, status: "awaiting_purchase" });
       if (!(process.env.STALL === "true" && role === "primary")) void (async () => {
         const html = await (await fetch(input.url, { signal: AbortSignal.timeout(10_000) })).text();
         const title = html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1]?.trim() ?? new URL(input.url).hostname;
-        for (let i = 0; i < 60; i++) {
-          try { await mpsJson("/payment/resolve-blockchain-identifier", { network: "Preprod", blockchainIdentifier: identifier(payment), includeHistory: "true" }); await submit(jobs.get(jobId)!, `Title: ${title}`); return; } catch { await new Promise((resolve) => setTimeout(resolve, 2_000)); }
+        for (let i = 0; i < 600; i++) {
+          try {
+            const state = await mpsJson("/payment/resolve-blockchain-identifier", { network: "Preprod", blockchainIdentifier: identifier(payment), includeHistory: "true" });
+            if (!["FundsLocked", "RefundRequested", "Disputed"].includes(state.onChainState) || !state.CurrentTransaction) throw new Error("payment is not locked");
+            await submit(jobs.get(jobId)!, `Title: ${title}`);
+            return;
+          } catch { await new Promise((resolve) => setTimeout(resolve, 2_000)); }
         }
       })();
       return send(response, 200, { job_id: jobId, payment: { ...payment, identifierFromPurchaser } });
