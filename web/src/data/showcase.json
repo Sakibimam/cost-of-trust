@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T08:49:37.192Z",
+  "generatedAt": "2026-10-07T10:38:25.938Z",
   "network": "Mainnet",
   "registryPolicy": "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9",
   "agents": [
@@ -156,7 +156,7 @@
               "arithmetic": "0 + 3.030673758865248 + (0.24113475177304963 * 5 - 0.24113475177304963 * 5) + 0.25 * 0"
             }
           },
-          "recommendation": "hire_as_is",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 1.2056737588652482,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -200,7 +200,7 @@
               "arithmetic": "0 + 3.030673758865248 + (0.24113475177304963 * 5 - 0.24113475177304963 * 5) + 0.25 * 0"
             }
           },
-          "recommendation": "hire_as_is",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 1.2056737588652482,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -244,7 +244,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 100 - 0.10000033333333333 * 80) + 0.25 * 6.000008888878601"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 5.66667390070922,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -288,7 +288,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 100 - 0.10000033333333333 * 80) + 0.25 * 6.000008888878601"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 13.303936591468153,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -332,7 +332,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 500 - 0.10000033333333333 * 80) + 0.25 * 126.00018666645063"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 21.205491896969697,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -376,7 +376,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 500 - 0.10000033333333333 * 80) + 0.25 * 126.00018666645063"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 52.85505113885133,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         }
@@ -455,7 +455,7 @@
               "arithmetic": "0 + 3.716891891891892 + (0.3783783783783784 * 5 - 0.3783783783783784 * 5) + 0.25 * 0"
             }
           },
-          "recommendation": "hire_as_is",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 1.891891891891892,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -499,7 +499,7 @@
               "arithmetic": "0 + 3.716891891891892 + (0.3783783783783784 * 5 - 0.3783783783783784 * 5) + 0.25 * 0"
             }
           },
-          "recommendation": "hire_as_is",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 1.891891891891892,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -543,7 +543,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 100 - 0.10000033333333333 * 80) + 0.25 * 6.000008888878601"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 8.891903243243245,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -587,7 +587,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 100 - 0.10000033333333333 * 80) + 0.25 * 6.000008888878601"
             }
           },
-          "recommendation": "require_coverage",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 22.200033333333334,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -631,7 +631,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 500 - 0.10000033333333333 * 80) + 0.25 * 126.00018666645063"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 21.205491896969697,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -675,7 +675,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 500 - 0.10000033333333333 * 80) + 0.25 * 126.00018666645063"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 52.85505113885133,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         }
@@ -917,7 +917,7 @@
               "arithmetic": "0 + 2.9478813559322035 + (0.2245762711864407 * 5 - 0.2245762711864407 * 5) + 0.25 * 0"
             }
           },
-          "recommendation": "hire_as_is",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 1.1228813559322035,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -961,7 +961,7 @@
               "arithmetic": "0 + 2.9478813559322035 + (0.2245762711864407 * 5 - 0.2245762711864407 * 5) + 0.25 * 0"
             }
           },
-          "recommendation": "hire_as_is",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 1.1228813559322035,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -1005,7 +1005,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 100 - 0.10000033333333333 * 80) + 0.25 * 6.000008888878601"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 5.277549110169492,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -1049,7 +1049,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 100 - 0.10000033333333333 * 80) + 0.25 * 6.000008888878601"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 12.727904178533798,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -1093,7 +1093,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 500 - 0.10000033333333333 * 80) + 0.25 * 126.00018666645063"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 21.228850988700565,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
@@ -1137,7 +1137,7 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 500 - 0.10000033333333333 * 80) + 0.25 * 126.00018666645063"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
+          "recommendation": "do_not_hire",
           "expectedCostAda": 52.52662018073426,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         }
@@ -1420,8 +1420,8 @@
               "arithmetic": "0 + 10.094736842105265 + (0.09868421052631579 * 100 - 0.09868421052631579 * 80) + 0.25 * 5.964751029812177"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
-          "expectedCostAda": 2.319081907894737,
+          "recommendation": "hire_as_is",
+          "expectedCostAda": 9.868421052631579,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
         {
@@ -1464,8 +1464,8 @@
               "arithmetic": "0 + 10.094736842105265 + (0.09868421052631579 * 100 - 0.09868421052631579 * 80) + 0.25 * 5.964751029812177"
             }
           },
-          "recommendation": "require_coverage",
-          "expectedCostAda": 12.068421052631582,
+          "recommendation": "hire_as_is",
+          "expectedCostAda": 9.868421052631579,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
         {
@@ -1508,8 +1508,8 @@
               "arithmetic": "0 + 10.094736842105265 + (0.09868421052631579 * 500 - 0.09868421052631579 * 80) + 0.25 * 125.25977162605571"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
-          "expectedCostAda": 8.240147697368421,
+          "recommendation": "hire_as_is",
+          "expectedCostAda": 49.3421052631579,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
         {
@@ -1552,8 +1552,8 @@
               "arithmetic": "0 + 10.094736842105265 + (0.09868421052631579 * 500 - 0.09868421052631579 * 80) + 0.25 * 125.25977162605571"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
-          "expectedCostAda": 37.302076472947235,
+          "recommendation": "hire_as_is",
+          "expectedCostAda": 49.3421052631579,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         }
       ]
@@ -1705,8 +1705,8 @@
               "arithmetic": "0 + 16.74545454545455 + (0.18181818181818182 * 100 - 0.18181818181818182 * 80) + 0.25 * 7.713892158398701"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
-          "expectedCostAda": 4.272732727272728,
+          "recommendation": "hire_as_is",
+          "expectedCostAda": 20.000033333333334,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
         {
@@ -1749,8 +1749,8 @@
               "arithmetic": "0 + 16.74545454545455 + (0.18181818181818182 * 100 - 0.18181818181818182 * 80) + 0.25 * 7.713892158398701"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
-          "expectedCostAda": 11.158765122543535,
+          "recommendation": "hire_as_is",
+          "expectedCostAda": 20.000033333333334,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
         {
@@ -1793,8 +1793,8 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 500 - 0.10000033333333333 * 80) + 0.25 * 126.00018666645063"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
-          "expectedCostAda": 15.181847878787881,
+          "recommendation": "hire_as_is",
+          "expectedCostAda": 60.000166666666665,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         },
         {
@@ -1837,8 +1837,8 @@
               "arithmetic": "10 + 10.200026666666668 + (0.10000033333333333 * 500 - 0.10000033333333333 * 80) + 0.25 * 126.00018666645063"
             }
           },
-          "recommendation": "hire_with_backup_keeper",
-          "expectedCostAda": 48.01807784284136,
+          "recommendation": "hire_as_is",
+          "expectedCostAda": 60.000166666666665,
           "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA."
         }
       ]
