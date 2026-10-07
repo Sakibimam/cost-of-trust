@@ -159,13 +159,17 @@ async function main() {
   const failed = payments.filter((payment) => payment.error);
   const hireable = payments.filter((payment) => !payment.error && payment.decision && HIRE.has(payment.decision) && payment.expectedCostAda !== null).sort((a, b) => a.expectedCostAda! - b.expectedCostAda!);
   const refused = payments.filter((payment) => payment.decision === "do_not_hire").map((payment) => payment.candidate);
-  const choice = hireable[0] ?? null;
-  let hire = null;
-  if (choice) {
-    const entry = registry.candidates.find((candidate) => candidate.identifier === choice.identifier)!;
-    hire = { agent: choice.candidate, identifier: choice.identifier, ...(await hireRequest(entry)) };
-    console.log(`Sub-hiring ${choice.candidate}: start_job request prepared for ${hire.request.url}, /availability ${hire.availability.status} (HTTP ${hire.availability.httpStatus}). Request only, no payment.`);
-  } else console.log("No candidate cleared the Trust Check. Nothing hired.");
+  // Cheapest cleared candidate whose input_schema takes the job query: one that cannot take it is skipped, not hired.
+  let choice: (typeof hireable)[number] | null = null;
+  let hire: Awaited<ReturnType<typeof hireRequest>> & { agent: string; identifier: string } | null = null;
+  const unsuitable: Array<{ agent: string; reason: string }> = [];
+  for (const candidate of hireable) {
+    const entry = registry.candidates.find((item) => item.identifier === candidate.identifier)!;
+    try { hire = { agent: candidate.candidate, identifier: candidate.identifier, ...(await hireRequest(entry)) }; choice = candidate; break; } catch (error) { unsuitable.push({ agent: candidate.candidate, reason: error instanceof Error ? error.message : String(error) }); }
+  }
+  for (const skipped of unsuitable) console.log(`Skipped ${skipped.agent}: ${skipped.reason}.`);
+  if (choice && hire) console.log(`Sub-hiring ${choice.candidate}: start_job request prepared for ${hire.request.url}, /availability ${hire.availability.status} (HTTP ${hire.availability.httpStatus}). Request only, no payment.`);
+  else console.log("No candidate cleared the Trust Check. Nothing hired.");
 
   const startedAt = new Date().toISOString();
   const run = {
@@ -177,6 +181,7 @@ async function main() {
     registry: { network: "Mainnet", policies: MAINNET_POLICIES, scanned: registry.scanned, matchedTags: registry.matched, candidates: registry.candidates },
     payments,
     refused,
+    unsuitable,
     choice: choice ? { agent: choice.candidate, decision: choice.decision, expectedCostAda: choice.expectedCostAda } : null,
     hire,
     verification: { koios: `${KOIOS_PREPROD}/tx_status`, allConfirmed: payments.length > 0 && payments.every((payment) => payment.txHash && payment.confirmations >= 1) },
