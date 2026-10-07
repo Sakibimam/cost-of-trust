@@ -88,10 +88,10 @@ The buyer's risk appetite and keeper infrastructure determine the route.
 
 | Buyer risk aversion | Independent keepers | Shared infrastructure |
 | --- | --- | --- |
-| 0 | Staggered A > B, 11.10 ADA | Staggered A > B, 18.24 ADA |
-| 0.25 | Staggered A > B, 15.36 ADA | Staggered B > A, 25.75 ADA |
-| 0.5 | Staggered A > B, 19.63 ADA | Underwritten B, 29.60 ADA |
-| 1 | Staggered B > A, 27.71 ADA | Underwritten B, 37.00 ADA |
+| 0 | Staggered A > B, 10.82 ADA | Staggered A > B, 17.70 ADA |
+| 0.25 | Staggered A > B, 14.89 ADA | Underwritten B, 23.70 ADA |
+| 0.5 | Staggered A > B, 18.96 ADA | Underwritten B, 25.20 ADA |
+| 1 | Staggered B > A, 26.98 ADA | Underwritten B, 28.20 ADA |
 
 The router returns each eligible route with expected loss, standard deviation, premium, arithmetic, and risk-adjusted cost. It selects the minimum risk-adjusted cost.
 

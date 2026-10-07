@@ -138,10 +138,10 @@ box(s, 3.9, 1.82, 4.1, 0.4, "INDEPENDENT KEEPERS", 13, TEAL, True, MONO, PP_ALIG
 box(s, 8.2, 1.82, 4.1, 0.4, "SHARED INFRASTRUCTURE", 13, ORANGE, True, MONO, PP_ALIGN.CENTER)
 # Source: docs/SPEC.md selection table.
 rows = [
-    ("0", "Staggered A > B\n11.10 ADA", "Staggered A > B\n18.24 ADA"),
-    ("0.25", "Staggered A > B\n15.36 ADA", "Staggered B > A\n25.75 ADA"),
-    ("0.5", "Staggered A > B\n19.63 ADA", "Underwritten B\n29.60 ADA"),
-    ("1", "Staggered B > A\n27.71 ADA", "Underwritten B\n37.00 ADA"),
+    ("0", "Staggered A > B\n10.82 ADA", "Staggered A > B\n17.70 ADA"),
+    ("0.25", "Staggered A > B\n14.89 ADA", "Underwritten B\n23.70 ADA"),
+    ("0.5", "Staggered A > B\n18.96 ADA", "Underwritten B\n25.20 ADA"),
+    ("1", "Staggered B > A\n26.98 ADA", "Underwritten B\n28.20 ADA"),
 ]
 for i, (risk, ind, shared) in enumerate(rows):
     y = 2.4 + i * 0.92
@@ -160,7 +160,7 @@ for x, head, sub, accent in [(0.75, "CAN ABSORB LOSS", "risk aversion 0  |  inde
     if x < 1:
         rows2 = [("route", "staggered A > B"), ("service", "8.10 ADA expected"), ("risk-adjusted", "8.83 ADA")]
     else:
-        rows2 = [("route", "underwritten B"), ("coverage", "10 ADA collateral"), ("risk-adjusted", "29.60 ADA")]
+        rows2 = [("route", "underwritten B"), ("coverage", "10 ADA collateral"), ("risk-adjusted", "25.20 ADA")]
     for i, (k, v) in enumerate(rows2):
         y = 3.2 + i * 0.62
         box(s, x + 0.35, y, 1.5, 0.35, k, 13, MUTED, True, MONO)
