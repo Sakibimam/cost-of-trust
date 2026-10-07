@@ -99,3 +99,11 @@ test("report flags a loopback api_base_url from chain metadata as unreachable", 
     for (const [key, value] of Object.entries(original)) if (value === undefined) delete process.env[key]; else process.env[key] = value;
   }
 });
+
+test("MIP-003 agent with /availability up and no /health route is not vetoed", () => {
+  const availability: Evidence = { source: "agent_availability", status: "ok", observedAt: "", data: { status: "available" } };
+  const noHealth: Evidence = { source: "agent_health", status: "unavailable", observedAt: "", error: "HTTP 404" };
+  const down: Evidence = { source: "agent_availability", status: "unavailable", observedAt: "", error: "HTTP 502" };
+  assert.notEqual(decide([delivery(28, 0), availability, noHealth], 100).recommendation, "do_not_hire");
+  assert.equal(decide([delivery(28, 0), down, noHealth], 100).recommendation, "do_not_hire");
+});

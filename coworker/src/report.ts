@@ -127,7 +127,15 @@ export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput
   const options = routes ? cheapestOptions(routes.routes) : emptyOptions();
   if (!record || record.paid + record.refunded + record.disputed === 0) return { recommendation: "insufficient_data", expectedCostAda: null, options, pricingNote: price.note };
   const pLoss = sellerRisk(registrySeller, underwriter).pLoss;
-  const endpointDown = facts.some((fact) => fact.source === "agent_health" && fact.status !== "ok" && fact.error !== "registry did not advertise an API URL");
+  // MIP-003 defines /availability, not /health, so availability decides; /health only counts when it answers and reports a fault.
+  const availability = facts.find((fact) => fact.source === "agent_availability");
+  const advertised = availability?.error !== "registry did not advertise an API URL";
+  const availabilityStatus = String((availability?.data as { status?: unknown } | undefined)?.status ?? "").toLowerCase();
+  const health = facts.find((fact) => fact.source === "agent_health");
+  const healthStatus = String((health?.data as { status?: unknown } | undefined)?.status ?? "").toLowerCase();
+  const endpointDown = availability
+    ? advertised && (availability.status !== "ok" || !["available", "ok", "online"].includes(availabilityStatus) || (health?.status === "ok" && ["unhealthy", "down", "error"].includes(healthStatus)))
+    : facts.some((fact) => fact.source === "agent_health" && fact.status !== "ok" && fact.error !== "registry did not advertise an API URL");
   const selected = routes!.routes.find((route) => route.route === routes!.selectedRoute && route.sellers.join(",") === routes!.selectedSellers.join(","))!;
   if (endpointDown || pLoss >= 0.5) return { recommendation: "do_not_hire", expectedCostAda: selected.expectedTotalCostAda, options, pricingNote: price.note };
   const recommendation = routes!.selectedRoute === "single" && routes!.selectedSellers[0] === registryId ? "hire_as_is" : routes!.selectedRoute === "underwritten" ? "require_coverage" : "hire_with_backup_keeper";

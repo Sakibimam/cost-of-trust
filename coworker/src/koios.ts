@@ -144,7 +144,7 @@ type TxInfo = {
   plutus_contracts?: Array<{ valid_contract?: boolean; spends_input?: { tx_hash: string; tx_index: number } | null; input?: { redeemer?: { datum?: { value?: PlutusJson } } } }>;
 };
 
-export type DeliveryTally = { escrowsOpened: number; resultsSubmitted: number; paid: number; refunded: number; disputed: number; events: Array<{ txHash: string; blockTime: number; action: string; contract: string }> };
+export type DeliveryTally = { escrowsOpened: number; resultsSubmitted: number; paid: number; refunded: number; disputed: number; walletOnly?: number; events: Array<{ txHash: string; blockTime: number; action: string; contract: string }> };
 
 export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: string, contract: string, tally: DeliveryTally): void {
   const ours = (datum: PlutusJson | undefined) => {
@@ -161,6 +161,8 @@ export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: st
       const action = ACTIONS[spend.input?.redeemer?.datum?.value?.constructor ?? -1];
       if (!action) continue;
       tally[action] += 1;
+      // V1 escrow datums carry no agent identifier, so the outcome belongs to the selling wallet, which several registry agents can share.
+      if (action !== "resultsSubmitted" && escrowParty(spent.inline_datum?.value)?.agent === undefined) tally.walletOnly = (tally.walletOnly ?? 0) + 1;
       tally.events.push({ txHash: tx.tx_hash, blockTime: tx.tx_timestamp, action, contract });
     }
     if (spentOurs) continue;
