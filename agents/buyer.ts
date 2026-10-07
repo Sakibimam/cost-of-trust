@@ -3,8 +3,9 @@ import { x402Client } from "@x402/core/client";
 import { x402HTTPClient } from "@x402/core/http";
 import { toClientCardanoSigner } from "@x402/cardano";
 import { ExactCardanoScheme as ExactClient } from "@x402/cardano/exact/client";
-import { assertCoverage, claim, forfeit, lockClaimVault, waitForTx, type OutRef } from "@cost-of-trust/offchain";
+import { assertCoverage, forfeit, lockClaimVault, waitForTx, type OutRef } from "@cost-of-trust/offchain";
 import { config, context, parseRef, refString } from "./common";
+import { checkpointDecision } from "./staggered";
 const walletPath = process.env.COT_WALLETS ?? "/Users/user/Desktop/canton/recourse/.wallets.json";
 const wallets = JSON.parse(readFileSync(walletPath, "utf8")) as Record<string, { seed: string }>;
 const router = process.env.ROUTER_URL ?? "http://127.0.0.1:8787";
@@ -25,7 +26,7 @@ async function main() {
   await record("claim_vault_lock", locked.txHash);
   const riskAversion = Number(process.env.BUYER_RISK_AVERSION ?? 0.25);
   const sharedInfrastructure = (process.env.SHARED_INFRA ?? "true") !== "false";
-  const sellerRes = await fetch(`${router}/sellers`); if (!sellerRes.ok) throw new Error(`seller discovery failed ${sellerRes.status}`); const discovered = await sellerRes.json() as Array<{ id: string; endpoint: string }>;
+  const sellerRes = await fetch(`${router}/sellers`); if (!sellerRes.ok) throw new Error(`seller discovery failed ${sellerRes.status}`); const discovered = await sellerRes.json() as Array<{ id: string; endpoint: string; priceAda?: number }>;
   const requestedCandidates = (process.env.CANDIDATE_SELLERS ?? "").split(",").map((value) => value.trim()).filter(Boolean);
   const candidates = requestedCandidates.length ? discovered.filter((seller) => requestedCandidates.includes(seller.id)).map((seller) => seller.id) : discovered.map((seller) => seller.id);
   if (!candidates.length) throw new Error("CANDIDATE_SELLERS did not match router sellers");
@@ -35,31 +36,59 @@ async function main() {
   if (!routeRes.ok) throw new Error(`router quote failed ${routeRes.status}: ${await routeRes.text()}`);
   const quote = await routeRes.json() as any; run.selectedRoute = quote;
   const underwritten = quote.selectedRoute === "underwritten";
-  const executionRoute = quote.selectedRoute === "staggered" ? "redundant" : quote.selectedRoute;
-  if (executionRoute !== quote.selectedRoute) save({ step: "route_execution_fallback", detail: { selectedRoute: quote.selectedRoute, executionRoute } });
+  save({ step: "route_executed", detail: { route: quote.selectedRoute, sellers: quote.selectedSellers } });
   let coverageRef: OutRef | undefined;
   const selectedQuote = quote.routes.find((r: any) => r.route === quote.selectedRoute && r.sellers.join(",") === quote.selectedSellers.join(","));
   if (!selectedQuote) throw new Error("router returned no selected route details");
   if (underwritten) { const bind = await fetch(`${underwriter}/bind`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ buyer: buyer.address, payoutAda: lossAda, coverageAda: selectedQuote.coverageAda, taskRef: refString(locked.ref), taskExpiry: String(expiry), decideBy: String(expiry + 1_860_000n), terms: { route: quote.selectedRoute, sellers: quote.selectedSellers, servicePriceAda: selectedQuote.servicePriceAda, premiumAda: selectedQuote.premiumAda, coverageAda: selectedQuote.coverageAda } }) }); const b = await bind.json() as any; if (!bind.ok) throw new Error(JSON.stringify(b)); coverageRef = parseRef(b.coverageRef); await assertCoverage(buyer.lucid, buyer.deployment, coverageRef, { buyer: buyer.address, taskRef: locked.ref, taskExpiry: expiry, config: config() }); await record("coverage_lock", b.txHash); }
   const selected = quote.selectedSellers.map((seller: string) => ({ seller, url: `${keeperUrl(seller)}/start_job` }));
-  // One buyer wallet funds every keeper payment, so payments are built one after another (parallel builds spend the same UTxOs).
-  // Claims run inside each keeper after its payment settles, so redundant keepers still contend for the vault on chain.
-  let paying: Promise<unknown> = Promise.resolve();
-  const results = await Promise.all(selected.map(({ seller, url }: { seller: string; url: string }) => {
-    const turn = paying.then(() => pay(url, { taskId: quote.quoteId, claimVault: refString(locked.ref), beneficiary: buyer.address, expiry: String(expiry), priceLovelace: 1_000_000, termsHash: quote.termsHash, identifier_from_purchaser: crypto.randomUUID() }, wallets.buyer.seed));
-    paying = turn.catch(() => undefined);
-    return turn.then(async (paid) => {
-      if (!paid.response.ok) throw new Error(`${seller} returned ${paid.response.status}: ${JSON.stringify(paid.body)}`);
-      if (paid.body.paymentTx) await record(`${seller}_payment`, paid.body.paymentTx);
-      const statusUrl = `${url.replace(/\/start_job$/, "")}/status?job_id=${paid.body.job_id}`;
-      for (const end = Date.now() + 300_000; ; await new Promise((resolve) => setTimeout(resolve, 3_000))) {
-        const status = await (await fetch(statusUrl)).json() as { status: string; result?: Record<string, unknown>; error?: string };
-        if (status.status === "failed") throw new Error(`${seller} claim rejected: ${status.error}`);
-        if (status.status === "completed") { if (status.result?.claimTx) await record(`${seller}_claim`, String(status.result.claimTx)); return { seller, body: status.result as Record<string, any> }; }
-        if (Date.now() > end) throw new Error(`${seller} job ${paid.body.job_id} still ${status.status} after 300s`);
+  const startKeeper = async ({ seller, url }: { seller: string; url: string }) => {
+    const paid = await pay(url, { taskId: quote.quoteId, claimVault: refString(locked.ref), beneficiary: buyer.address, expiry: String(expiry), priceLovelace: 1_000_000, termsHash: quote.termsHash, identifier_from_purchaser: crypto.randomUUID() }, wallets.buyer.seed);
+    if (!paid.response.ok) throw new Error(`${seller} returned ${paid.response.status}: ${JSON.stringify(paid.body)}`);
+    if (paid.body.paymentTx) await record(`${seller}_payment`, paid.body.paymentTx);
+    return `${url.replace(/\/start_job$/, "")}/status?job_id=${paid.body.job_id}`;
+  };
+  const pollKeeper = async (seller: string, statusUrl: string, deadline: number) => {
+    for (;;) {
+      const status = await (await fetch(statusUrl)).json() as { status: string; result?: Record<string, unknown>; error?: string };
+      if (status.status === "failed") throw new Error(`${seller} claim rejected: ${status.error}`);
+      if (status.status === "completed") {
+        if (status.result?.claimTx) await record(`${seller}_claim`, String(status.result.claimTx));
+        return status.result as Record<string, any>;
       }
-    }).catch((error) => { const message = error instanceof Error ? error.message : String(error); save({ step: `${seller}_claim_rejected`, error: message }); return { seller, error: message } as { seller: string; body?: Record<string, any>; error?: string }; });
-  }));
+      if (Date.now() >= deadline) return undefined;
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+    }
+  };
+  let results: Array<{ seller: string; body?: Record<string, any>; error?: string }>;
+  if (quote.selectedRoute === "staggered") {
+    if (selected.length !== 2) throw new Error("staggered route requires first and backup keepers");
+    // 120s default: past preprod lock->seller-a claim latencies were 58s and 104s (runs 2026-10-06T04-44-21-919Z and 04-40-21-303Z), leaving 16s over the measured maximum.
+    const checkpointMs = Number(process.env.STAGGER_CHECKPOINT_MS ?? 120_000);
+    const checkpointAt = Number(expiry) - checkpointMs;
+    if (checkpointAt <= Date.now()) throw new Error("stagger checkpoint is already past");
+    const aStatus = await startKeeper(selected[0]);
+    const aResult = await pollKeeper(selected[0].seller, aStatus, checkpointAt);
+    if (Date.now() < checkpointAt) await new Promise((resolve) => setTimeout(resolve, checkpointAt - Date.now()));
+    const decision = await checkpointDecision(locked.ref, sponsor.deployment.claimAddress);
+    const bPriceAda = discovered.find((seller) => seller.id === selected[1].seller)?.priceAda;
+    save({ step: decision, detail: { checkpointAt: new Date(checkpointAt).toISOString(), vaultRef: refString(locked.ref), savedFeeAda: bPriceAda } });
+    if (decision === "backup_not_needed" && !aResult?.claimTx) throw new Error("claim vault was spent but seller-a supplied no claim tx");
+    if (decision === "backup_not_needed") results = [{ seller: selected[0].seller, body: aResult }];
+    else {
+      const bStatus = await startKeeper(selected[1]);
+      const bResult = await pollKeeper(selected[1].seller, bStatus, Number(expiry));
+      results = [{ seller: selected[0].seller, body: aResult }, { seller: selected[1].seller, body: bResult }];
+    }
+  } else {
+    // One buyer wallet funds every keeper payment sequentially because parallel builds spend the same UTxOs.
+    let paying: Promise<unknown> = Promise.resolve();
+    results = await Promise.all(selected.map(({ seller, url }: { seller: string; url: string }) => {
+      const turn = paying.then(() => startKeeper({ seller, url }));
+      paying = turn.catch(() => undefined);
+      return turn.then((statusUrl) => pollKeeper(seller, statusUrl, Date.now() + 300_000)).then((body) => ({ seller, body })).catch((error) => { const message = error instanceof Error ? error.message : String(error); save({ step: `${seller}_claim_rejected`, error: message }); return { seller, error: message }; });
+    }));
+  }
   save({ step: "keeper_results", detail: results });
   if (!results.some((r) => r.body?.claimTx)) { const ms = Number(expiry) - Date.now() + 5_000; if (ms > 0) await new Promise((resolve) => setTimeout(resolve, ms)); const forfeited = await forfeit(sponsor.lucid, sponsor.deployment, locked.ref, sponsor.address, expiry); await record("claim_vault_forfeit", forfeited); }
   if (coverageRef) { const wait = Number(expiry) - Date.now() + 15_000; if (wait > 0) { save({ step: "wait_for_expiry_before_settle", detail: { ms: wait } }); await new Promise((resolve) => setTimeout(resolve, wait)); } const adjudicate = await fetch(`${relayer}/adjudicate`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ coverageRef: refString(coverageRef), buyerAddress: buyer.address, underwriterAddress: (await context("admin1")).address, flipReport: process.env.FLIP_REPORT === "true" }) }); const a = await adjudicate.json() as any; if (!adjudicate.ok) throw new Error(JSON.stringify(a)); save({ step: "cre_report", detail: a.attestation }); if (a.rejectedSettle) save({ step: "flipped_report_rejected", error: a.rejectedSettle }); if (a.txHash) await record("coverage_settle", a.txHash); }
