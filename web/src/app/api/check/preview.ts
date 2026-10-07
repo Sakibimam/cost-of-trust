@@ -1,4 +1,5 @@
-import { decide } from "../../../../../coworker/src/report";
+import { advertisedUrl, decide, getJson } from "../../../../../coworker/src/report";
+import { registryFromChain } from "../../../../../coworker/src/koios";
 import escrowIndex from "../../../data/escrow-index.json";
 import { byId, entriesByName, indexed, jobs, type Entry } from "./names";
 import type { Evidence, TrustReport } from "../../../../../coworker/src/types";
@@ -56,7 +57,7 @@ const HEADLINE: Record<TrustReport["recommendation"], (name: string) => string> 
 
 export type Preview = { status: number; body: Record<string, unknown> };
 
-export function preview(params: { agent: string | null; valueAda: string | null; deadlineMinutes: string | null }): Preview {
+export async function preview(params: { agent: string | null; valueAda: string | null; deadlineMinutes: string | null }): Promise<Preview> {
   const agent = params.agent?.trim() ?? "";
   if (!agent) return { status: 400, body: { error: "agent is required: a registry name such as Knight, or a registry asset id", suggestions: suggestions("") } };
   const valueAda = params.valueAda === null || params.valueAda === "" ? 100 : Number(params.valueAda);
@@ -74,6 +75,10 @@ export function preview(params: { agent: string | null; valueAda: string | null;
     { source: "registry_chain", status: "ok", observedAt: String((escrowIndex as { generatedAt: string }).generatedAt), data: { name: entry.name } },
     { source: "masumi_delivery_history", status: "ok", observedAt: String((escrowIndex as { generatedAt: string }).generatedAt), data: { paid: record.paid, refunded: record.refunded, disputed: record.disputed, responseSeconds: waits, ceilingSeconds: record.ceilingSeconds ?? [] } },
   ];
+  // The paid report refuses an agent whose API is down; the preview reads the same /availability so both answer alike.
+  const registry = await registryFromChain(entry.identifier, entry.network);
+  const endpoint = registry.status === "ok" ? advertisedUrl(registry.data) : null;
+  if (endpoint) facts.push(await getJson("agent_availability", `${endpoint}/availability`));
   const decision = decide(facts, valueAda, { agentIdentifier: entry.identifier, deadlineMinutes });
 
   const options = (Object.keys(ROUTES) as Array<keyof typeof ROUTES>).flatMap((route) => {
@@ -101,7 +106,8 @@ export function preview(params: { agent: string | null; valueAda: string | null;
       withinDeadline,
       headline,
       sentence,
-      note: "Free preview from the escrow index of Masumi mainnet jobs. The paid report also reads the agent's live API and registry price.",
+      liveApi: endpoint ? { url: endpoint, status: facts.find((fact) => fact.source === "agent_availability")?.status ?? null } : null,
+      note: endpoint ? "Free preview from the Masumi mainnet escrow index and the agent's live /availability. The paid report also reads the registry price." : "Free preview from the Masumi mainnet escrow index. The agent's live API could not be read for this preview.",
       indexGeneratedAt: (escrowIndex as { generatedAt: string }).generatedAt,
     },
   };

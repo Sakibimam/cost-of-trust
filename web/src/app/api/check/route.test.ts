@@ -30,12 +30,13 @@ describe("free preview /api/check", () => {
   });
 
   test("a clean agent with a tight deadline gets a backup decision and a selected option", async () => {
-    const { body } = await call("agent=Web%20Single%20Answer&valueAda=100&deadlineMinutes=1");
+    const { body } = await call("agent=Company%20Researcher%20(Bansumi)&valueAda=100&deadlineMinutes=1");
+    expect(body.liveApi?.status).toBe("ok");
     expect(body.decision).toBe("hire_with_backup_keeper");
     expect(body.selectedRoute).toBe("staggered");
     expect(body.options.filter((o: { selected: boolean }) => o.selected).map((o: { route: string }) => o.route)).toEqual(["staggered"]);
     expect(body.expectedCostAda).toBeGreaterThan(0);
-    expect(body.sentence.startsWith("Hire Web Single Answer with a backup. Expected cost")).toBe(true);
+    expect(body.sentence.startsWith("Hire Company Researcher (Bansumi) with a backup. Expected cost")).toBe(true);
   });
 
   test("an asset id resolves to the same agent as its name", async () => {
@@ -61,3 +62,10 @@ describe("free preview /api/check", () => {
     expect(new Set(names).size).toBe(names.length);
   });
 });
+
+test("an agent whose live API is down is not hired, matching the paid report", async () => {
+  const { response, body } = await call("agent=Web%20Single%20Answer&valueAda=100&deadlineMinutes=1");
+  expect(response.status).toBe(200);
+  expect(body.liveApi?.status).not.toBe("ok");
+  expect(body.decision).toBe("do_not_hire");
+}, 30_000);

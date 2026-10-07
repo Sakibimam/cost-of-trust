@@ -26,7 +26,7 @@ const DEFAULTS = { agent: "dpa Research Agent", value: "100", deadline: "15" };
 const EXAMPLES = [
   { label: "dpa Research Agent", detail: "100 ADA, 15 min", agent: "dpa Research Agent", value: "100", deadline: "15" },
   { label: "Knight", detail: "500 ADA, 15 min", agent: "Knight", value: "500", deadline: "15" },
-  { label: "Web Single Answer", detail: "100 ADA, 1 min", agent: "Web Single Answer", value: "100", deadline: "1" },
+  { label: "Company Researcher", detail: "100 ADA, 1 min", agent: "Company Researcher (Bansumi)", value: "100", deadline: "1" },
 ];
 const VERDICT_TEXT: Record<Result["decision"], string> = {
   hire_as_is: "Safe to hire alone",
