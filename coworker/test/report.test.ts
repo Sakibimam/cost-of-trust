@@ -167,3 +167,16 @@ test("buyer deadline evidence remains visible when the recommendation is do not 
   assert.equal(report.recommendation, "do_not_hire");
   assert.deepEqual(report.deadlineStats, { within: 1, total: 2, deadlineSeconds: 60, median: null, p90: null });
 });
+
+test("recorded Knight V1 refund responses remain attributed to Knight", async () => {
+  const recorded = await fixture("knight-refund-txs.json");
+  const unit = "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9f72c4fd88720ace11d813fd94dc27c74034d951f8b27dbc7b871e6a048cbf495";
+  const seller = "bd2adb685621e224aae7571cb6bd8f0beb0fdd31875eb3a27feee6c0";
+  const datum = { constructor: 0, fields: [{}, { fields: [{ fields: [{ bytes: seller }] }] }, {}, {}, { bytes: "0".repeat(64) + unit }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, { constructor: 0 }] } as never;
+  const txs = recorded.map((tx: { tx_hash: string; tx_timestamp: number }) => ({ ...tx, inputs: [{ tx_hash: `open-${tx.tx_hash}`, tx_index: 0, payment_addr: { bech32: "addr1wx7j4kmg2cs7yf92uat3ed4a3u97kr7axxr4avaz0lhwdsq87ujx7" }, inline_datum: { value: datum } }], plutus_contracts: [{ valid_contract: true, spends_input: { tx_hash: `open-${tx.tx_hash}`, tx_index: 0 }, input: { redeemer: { datum: { value: { constructor: 3 } } } } }] }));
+  const tally = empty();
+  tallyDelivery(txs as never, new Set([seller]), unit, "addr1wx7j4kmg2cs7yf92uat3ed4a3u97kr7axxr4avaz0lhwdsq87ujx7", tally);
+  assert.equal(tally.refunded, 15);
+  assert.equal(tally.paid, 0);
+  assert.equal(decide([{ source: "masumi_delivery_history", status: "ok", observedAt: "", data: tally }], 500, { agentIdentifier: unit }).recommendation, "do_not_hire");
+});

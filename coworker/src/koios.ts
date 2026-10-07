@@ -164,7 +164,8 @@ export function escrowParty(datum: PlutusJson | undefined): { seller: string; bu
   if (fields.length === 19) return { seller, agent: fields[8]?.bytes, state };
   // V1 (16 fields): buyer at 0, blockchainIdentifier at 4 = 32-byte hash || agent registry unit (28-byte policy + 32-byte name).
   const identifier = fields[4]?.bytes ?? "";
-  return { seller, buyer: fields[0]?.fields?.[0]?.fields?.[0]?.bytes, agent: identifier.length === 184 ? identifier.slice(64) : undefined, state };
+  const agent = identifier.length === 184 ? identifier.slice(64) : identifier.length === 120 ? identifier : undefined;
+  return { seller, buyer: fields[0]?.fields?.[0]?.fields?.[0]?.bytes, agent, state };
 }
 
 // Redeemer constructors shared by V1 and V2 vested_pay: Withdraw 0, WithdrawRefund 3, WithdrawDisputed 4, SubmitResult 5.
