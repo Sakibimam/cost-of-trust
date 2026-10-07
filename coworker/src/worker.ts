@@ -62,6 +62,7 @@ export async function processTask(task: InFlightTask, journal: InFlightTask[]): 
       catch (error) { console.error(`Task ${task.id}: result submitted, confirmation lookup failed: ${error instanceof Error ? error.message : error}`); }
     }
     await taskEvent(task.id, { status: "COMPLETED", comment: result });
+    console.log(`Task ${task.id}: COMPLETED`);
     journal.splice(journal.indexOf(task), 1); await saveJournal(journal);
   } catch (error) {
     const message = failedResult(task.id, error);
@@ -131,6 +132,7 @@ export async function once(): Promise<void> {
       }
     }
     const entry = taskInFlight(task, events);
+    console.log(`Task ${id}: picked up (${String(task.status)}, escrow ${entry.payment ? "attached" : "none"})`);
     journal.push(entry); await saveJournal(journal); await processTask(entry, journal);
   }
 }
