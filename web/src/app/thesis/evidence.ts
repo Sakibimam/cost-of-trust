@@ -5,7 +5,7 @@ export const tx = (hash: string) => `https://preprod.cardanoscan.io/transaction/
 export const runs = [
   { time: "04:12", route: "underwritten", label: "claim and coverage settlement", hashes: ["f158c93d4ea5ff3c484755a3cd99bcbeea9c7e11dafa070f59cb4829a7f9a3b2", "5f44c119aba938848be23a20abd542f473cc4c6447b5e41e2450c032473d10ff"] },
   { time: "04:23", route: "underwritten", label: "expired forfeit and settlement", hashes: ["3f65613f45d16aa23a6a623c9dbe2215b4f3f248f71fd4a41b3d377642f16d70", "54c5eb596f9d351f4c73e74790e52ac30dc5fbe61b6d1a6bf6d9972b895af761"] },
-  { time: "04:35", route: "staggered A > B", label: "seller A claims first slot", hashes: ["b26f22c362be625765324d31bfa15f7d58b73db84725801f32700aca65cc1a73", "99fd62a161501064cb5274a0ab3c25a14943c947f5487c82eb97c4818754e01d"] },
+  { time: "04:35", route: "redundant A + B", label: "seller A claims, seller B refused by the ledger", hashes: ["b26f22c362be625765324d31bfa15f7d58b73db84725801f32700aca65cc1a73", "99fd62a161501064cb5274a0ab3c25a14943c947f5487c82eb97c4818754e01d"] },
   { time: "04:45", route: "underwritten", label: "seller B claim and settlement", hashes: ["296257f15d00134b30b9c18360cd216acf3b445eb39df352d4e70e31d47da239", "3c20440b7419f5c8da18910af0c6fd2b8a40dae0b4d22cacccf8ef0fddf41abb"] },
 ] as const;
 

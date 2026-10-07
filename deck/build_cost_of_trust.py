@@ -102,12 +102,12 @@ def tx_url(tx):
 # 1. Hook
 s = slide()
 box(s, 0.82, 0.5, 4.0, 0.3, "CARDANO AGENTIC COMMERCE", 11, TEAL, True, MONO)
-box(s, 0.82, 1.55, 11.5, 1.35, "Your AI agent prices\nwho to trust before it spends.", 38, INK, True, TITLE)
-box(s, 0.82, 3.35, 8.5, 0.62, "The cheapest keeper is not the cheapest route.", 24, TEAL_DARK, True)
+box(s, 0.82, 1.55, 11.5, 1.35, "Agents can buy reliability,\nnot just access.", 38, INK, True, TITLE)
+box(s, 0.82, 3.35, 8.5, 0.62, "We do not rank agents. We decide how to buy the job.", 24, TEAL_DARK, True)
 box(s, 0.82, 4.6, 3.45, 1.05, "10 ADA\nservice price", 25, INK, True, TITLE, PP_ALIGN.CENTER, CARD, LINE, 0.12, 0.16, MSO_ANCHOR.MIDDLE)
 box(s, 4.65, 4.6, 3.45, 1.05, "100 ADA\ndeadline loss", 25, ORANGE, True, TITLE, PP_ALIGN.CENTER, CARD, LINE, 0.12, 0.16, MSO_ANCHOR.MIDDLE)
 box(s, 8.48, 4.6, 3.7, 1.05, "route before\npayment", 25, CARD, True, TITLE, PP_ALIGN.CENTER, TEAL_DARK, TEAL_DARK, 0.12, 0.16, MSO_ANCHOR.MIDDLE)
-box(s, 0.82, 6.86, 11.5, 0.25, "Cost of Trust  |  risk-priced routing for deadline work", 11, MUTED, False, MONO)
+box(s, 0.82, 6.86, 11.5, 0.25, "Cost of Trust  |  how an agent buys a deadline job on Cardano", 11, MUTED, False, MONO)
 
 # 2. Problem
 s = slide(); title(s, "Price alone is the wrong decision rule.", 2, "the problem")
@@ -172,8 +172,8 @@ s = slide(); title(s, "One deadline task. One spend. One winner.", 5, "cardano m
 steps = [
     ("01", "Quote", "Router returns route, arithmetic, and terms hash."),
     ("02", "Lock", "Buyer creates one claim-vault UTxO."),
-    ("03", "Schedule", "Validity intervals give A the first slot and B the late slot."),
-    ("04", "Settle", "EUTXO contention pays the keeper whose slot lands."),
+    ("03", "Race", "Buyer pays two keepers. Both submit a claim on that UTxO."),
+    ("04", "Settle", "The ledger accepts the first claim and refuses the second: BadInputsUTxO."),
 ]
 for i, (num, head, body) in enumerate(steps):
     x = 0.75 + i * 3.05
@@ -245,7 +245,7 @@ box(s, 0.72, 1.8, 3.0, 0.36, "FOUR CONFIRMED RUNS", 11, TEAL, True, MONO)
 evidence = [
     ("04:12", "underwritten", "claim vault + coverage settle", "f158c93d", "5f44c119"),
     ("04:23", "underwritten", "forfeit + coverage settle", "3f65613f", "54c5eb59"),
-    ("04:35", "staggered A > B", "seller A claims first slot", "b26f22c3", "99fd62a1"),
+    ("04:35", "redundant A + B", "A claims, B refused by the ledger", "b26f22c3", "99fd62a1"),
     ("04:45", "underwritten", "seller B claims + coverage settle", "296257f1", "3c20440b"),
 ]
 for i, (t, route, action, lock, settle) in enumerate(evidence):
@@ -269,7 +269,7 @@ box(s, 8.85, 1.8, 3.7, 4.35, "", fill=CARD, line=LINE)
 box(s, 9.2, 2.15, 3.0, 0.42, "CARDANO", 12, TEAL, True, MONO)
 box(s, 9.2, 2.8, 2.95, 1.45, "One spend.\nOne winner.", 29, INK, True, TITLE)
 box(s, 9.2, 4.55, 2.9, 0.95, "Let the chain enforce the route.", 17, TEAL_DARK, True)
-box(s, 0.75, 6.55, 11.8, 0.45, "Cost of Trust  |  your AI agent prices who to trust before it spends.", 18, TEAL_DARK, True, BODY, PP_ALIGN.CENTER)
+box(s, 0.75, 6.55, 11.8, 0.45, "Cost of Trust  |  agents buy reliability, and Cardano enforces one winner.", 18, TEAL_DARK, True, BODY, PP_ALIGN.CENTER)
 
 prs.save(OUT)
 print(f"wrote {OUT}")

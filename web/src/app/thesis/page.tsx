@@ -77,7 +77,7 @@ export default function ThesisPage() {
           <div className={styles.prose}>
             <p>The router takes the seller price, the observed delivery history, the buyer's risk aversion, and whether keepers share infrastructure. It returns single, redundant, staggered, and underwritten routes with their arithmetic and terms hash.</p>
             <div className={styles.formula}><strong>risk-adjusted cost</strong> = service price + premium + expected loss + risk aversion × loss standard deviation</div>
-            <p>On Cardano, a staggered route is more than a second HTTP request. A single claim-vault UTxO can be spent once. Validity intervals give keeper A the first slot and keeper B the late slot. The chain pays the keeper whose slot lands. If the infrastructure is shared, the backup can fail with the primary, so a bonded underwriter prices the tail instead.</p>
+            <p>On Cardano, a staggered route is more than a second HTTP request. A single claim-vault UTxO can be spent once. The buyer pays two keepers and both submit a claim against that UTxO; the ledger accepts the first valid claim and refuses the second with BadInputsUTxO. The keeper whose claim lands first is paid. If the infrastructure is shared, the backup can fail with the primary, so a bonded underwriter prices the tail instead.</p>
             <p>Coverage settles through a separate collateral UTxO. The CRE workflow observes the task, signs the outcome, and the Plutus V3 validator checks the report binding, signer threshold, DON digest, and settlement window before releasing collateral.</p>
           </div>
         </div></div>
