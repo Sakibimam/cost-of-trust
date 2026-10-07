@@ -14,7 +14,7 @@ Demo moment: two keepers race for one claim UTxO, keeper A claims and keeper B i
 
 - Race lock: [c0c104a07e...f814](https://preprod.cardanoscan.io/transaction/c0c104a07e8a375982ba72f0a7d0f949a2dbd194a69eb171d9ca375d7e60f814)
 - Winning claim: [43b27058c9...de9b](https://preprod.cardanoscan.io/transaction/43b27058c91abc30ff560251cc7997a0ca0343df4432319c265b4f140163de9b)
-- CRE settlement: [3c20440b74...1abb](https://preprod.cardanoscan.io/transaction/3c20440b7419f5c8da18910af0c6fd2b8a40dae0b4d22cacccf8ef0fddf41abb)
+- CRE settlement: [3e33929dbf...ff1b](https://preprod.cardanoscan.io/transaction/3e33929dbf296722029680f3ff26676da5b420ebe4e4e34265b9992a8526ff1b)
 - Trust Check result: [0be9fa229a...3f91](https://preprod.cardanoscan.io/transaction/0be9fa229a864ddbaa8847afa84657d535d93d4a26fdbab506e2a2ebde573f91)
 
 ## How to run
@@ -64,7 +64,7 @@ Coverage collateral is released only by a CRE report that the Plutus V3 validato
 | Coverage lock | [0646c8af88...bcf9](https://preprod.cardanoscan.io/transaction/0646c8af88359bb10b13fdddc67dcc4258f54efa59572ddd84564be69099bcf9) |
 | Seller payment | [44df00ebd0...fe71](https://preprod.cardanoscan.io/transaction/44df00ebd0ccd9f48a6341b3f9f35c5c9e5ce0d7be61020d971159067eaefe71) |
 | Seller claim | [4afb027d...775f](https://preprod.cardanoscan.io/transaction/4afb027dfc182ac65b854bcdb4bee0eb07775fe194edf49cef1c7b98060a775f) |
-| CRE coverage settlement | [3c20440b74...1abb](https://preprod.cardanoscan.io/transaction/3c20440b7419f5c8da18910af0c6fd2b8a40dae0b4d22cacccf8ef0fddf41abb) |
+| CRE coverage settlement | [3e33929dbf...ff1b](https://preprod.cardanoscan.io/transaction/3e33929dbf296722029680f3ff26676da5b420ebe4e4e34265b9992a8526ff1b) |
 
 ### Trust Check
 

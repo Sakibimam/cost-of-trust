@@ -28,13 +28,13 @@ const race: Step[] = [
   { label: "Keeper B claims the same UTxO", note: "rejected by the ledger: BadInputsUTxO", bad: true },
 ];
 
-// Source: agents/runs/2026-10-06T04-45-57-790Z.json; cre/evidence/simulate-*.log for the workflow runs.
+// Source: agents/runs/2026-10-07T04-02-54-740Z.json (lane fix-cre4, commit e882f90). Native 210-byte report, 96-byte context, 4 signatures, decision FAILURE.
 const cover: Step[] = [
-  { label: "Claim vault locked", hash: "296257f15d00134b30b9c18360cd216acf3b445eb39df352d4e70e31d47da239" },
-  { label: "Underwriter locks coverage", hash: "0646c8af88359bb10b13fdddc67dcc4258f54efa59572ddd84564be69099bcf9" },
-  { label: "Keeper paid and job claimed", hash: "4afb027dfc182ac65b854bcdb4bee0eb07775fe194edf49cef1c7b98060a775f" },
-  { label: "Report with the decision flipped", note: "rejected by the coverage validator", bad: true },
-  { label: "CRE report settles the coverage", hash: "3c20440b7419f5c8da18910af0c6fd2b8a40dae0b4d22cacccf8ef0fddf41abb" },
+  { label: "Config NFT pins the 2f+1 report signer set", hash: "f46171f2855035ec7c9a0505b0b4f48cf178f17546476217949d8769d7cf7fc2" },
+  { label: "Claim vault for the job locked", hash: "cf2a4198860272c11732c732bd18363b45f079217dec79116eead1f67736c79d" },
+  { label: "Underwriter locks coverage against that vault", hash: "9dc6f13768859de0ab39e36585a9aa660cae7973f39d54440697c4e77de0d704" },
+  { label: "Report with the decision byte flipped", note: "rejected by the coverage validator", bad: true },
+  { label: "Unmodified CRE report (job missed) pays the buyer", hash: "3e33929dbf296722029680f3ff26676da5b420ebe4e4e34265b9992a8526ff1b" },
 ];
 
 // Source: Sokosumi Task 01a11153-9886 via local MPS PaymentRequest history; report sha256 923cdcd5 matches the on-chain result hash.
@@ -64,7 +64,7 @@ export function Proof() {
           <div className="min-w-0 lg:col-span-5">
             <p className="label">Chainlink CRE adjudicator</p>
             <h2 id="cover-h" className="mt-2 max-w-[18ch] text-[28px] font-extrabold leading-[1.1] md:text-[32px]">When a job fails, coverage pays. A forged report cannot.</h2>
-            <p className="mt-4 max-w-[52ch] text-[17px] leading-[1.45]">The <span className="fig">cot-adjudicator</span> CRE workflow reads the coverage and claim UTxOs from preprod through Koios, applies deterministic rules to decide whether the job was delivered before expiry, and sends a signed report. The coverage validator releases funds only against a report signed by the 2f+1 signer set pinned in its config NFT. Flip one decision byte after signing and the validator rejects it.</p>
+            <p className="mt-4 max-w-[52ch] text-[17px] leading-[1.45]">The <span className="fig">cot-adjudicator</span> CRE workflow reads the coverage and claim UTxOs from preprod through Koios and decides whether the job was delivered before expiry. Its report, produced by <span className="fig">cre workflow simulate</span>, travels to Cardano unmodified. The coverage validator releases funds only against a report signed by the 2f+1 signer set pinned in its config NFT. Flip one decision byte after signing and the validator rejects it.</p>
           </div>
           <div className="min-w-0 lg:col-span-7"><Steps steps={cover} /></div>
         </div>
