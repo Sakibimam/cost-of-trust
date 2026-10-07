@@ -12,7 +12,7 @@ const policies: Array<[string, string, Policy]> = [
   ["P0", "Hire alone, always", backtest.policies.P0["100"]],
   ["P1", "Skip above 5% dispute rate", backtest.policies.P1["100"]],
   ["P2", "Skip above 20% refund + dispute rate", backtest.policies.P2["100"]],
-  ["P3", "Cost of Trust route ranking", backtest.policies.P3["100"]],
+  ["P3", "Cost of Trust route choice", backtest.policies.P3["100"]],
 ];
 
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
@@ -49,11 +49,12 @@ export function Backtest() {
           </table>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-x-8 gap-y-4 border-l-[6px] border-signal bg-paper-2 p-4 sm:grid-cols-2">
-          <p className="m-0 text-[15px] leading-snug"><span className="font-extrabold">Calibration.</span> Trust Check Brier {backtest.calibration.betaBinomialBrier.toFixed(3)} versus dispute rate {backtest.calibration.disputeRateBrier.toFixed(3)} across {backtest.calibration.observations} observations.</p>
-          <p className="m-0 text-[15px] leading-snug"><span className="font-extrabold">Backup provenance.</span> Cost of Trust records {backtest.policies.P3["100"].observedBackupLegs} observed backup legs and {backtest.policies.P3["100"].modelledBackupLegs} modelled legs at this risk level.</p>
+        <div className="border-b border-rule py-3 text-[15px] leading-snug">
+          <p className="m-0"><span className="font-extrabold">Calibration.</span> Trust Check Brier {backtest.calibration.betaBinomialBrier.toFixed(3)} versus dispute rate {backtest.calibration.disputeRateBrier.toFixed(3)} across {backtest.calibration.observations} observations; lower is better.</p>
         </div>
-        <p className="mt-4 max-w-[78ch] text-[13px] leading-snug text-muted">Escrow outcomes, decisions, done rates, and primary losses are observed from the mainnet sample; backup legs are observed when same-capability alternative history exists and modelled otherwise.</p>
+        <div className="border-b border-rule py-3 text-[15px] leading-snug">
+          <p className="m-0"><span className="font-extrabold">Backup legs.</span> Cost of Trust uses {backtest.policies.P3["100"].observedBackupLegs} observed and {backtest.policies.P3["100"].modelledBackupLegs} modelled backup legs at this risk level. A leg is observed when the same-capability alternative has a next escrow on chain, and modelled as undone work otherwise.</p>
+        </div>
       </div>
     </section>
   );
