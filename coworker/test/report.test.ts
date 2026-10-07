@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { createReport, decide } from "../src/report.ts";
+import { createReport, decide, getJson, isUnsafeUrl } from "../src/report.ts";
 import { registryFromChain, tallyDelivery, type DeliveryTally } from "../src/koios.ts";
 import type { Evidence } from "../src/types.ts";
 
@@ -98,6 +98,28 @@ test("report flags a loopback api_base_url from chain metadata as unreachable", 
     globalThis.fetch = originalFetch;
     for (const [key, value] of Object.entries(original)) if (value === undefined) delete process.env[key]; else process.env[key] = value;
   }
+});
+
+test("SSRF gate rejects private, metadata, IPv6 ULA, link-local, and mapped addresses", async () => {
+  const resolve = (async () => [{ address: "127.0.0.1", family: 4 }]) as unknown as typeof import("node:dns/promises").lookup;
+  for (const url of ["http://169.254.169.254", "http://[::1]", "http://[fc00::1]", "http://[fe80::1]", "http://[::ffff:7f00:1]", "http://metadata.google.internal", "http://agent.example"]) {
+    assert.equal(await isUnsafeUrl(url, resolve), true, url);
+  }
+  assert.equal(await isUnsafeUrl("https://agent.example", (async () => [{ address: "93.184.216.34", family: 4 }]) as unknown as typeof import("node:dns/promises").lookup), false);
+});
+
+test("registry endpoint requests refuse redirects", async () => {
+  const originalFetch = globalThis.fetch;
+  let calls = 0;
+  let redirect: RequestRedirect | undefined;
+  globalThis.fetch = async (_input, init) => { calls += 1; redirect = init?.redirect; return new Response(null, { status: 302, headers: { location: "http://127.0.0.1:3012" } }); };
+  try {
+    const evidence = await getJson("agent_health", "https://agent.example/health", undefined, (async () => [{ address: "93.184.216.34", family: 4 }]) as unknown as typeof import("node:dns/promises").lookup);
+    assert.equal(evidence.status, "unavailable");
+    assert.match(evidence.error ?? "", /redirect refused/);
+    assert.equal(calls, 1);
+    assert.equal(redirect, "manual");
+  } finally { globalThis.fetch = originalFetch; }
 });
 
 test("MIP-003 agent with /availability up and no /health route is not vetoed", () => {

@@ -18,38 +18,73 @@ async function taskEvent(taskId: string, body: Record<string, unknown>): Promise
   return payload.data;
 }
 
-// Polls overlap while a paid task waits on escrow; a READY listing can lag the RUNNING event, so a task is taken once per process.
-const inFlight = new Set<string>();
+type Payment = Record<string, unknown>;
+export type InFlightTask = { id: string; input: string; payment: Payment | null; runningPosted: boolean };
 
-async function once(): Promise<void> {
+const statePath = () => env("WORKER_STATE_FILE", "/tmp/trust-check-worker-state.json");
+
+export async function loadJournal(path = statePath()): Promise<InFlightTask[]> {
+  try { return JSON.parse(await readFile(path, "utf8")) as InFlightTask[]; } catch { return []; }
+}
+
+export async function saveJournal(tasks: InFlightTask[], path = statePath()): Promise<void> {
+  await writeFile(path, `${JSON.stringify(tasks, null, 2)}\n`, { mode: 0o600 });
+}
+
+export function failedResult(taskId: string, error: unknown): string {
+  const message = error instanceof Error ? error.message : "request failed";
+  return `Trust Check could not complete task ${taskId}: ${message}`;
+}
+
+async function markRunning(task: InFlightTask): Promise<void> {
+  if (task.runningPosted) return;
+  try { await taskEvent(task.id, task.payment ? { status: "RUNNING", masumiPayment: task.payment.data ?? task.payment } : { status: "RUNNING" }); }
+  catch (error) { if (!(error instanceof Error && /HTTP 422/.test(error.message))) throw error; }
+  task.runningPosted = true;
+}
+
+async function processTask(task: InFlightTask, journal: InFlightTask[]): Promise<void> {
+  try {
+    const reportInput = parseTaskInput(task.input);
+    await markRunning(task);
+    await saveJournal(journal);
+    if (!reportInput) { await taskEvent(task.id, { status: "COMPLETED", comment: USAGE_RESULT }); journal.splice(journal.indexOf(task), 1); await saveJournal(journal); return; }
+    if (env("ENABLE_MPS_PAYMENTS") === "true" && !task.payment) { task.payment = await createPayment(task.input); await saveJournal(journal); }
+    if (task.payment) await waitForPayment(task.payment);
+    const report = await createReport(reportInput);
+    const result = JSON.stringify(report, null, 2);
+    await writeFile(`result-${task.id}.txt`, result);
+    if (task.payment) { await submitResult(task.payment, result); await waitForPayment(task.payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]); }
+    await taskEvent(task.id, { status: "COMPLETED", comment: result });
+    journal.splice(journal.indexOf(task), 1); await saveJournal(journal);
+  } catch (error) {
+    const message = failedResult(task.id, error);
+    if (task.payment) {
+      await submitResult(task.payment, message);
+      await waitForPayment(task.payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]);
+    }
+    try { await taskEvent(task.id, { status: "FAILED", comment: `${message}. Escrow was submitted through the failure result path.` }); }
+    finally { journal.splice(journal.indexOf(task), 1); await saveJournal(journal); }
+    console.error(`Task ${task.id} failed: ${message}`);
+  }
+}
+
+export async function once(): Promise<void> {
   const coworker = env("SOKOSUMI_COWORKER_ID"); if (!coworker) throw new Error("SOKOSUMI_COWORKER_ID is required");
+  const journal = await loadJournal();
+  for (const task of [...journal]) await processTask(task, journal);
   const response = await core("/tasks?scope=owned");
   if (!response.ok) throw new Error(`Sokosumi task list HTTP ${response.status}`);
   const parsed = await response.json() as Array<Record<string, unknown>> | { tasks?: Array<Record<string, unknown>>; data?: Array<Record<string, unknown>> };
   const tasks = Array.isArray(parsed) ? parsed : parsed.tasks ?? parsed.data ?? [];
-  for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker && !inFlight.has(String(item.id)))) {
+  for (const task of tasks.filter((item) => item.status === "READY" && item.coworkerId === coworker && !journal.some((entry) => entry.id === String(item.id)))) {
     const id = String(task.id);
-    inFlight.add(id);
     const input = typeof task.description === "string" ? task.description : String(task.input ?? "");
-    try {
-      const reportInput = parseTaskInput(input);
-      if (!reportInput) { await taskEvent(id, { status: "RUNNING" }); await taskEvent(id, { status: "COMPLETED", comment: USAGE_RESULT }); continue; }
-      const payment = env("ENABLE_MPS_PAYMENTS") === "true" ? await createPayment(input) : null;
-      // Sokosumi rejects a second RUNNING event (422 same status), so the escrow terms ride on the first one.
-      await taskEvent(id, payment ? { status: "RUNNING", masumiPayment: payment.data ?? payment } : { status: "RUNNING" });
-      if (payment) await waitForPayment(payment);
-      const report = await createReport(reportInput);
-      const file = `result-${id}.txt`; await writeFile(file, JSON.stringify(report, null, 2));
-      const result = await readFile(file, "utf8");
-      if (payment) { await submitResult(payment, result); await waitForPayment(payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]); }
-      await taskEvent(id, { status: "COMPLETED", comment: result });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "request failed";
-      try { await taskEvent(id, { status: "FAILED", comment: `Trust Check could not complete this task: ${message}` }); } catch (eventError) { console.error(`Task ${id} could not be marked FAILED: ${eventError instanceof Error ? eventError.message : "request failed"}`); }
-      console.error(`Task ${id} failed: ${message}`);
-    }
+    const entry: InFlightTask = { id, input, payment: null, runningPosted: false };
+    journal.push(entry); await saveJournal(journal); await processTask(entry, journal);
   }
 }
 
-async function main(): Promise<void> { await once(); setInterval(() => once().catch((error) => console.error(error.message)), Number(env("POLL_SECONDS", "60")) * 1000); }
-main().catch((error) => { console.error(error.message); process.exitCode = 1; });
+if (process.argv[1]?.endsWith("/worker.ts")) {
+  once().then(() => setInterval(() => once().catch((error) => console.error(error.message)), Number(env("POLL_SECONDS", "60")) * 1000)).catch((error) => { console.error(error.message); process.exitCode = 1; });
+}

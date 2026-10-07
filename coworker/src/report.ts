@@ -1,4 +1,6 @@
 import { env, loadEnv } from "./config.ts";
+import { lookup } from "node:dns/promises";
+import { isIP } from "node:net";
 import { evaluateRoutes, sellerRisk, type RouteQuote, type Seller, type UnderwriterConfig } from "../../router/src/routes.ts";
 import sellersSeed from "../../router/sellers.json" with { type: "json" };
 import underwriterSeed from "../../router/underwriter.json" with { type: "json" };
@@ -9,9 +11,52 @@ loadEnv();
 
 const now = () => new Date().toISOString();
 
-async function getJson(source: string, url: string, init?: RequestInit): Promise<Evidence> {
+function ipv4Private(value: string): boolean {
+  const octets = value.split(".").map(Number);
+  if (octets.length !== 4 || octets.some((octet) => !Number.isInteger(octet) || octet < 0 || octet > 255)) return false;
+  const [a, b] = octets;
+  return a === 0 || a === 10 || a === 127 || (a === 100 && b >= 64 && b <= 127) || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168);
+}
+
+function ipv6Value(value: string): bigint | null {
+  const groups = value.toLowerCase().split("::");
+  if (groups.length > 2) return null;
+  const left = groups[0] ? groups[0].split(":") : [];
+  const right = groups.length === 2 && groups[1] ? groups[1].split(":") : [];
+  const expand = [...left, ...right];
+  if (expand.some((part) => !/^[0-9a-f]{1,4}$/.test(part))) return null;
+  const missing = 8 - expand.length;
+  if ((groups.length === 1 && missing !== 0) || missing < 0) return null;
+  return BigInt(`0x${[...left, ...Array(missing).fill("0"), ...right].join("")}`);
+}
+
+function ipv6Private(value: string): boolean {
+  const parsed = ipv6Value(value);
+  if (parsed === null) return false;
+  const first = Number(parsed >> 120n);
+  const mapped = Number((parsed >> 32n) & 0xffffffffn);
+  return parsed === 0n || parsed === 1n || first >= 0xfc && first <= 0xfd || (parsed >> 118n) === 0x3fan || (parsed >> 32n) === 0xffffn && ipv4Private(`${mapped >>> 24}.${mapped >>> 16 & 255}.${mapped >>> 8 & 255}.${mapped & 255}`);
+}
+
+export async function isUnsafeUrl(url: string, resolve = lookup): Promise<boolean> {
+  let parsed: URL;
+  try { parsed = new URL(url); } catch { return true; }
+  if (!/^https?:$/.test(parsed.protocol)) return true;
+  const host = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (host === "metadata" || host === "instance-data" || host === "metadata.google.internal" || host.endsWith(".metadata.google.internal") || host === "metadata.google") return true;
+  const unsafe = (address: string) => isIP(address) === 4 ? ipv4Private(address) : isIP(address) === 6 && ipv6Private(address);
+  if (unsafe(host)) return true;
   try {
-    const response = await fetch(url, { ...init, signal: AbortSignal.timeout(15_000) });
+    const addresses = await resolve(host, { all: true, verbatim: true });
+    return addresses.some(({ address }) => unsafe(address));
+  } catch { return true; }
+}
+
+export async function getJson(source: string, url: string, init?: RequestInit, resolve = lookup): Promise<Evidence> {
+  try {
+    if (await isUnsafeUrl(url, resolve)) return { source, status: "unavailable", observedAt: now(), error: `private API URL (${url})` };
+    const response = await fetch(url, { ...init, redirect: "manual", signal: AbortSignal.timeout(15_000) });
+    if (response.status >= 300 && response.status < 400) return { source, status: "unavailable", observedAt: now(), error: `redirect refused (${response.status})` };
     const text = await response.text();
     let data: unknown;
     try { data = text ? JSON.parse(text) : null; } catch { data = text.slice(0, 1000); }
