@@ -60,11 +60,17 @@ export async function processTask(task: InFlightTask, journal: InFlightTask[]): 
     journal.splice(journal.indexOf(task), 1); await saveJournal(journal);
   } catch (error) {
     const message = failedResult(task.id, error);
+    // If the failure result cannot be submitted (e.g. the payment service no longer knows the escrow), Masumi refunds the buyer after unlock; still close the task.
+    let escrowNote = "No escrow was collected.";
     if (task.payment) {
-      await submitResult(task.payment, message);
-      await waitForPayment(task.payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]);
+      try {
+        await submitResult(task.payment, message);
+        await waitForPayment(task.payment, 20 * 60_000, ["ResultSubmitted", "WithdrawAuthorized", "Withdrawn", "DisputedWithdrawn"]);
+        escrowNote = "Escrow was submitted through the failure result path.";
+      } catch (submitError) { escrowNote = `The escrow refunds to the buyer after unlock (${submitError instanceof Error ? submitError.message : "submit failed"}).`; }
     }
-    try { await taskEvent(task.id, { status: "FAILED", comment: `${message}. Escrow was submitted through the failure result path.` }); }
+    try { await taskEvent(task.id, { status: "FAILED", comment: `${message}. ${escrowNote}` }); }
+    catch (eventError) { console.error(`Task ${task.id} FAILED event not posted: ${eventError instanceof Error ? eventError.message : eventError}`); }
     finally { journal.splice(journal.indexOf(task), 1); await saveJournal(journal); }
     console.error(`Task ${task.id} failed: ${message}`);
   }
@@ -87,5 +93,7 @@ export async function once(): Promise<void> {
 }
 
 if (process.argv[1]?.endsWith("/worker.ts")) {
-  once().then(() => setInterval(() => once().catch((error) => console.error(error.message)), Number(env("POLL_SECONDS", "60")) * 1000)).catch((error) => { console.error(error.message); process.exitCode = 1; });
+  // A failed poll must never stop the worker: log it and poll again.
+  const tick = () => once().catch((error) => console.error(error instanceof Error ? error.message : error));
+  void tick(); setInterval(tick, Number(env("POLL_SECONDS", "60")) * 1000);
 }

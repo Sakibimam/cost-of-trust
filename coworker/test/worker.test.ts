@@ -40,3 +40,24 @@ test("paid task: the first RUNNING event carries the escrow terms", async () => 
     assert.ok(running.masumiPayment, "RUNNING carries masumiPayment");
   } finally { globalThis.fetch = real; process.env = saved; }
 });
+
+test("a task whose escrow the payment service no longer knows is closed, not left to crash the worker", async () => {
+  const { processTask } = await import("../src/worker.ts");
+  const saved = { ...process.env };
+  Object.assign(process.env, { ENABLE_MPS_PAYMENTS: "true", MPS_URL: "http://mps.test/api/v1", SOKOSUMI_API_URL: "http://soko.test/v1", WORKER_STATE_FILE: `/tmp/worker-stale-${process.pid}.json` });
+  const real = globalThis.fetch;
+  const events: Array<Record<string, unknown>> = [];
+  globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
+    const url = String(input);
+    if (url.startsWith("http://mps.test")) return new Response(JSON.stringify({ error: "not found" }), { status: 404 });
+    if (url.includes("/events")) { events.push(JSON.parse(String(init?.body))); return Response.json({ data: { id: "e" } }); }
+    throw new Error(`unexpected ${url}`);
+  }) as typeof fetch;
+  try {
+    const task = { id: "t-stale", input: JSON.stringify({ agentIdentifier: "asset1h6lypyuwtgjqjf9wd4wmg53pgk7gtv08nk40pn", taskValueAtRiskAda: 5, task: "x" }), payment: { data: { blockchainIdentifier: "gone" } }, runningPosted: true };
+    const journal = [task];
+    await processTask(task, journal);
+    assert.equal(journal.length, 0, "journal entry removed");
+    assert.ok(events.some((event) => event.status === "FAILED"), "FAILED posted");
+  } finally { globalThis.fetch = real; process.env = saved; }
+});
