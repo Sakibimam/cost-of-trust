@@ -13,4 +13,4 @@ const server = createServer(async (request, response) => {
     response.end(JSON.stringify(report));
   } catch (error) { response.statusCode = 400; response.end(JSON.stringify({ error: error instanceof Error ? error.message : "request failed" })); }
 });
-server.listen(Number(env("PORT", "8788")), "127.0.0.1");
+server.listen(Number(env("PORT", "8788")), env("HOST", "0.0.0.0"));
