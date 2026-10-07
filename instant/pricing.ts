@@ -26,5 +26,6 @@ export function priceInstantRisk(input: PriceInput): Price {
   const ageDiscount = Math.min(input.inputConfirmations / 20, 0.1);
   const pLoss = Math.min(0.999, Math.max(0.001, (measured + input.routerPLoss) / 2 + historyPenalty - ageDiscount));
   const feeLovelace = BigInt(Math.ceil(Number(input.amountLovelace) * pLoss)) + input.marginLovelace;
-  return { pLoss, feeLovelace, serveInstant: pLoss * Number(input.amountLovelace) <= Number(feeLovelace), reason: "measured Beta risk plus router risk, payer history, and input age" };
+  const maxInstantPLoss = Number(process.env.MAX_INSTANT_PLOSS ?? 0.2);
+  return { pLoss, feeLovelace, serveInstant: feeLovelace <= input.amountLovelace && pLoss <= maxInstantPLoss, reason: `measured Beta risk plus router risk, payer history, and input age; instant threshold ${maxInstantPLoss}` };
 }

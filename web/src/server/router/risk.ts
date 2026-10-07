@@ -46,11 +46,13 @@ export function betaBinomialRisk(successes: number, failures: number, options: R
     beta,
     posterior,
     pLoss,
-    pClaim: pLoss * coverageApplicabilityRate,
+    // The coverage validator pays on every FAILURE. Applicability is not an
+    // on-chain condition, so pricing must use the full loss probability.
+    pClaim: pLoss,
     confidence: alpha + beta,
     dependencyRiskPenalty,
     recentIncidentPenalty,
     bondDiscount,
-    coverageApplicabilityRate,
+    coverageApplicabilityRate: 1,
   };
 }

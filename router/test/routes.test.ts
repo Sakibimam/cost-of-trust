@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { evaluateRoutes, sellerRisk, type RouteResult, type Seller } from "../src/routes.ts";
+import { boundedJointFailureProbability, evaluateRoutes, sellerRisk, type RouteResult, type Seller } from "../src/routes.ts";
 import underwriter from "../underwriter.json" with { type: "json" };
 
 const make = (id: string, priceAda: number, provider: string, extra: Partial<Seller> = {}): Seller => ({ id, name: id, priceAda, provider, payTo: id, endpoint: id, successes: 0, failures: 0, evidence: [], dependencyRiskPenalty: 0, ...extra });
@@ -21,7 +21,7 @@ const table: [string, string, string[], boolean, number, number, number, number]
   ["single B", "single", ["seller-b"], false, 20, 30, 20, 27.5],
   ["redundant A+C shared", "redundant", ["seller-a", "seller-c"], false, 28, 32.5, 28, 36.12],
   ["redundant A+C independent", "redundant", ["seller-a", "seller-c"], true, 20, 19.6, 20, 24.9],
-  ["underwritten B", "underwritten", ["seller-b"], false, 22.2, 14.8, 22.2, 25.9],
+  ["underwritten B", "underwritten", ["seller-b"], false, 22.2, 6, 22.2, 23.7],
 ];
 for (const [name, route, ids, independent, mean, sd, lambda0, lambda25] of table) {
   test(`golden ${name}`, () => {
@@ -37,10 +37,10 @@ for (const [name, route, ids, independent, mean, sd, lambda0, lambda25] of table
 
 test("underwritten B premium and covered expected loss", () => {
   const q = find(run([a, b, c], 0), "underwritten", "seller-b");
-  expect(q.premiumAda).toBeCloseTo(8.6, 2);
-  expect(q.expectedLossAda).toBeCloseTo(3.6, 2);
-  expect(q.sdLossAda).toBeCloseTo(14.8, 2);
-  expect(q.pClaim).toBeCloseTo(0.08, 4);
+  expect(q.premiumAda).toBeCloseTo(10.2, 2);
+  expect(q.expectedLossAda).toBeCloseTo(2, 2);
+  expect(q.sdLossAda).toBeCloseTo(6, 2);
+  expect(q.pClaim).toBeCloseTo(0.1, 4);
 });
 
 test("every route is quoted, none pruned", () => {
@@ -67,7 +67,7 @@ test("2x2 selection table, sharedInfrastructure true", () => {
   expect(winner(r0).riskAdjustedCostAda).toBeCloseTo(20, 2);
   const r25 = noStagger(run([a, b, c], 0.25, { allowRedundancy: true }, true));
   expect([r25.selectedRoute, r25.selectedSellers]).toEqual(["underwritten", ["seller-b"]]);
-  expect(winner(r25).riskAdjustedCostAda).toBeCloseTo(25.9, 2);
+  expect(winner(r25).riskAdjustedCostAda).toBeCloseTo(23.7, 2);
   const ab = find(r25, "redundant", "seller-a", "seller-b");
   expect(ab.jointFailureProbability).toBeCloseTo(0.08, 4);
   expect(ab.expectedTotalCostAda).toBeCloseTo(26, 2);
@@ -86,9 +86,9 @@ test("ties break by lower sd then route id", () => {
 });
 test("reason names the mechanism", () => {
   expect(run([a, b, c], 0.25).reason).toContain("sellers fail independently, so an escrowed schedule (seller-a first, seller-b as late backup)");
-  expect(run([a, b, c], 0.25, { allowRedundancy: true }, true).reason).toContain("sellers share infrastructure, so the late keeper is correlated");
+  expect(run([a, b, c], 0.25, { allowRedundancy: true }, true).reason).toContain("sellers share infrastructure, so backups fail together");
   const cover = run([a, b, c], 0.25, { allowRedundancy: false }, true);
-  expect(cover.reason).toContain("sellers share infrastructure, so backups fail together; coverage caps the 30.00 ADA loss sd of seller-b");
+  expect(cover.reason).toContain("coverage caps the 30.00 ADA loss sd of seller-b");
 });
 
 test("constraints filter route families", () => {
@@ -147,5 +147,13 @@ test("staggered selection in the four quadrants", () => {
   expect(pick(0, false)).toEqual(["staggered", "seller-a>seller-b", 11.1]);
   expect(pick(0.25, false)).toEqual(["staggered", "seller-a>seller-b", 15.36]);
   expect(pick(0, true)).toEqual(["staggered", "seller-a>seller-b", 18.24]);
-  expect(pick(0.25, true)).toEqual(["staggered", "seller-b>seller-a", 25.75]);
+  expect(pick(0.25, true)).toEqual(["underwritten", "seller-b", 23.7]);
+});
+
+test("bounded correlation keeps joint failure below each single seller", () => {
+  for (let pa = 0; pa <= 1; pa += 0.05) for (let pb = 0; pb <= 1; pb += 0.05) for (let rho = -2; rho <= 2; rho += 0.25) {
+    const joint = boundedJointFailureProbability(pa, pb, rho);
+    expect(joint).toBeGreaterThanOrEqual(Math.max(0, pa + pb - 1) - 1e-12);
+    expect(joint).toBeLessThanOrEqual(Math.min(pa, pb) + 1e-12);
+  }
 });

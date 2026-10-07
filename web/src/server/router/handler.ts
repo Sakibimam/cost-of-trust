@@ -30,20 +30,51 @@ async function persistSellers(next: Seller[]) {
   await writeFile(sellerFile, `${JSON.stringify(next, null, 2)}\n`);
 }
 
-async function requireConfirmedTx(txHash: string): Promise<void> {
+type KoiosTx = { tx_hash?: string; inputs?: Array<Record<string, unknown>>; outputs?: Array<Record<string, unknown>> };
+const claimVaultAddress = process.env.CLAIM_VAULT_ADDRESS ?? "addr_test1wpvyupyu5rclc55v8j342y295mc8f6wdc434ansa7j64vwc2mvcle";
+
+function hasClaimRedeemer(input: Record<string, unknown>, success: boolean): boolean {
+  const redeemer = input.redeemer ?? input.spending_redeemer ?? input.redeemer_data;
+  const text = JSON.stringify(redeemer ?? "").toLowerCase();
+  if (text.includes(success ? "claim" : "forfeit")) return true;
+  const constructor = (redeemer as { constructor?: unknown } | null)?.constructor ?? (redeemer as { value?: { constructor?: unknown } } | null)?.value?.constructor;
+  return constructor === (success ? 0 : 1);
+}
+
+async function koios<T>(path: string, body: unknown): Promise<T> {
   const key = process.env.KAIOS_KEY;
   if (!key) throw new Error("KAIOS_KEY is not set");
-  if (!/^[0-9a-f]{64}$/i.test(txHash)) throw new Error("txHash must be a 64-character hex hash");
-  const response = await fetch(`${KOIOS_URL}/tx_status`, {
+  const response = await fetch(`${KOIOS_URL}/${path}`, {
     method: "POST",
     headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
-    body: JSON.stringify({ _tx_hashes: [txHash] }),
+    body: JSON.stringify(body),
   });
-  if (!response.ok) throw new Error(`Koios tx_status returned ${response.status}`);
-  const rows = await response.json() as Array<{ num_confirmations?: number | null; status?: string; error?: string }>;
+  if (!response.ok) throw new Error(`Koios ${path} returned ${response.status}`);
+  return await response.json() as T;
+}
+
+async function requireConfirmedTx(txHash: string, seller: Seller, success: boolean, paymentTxHash?: string): Promise<void> {
+  if (!/^[0-9a-f]{64}$/i.test(txHash)) throw new Error("txHash must be a 64-character hex hash");
+  const rows = await koios<Array<{ num_confirmations?: number | null; status?: string }>>("tx_status", { _tx_hashes: [txHash] });
   const row = rows[0];
   if (row?.status && /fail|reject|invalid/i.test(row.status)) throw new Error(`transaction rejected: ${row.status}`);
   if ((row?.num_confirmations ?? 0) < 1) throw new Error("txHash is not confirmed");
+  const txRows = await koios<KoiosTx[]>("tx_info", { _tx_hashes: [txHash], _bytecode: true });
+  const tx = txRows[0];
+  const scriptHash = process.env.CLAIM_VAULT_SCRIPT_HASH;
+  const claimInput = tx?.inputs?.find((input) => (input.address === claimVaultAddress || (scriptHash && input.script_hash === scriptHash)) && hasClaimRedeemer(input, success));
+  if (!claimInput) throw new Error("transaction does not spend the claim vault with the expected redeemer");
+  const paymentHash = paymentTxHash ?? txHash;
+  if (!/^[0-9a-f]{64}$/i.test(paymentHash)) throw new Error("paymentTxHash must be a 64-character hex hash");
+  if (paymentHash !== txHash) {
+    const paymentStatus = (await koios<Array<{ num_confirmations?: number | null }>>("tx_status", { _tx_hashes: [paymentHash] }))[0];
+    if ((paymentStatus?.num_confirmations ?? 0) < 1) throw new Error("paymentTxHash is not confirmed");
+  }
+  const payment = paymentHash === txHash ? tx : (await koios<KoiosTx[]>("tx_info", { _tx_hashes: [paymentHash], _bytecode: true }))[0];
+  if (!payment?.outputs?.some((output) => {
+    const value = output.value as { lovelace?: number | string } | undefined;
+    return output.address === seller.payTo && Number(value?.lovelace ?? 0) > 0;
+  })) throw new Error("transaction does not pay the seller");
 }
 
 export async function ingestOutcome(sellerId: string, success: boolean, txHash: string): Promise<Seller> {
@@ -81,9 +112,15 @@ export async function handle(request: Request, pathname = new URL(request.url).p
       return json({ ...saved, termsHash: termsHash(selectedTerms(saved!.result)) });
     }
     if (request.method === "POST" && pathname === "/ingest") {
-      const body = await request.json() as { sellerId?: unknown; success?: unknown; txHash?: unknown };
+      const body = await request.json() as { sellerId?: unknown; success?: unknown; txHash?: unknown; paymentTxHash?: unknown };
       if (typeof body.sellerId !== "string" || typeof body.success !== "boolean" || typeof body.txHash !== "string") return json({ error: "sellerId, success, and txHash are required" }, 400);
-      await requireConfirmedTx(body.txHash);
+      const token = process.env.INGEST_TOKEN;
+      if (!token || request.headers.get("authorization") !== `Bearer ${token}`) return json({ error: "ingest authentication required" }, 401);
+      const seller = sellers.find((item) => item.id === body.sellerId);
+      if (!seller) return json({ error: "seller not found" }, 400);
+      const paymentTxHash = body.paymentTxHash === undefined ? undefined : typeof body.paymentTxHash === "string" ? body.paymentTxHash : "";
+      await requireConfirmedTx(body.txHash, seller, body.success, paymentTxHash);
+      if (seller.evidence.includes(body.txHash)) return json(seller);
       return json(await ingestOutcome(body.sellerId, body.success, body.txHash));
     }
     if (request.method === "POST" && pathname === "/best-route") {

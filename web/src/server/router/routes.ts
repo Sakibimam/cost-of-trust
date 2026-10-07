@@ -39,6 +39,13 @@ function riskFor(seller: Seller, underwriter: UnderwriterConfig): Risk {
 }
 
 const byCost = (a: RouteQuote, b: RouteQuote) => a.riskAdjustedCostAda - b.riskAdjustedCostAda;
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+export function boundedJointFailureProbability(pa: number, pb: number, correlation: number): number {
+  const rho = clamp(correlation, -1, 1);
+  const covariance = rho * Math.sqrt(pa * (1 - pa) * pb * (1 - pb));
+  return clamp(pa * pb + covariance, Math.max(0, pa + pb - 1), Math.min(pa, pb));
+}
 
 function finish(base: Omit<RouteQuote, "expectedTotalCostAda" | "riskAdjustedCostAda">, lambda: number): RouteQuote {
   const expectedTotalCostAda = base.servicePriceAda + base.premiumAda + base.expectedLossAda;
@@ -55,8 +62,7 @@ function single(seller: Seller, loss: number, underwriter: UnderwriterConfig, la
 function redundant(a: Seller, b: Seller, loss: number, underwriter: UnderwriterConfig, lambda: number, sharedInfrastructure: boolean): RouteQuote {
   const ra = riskFor(a, underwriter); const rb = riskFor(b, underwriter);
   const shared = sharedInfrastructure || a.provider === b.provider;
-  const covariance = underwriter.sharedProviderCorrelation * Math.sqrt(ra.pLoss * (1 - ra.pLoss) * rb.pLoss * (1 - rb.pLoss));
-  const jointFailureProbability = shared ? ra.pLoss * rb.pLoss + covariance : ra.pLoss * rb.pLoss;
+  const jointFailureProbability = shared ? boundedJointFailureProbability(ra.pLoss, rb.pLoss, underwriter.sharedProviderCorrelation) : ra.pLoss * rb.pLoss;
   const expectedLossAda = jointFailureProbability * loss;
   const sdLossAda = loss * Math.sqrt(jointFailureProbability * (1 - jointFailureProbability));
   return finish({ route: "redundant", sellers: [a.id, b.id], servicePriceAda: a.priceAda + b.priceAda, premiumAda: 0, premiumBreakdown: {}, coverageAda: 0, pLoss: jointFailureProbability, pClaim: 0, confidence: ra.confidence + rb.confidence, expectedLossAda, sdLossAda, jointFailureProbability, arithmetic: `${a.priceAda} + ${b.priceAda} + ${jointFailureProbability} * ${loss} + ${lambda} * ${sdLossAda}` }, lambda);
@@ -66,8 +72,7 @@ function staggered(a: Seller, b: Seller, loss: number, underwriter: UnderwriterC
   const ra = riskFor(a, underwriter); const rb = riskFor(b, underwriter);
   const pbLate = Math.min(rb.pLoss + underwriter.lateSlotPenalty, 0.999);
   const shared = sharedInfrastructure || a.provider === b.provider;
-  const covariance = underwriter.sharedProviderCorrelation * Math.sqrt(ra.pLoss * (1 - ra.pLoss) * pbLate * (1 - pbLate));
-  const jointFailureProbability = ra.pLoss * pbLate + (shared ? covariance : 0);
+  const jointFailureProbability = shared ? boundedJointFailureProbability(ra.pLoss, pbLate, underwriter.sharedProviderCorrelation) : ra.pLoss * pbLate;
   const expectedFeeAda = a.priceAda * (1 - ra.pLoss) + b.priceAda * ra.pLoss * (1 - pbLate);
   const expectedLossAda = jointFailureProbability * loss;
   const sdLossAda = loss * Math.sqrt(jointFailureProbability * (1 - jointFailureProbability));
@@ -128,7 +133,7 @@ export function evaluateRoutes(input: RouteInput): RouteResult {
   const reason = forced
     ? `coverage required by buyer; ${label(selected)} costs ${selected.riskAdjustedCostAda.toFixed(2)} ADA, the unconstrained best route (${label(cheapest)}) would cost ${cheapest.riskAdjustedCostAda.toFixed(2)} ADA`
     : explain(selected, eligible, lambda, sharedInfrastructure);
-  return { selectedRoute: selected.route, selectedSellers: selected.sellers, reason, forcedByConstraints: !!forced, routes, alternatives: eligible.slice(1), assumptions: { sharedInfrastructure: { value: sharedInfrastructure, status: "buyer-supplied" }, riskAversion: { value: lambda, status: "buyer-supplied" }, prior: { alpha0: 2, beta0: 8, status: "configured" }, sharedProviderCorrelation: { value: underwriter.sharedProviderCorrelation, status: "configured" }, coverageApplicabilityRate: { value: underwriter.coverageApplicabilityRate, status: "configured" }, penalties: "seller-specific values are configured; outcome counts are measured" } };
+  return { selectedRoute: selected.route, selectedSellers: selected.sellers, reason, forcedByConstraints: !!forced, routes, alternatives: eligible.slice(1), assumptions: { sharedInfrastructure: { value: sharedInfrastructure, status: "buyer-supplied" }, riskAversion: { value: lambda, status: "buyer-supplied" }, prior: { alpha0: 2, beta0: 8, status: "configured" }, sharedProviderCorrelation: { value: underwriter.sharedProviderCorrelation, status: "configured" }, coverageApplicabilityRate: { value: 1, status: "validator pays every FAILURE" }, penalties: "seller-specific values are configured; outcome counts are measured" } };
 }
 
 export function sellerRisk(seller: Seller, underwriter: UnderwriterConfig): Risk { return riskFor(seller, underwriter); }

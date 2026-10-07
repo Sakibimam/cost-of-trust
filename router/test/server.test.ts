@@ -28,9 +28,9 @@ test("POST /best-route then GET /quotes/:id, /sellers, /health, CORS", async () 
   expect(body.selectedSellers).toEqual(["seller-a", "seller-b"]);
   expect(body.riskAversion ?? body.assumptions.riskAversion.value).toBe(0);
   const under = body.routes.find((r: any) => r.route === "underwritten" && r.sellers[0] === "seller-b");
-  expect(under.premiumAda).toBeCloseTo(8.6, 2);
+  expect(under.premiumAda).toBeCloseTo(10.2, 2);
   expect(under.expectedTotalCostAda).toBeCloseTo(22.2, 2);
-  expect(under.sdLossAda).toBeCloseTo(14.8, 2);
+  expect(under.sdLossAda).toBeCloseTo(6, 2);
   expect(under.riskAdjustedCostAda).toBeCloseTo(22.2, 2);
   expect(body.termsHash).toMatch(/^[0-9a-f]{64}$/);
   const hash = Buffer.from(blake2b(new TextEncoder().encode(canonicalJson({ route: "staggered", sellers: ["seller-a", "seller-b"], servicePriceAda: body.routes.find((r: any) => r.route === "staggered").servicePriceAda, premiumAda: 0, coverageAda: 0 })), { dkLen: 32 })).toString("hex");
@@ -39,7 +39,7 @@ test("POST /best-route then GET /quotes/:id, /sellers, /health, CORS", async () 
   const quote = await (await fetch(`${base()}/quotes/${body.quoteId}`)).json();
   expect(quote.result.selectedRoute).toBe("staggered");
   const sellerQuote = await (await fetch(`${base()}/quotes/seller-b`)).json();
-  expect(sellerQuote.coverageOffers[0].premiumAda).toBeCloseTo(8.6, 2);
+  expect(sellerQuote.coverageOffers[0].premiumAda).toBeCloseTo(10.2, 2);
   expect(sellerQuote.coverageOffers[0].termsHash).toMatch(/^[0-9a-f]{64}$/);
   expect((await fetch(`${base()}/quotes/nope`)).status).toBe(404);
 
@@ -55,12 +55,12 @@ test("POST /best-route then GET /quotes/:id, /sellers, /health, CORS", async () 
 test("requireCoverage and maxServiceSpendAda over HTTP; unknown seller 400", async () => {
   server = startServer(0);
   const shared = await (await post({ ...req, riskAversion: 0.25, sharedInfrastructure: true })).json();
-  expect(shared.selectedRoute).toBe("staggered");
-  expect(shared.selectedSellers).toEqual(["seller-b", "seller-a"]);
+  expect(shared.selectedRoute).toBe("underwritten");
+  expect(shared.selectedSellers).toEqual(["seller-b"]);
   expect(shared.assumptions.sharedInfrastructure.value).toBe(true);
   const averse = await (await post({ ...req, riskAversion: 0.25, constraints: { allowRedundancy: false } })).json();
   expect(averse.selectedRoute).toBe("underwritten");
-  expect(averse.routes.find((r: any) => r.route === "underwritten" && r.sellers[0] === "seller-b").riskAdjustedCostAda).toBeCloseTo(25.9, 2);
+  expect(averse.routes.find((r: any) => r.route === "underwritten" && r.sellers[0] === "seller-b").riskAdjustedCostAda).toBeCloseTo(23.7, 2);
   expect(averse.reason).toContain("coverage caps the 30.00 ADA loss sd of seller-b");
   const covered = await (await post({ ...req, constraints: { allowRedundancy: true, requireCoverage: true } })).json();
   expect(covered.selectedRoute).toBe("underwritten");
@@ -71,18 +71,19 @@ test("requireCoverage and maxServiceSpendAda over HTTP; unknown seller 400", asy
   expect((await post({ ...req, candidateSellers: ["seller-b"], constraints: { maxServiceSpendAda: 5 } })).status).toBe(400);
 });
 
-test("ingestOutcome persists evidence and moves the posterior", async () => {
+test.serial("ingestOutcome persists evidence and moves the posterior", async () => {
   server = startServer(0);
-  const before = (await (await fetch(`${base()}/sellers`)).json())[0].risk.pLoss;
+  const initial = (await (await fetch(`${base()}/sellers`)).json())[0];
+  const before = initial.risk.pLoss;
   const tx = "ab".repeat(32);
   const updated = await ingestOutcome("seller-a", false, tx);
-  expect(updated.failures).toBe(1);
+  expect(updated.failures).toBe(initial.failures + 1);
   const disk = JSON.parse(readFileSync(sellersPath, "utf8"));
   expect(disk[0].failures).toBe(1);
-  expect(disk[0].evidence).toEqual([tx]);
+  expect(disk[0].evidence).toEqual([...initial.evidence, tx]);
   const after = (await (await fetch(`${base()}/sellers`)).json())[0];
   expect(after.risk.pLoss).toBeGreaterThan(before);
-  expect(after.evidence).toEqual([tx]);
+  expect(after.evidence).toEqual([...initial.evidence, tx]);
   await expect(ingestOutcome("seller-a", true, "")).rejects.toThrow("txHash is required");
   await expect(ingestOutcome("ghost", true, tx)).rejects.toThrow("seller not found");
 });
@@ -90,6 +91,39 @@ test("ingestOutcome persists evidence and moves the posterior", async () => {
 test("termsHash is key-order independent blake2b-256", () => {
   expect(termsHash({ a: 1, b: 2 })).toBe(termsHash({ b: 2, a: 1 }));
   expect(termsHash({ a: 1 })).not.toBe(termsHash({ a: 2 }));
+});
+
+test.serial("ingest authenticates, binds claim evidence to the seller, and dedupes", async () => {
+  server = startServer(0);
+  const previousFetch = globalThis.fetch;
+  const tx = "cd".repeat(32);
+  const seller = (await (await fetch(`${base()}/sellers`)).json())[0];
+  const sellerPayTo = seller.payTo;
+  process.env.INGEST_TOKEN = "ingest-test-token";
+  process.env.KAIOS_KEY = "koios-test-key";
+  let txInfoCalls = 0;
+  globalThis.fetch = (async (input, init) => {
+    const path = new URL(String(input)).pathname;
+    if (path.endsWith("/tx_status")) return new Response(JSON.stringify([{ num_confirmations: 1 }]));
+    if (path.endsWith("/tx_info")) {
+      const unrelated = txInfoCalls++ === 0;
+      return new Response(JSON.stringify([{ inputs: unrelated ? [{ address: "addr_test1 unrelated", redeemer: { constructor: 0 } }] : [{ address: "addr_test1wpvyupyu5rclc55v8j342y295mc8f6wdc434ansa7j64vwc2mvcle", redeemer: { constructor: 0 } }], outputs: [{ address: sellerPayTo, value: { lovelace: 1_000_000 } }] }]));
+    }
+    return previousFetch(input, init);
+  }) as typeof fetch;
+  try {
+    expect((await fetch(`${base()}/ingest`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sellerId: "seller-a", success: true, txHash: tx }) })).status).toBe(401);
+    const unrelated = await fetch(`${base()}/ingest`, { method: "POST", headers: { authorization: "Bearer ingest-test-token", "content-type": "application/json" }, body: JSON.stringify({ sellerId: "seller-a", success: true, txHash: "ef".repeat(32) }) });
+    expect(unrelated.status).toBe(400);
+    const rejected = await fetch(`${base()}/ingest`, { method: "POST", headers: { authorization: "Bearer ingest-test-token", "content-type": "application/json" }, body: JSON.stringify({ sellerId: "seller-a", success: true, txHash: tx }) });
+    expect(rejected.status).toBe(200);
+    const duplicate = await fetch(`${base()}/ingest`, { method: "POST", headers: { authorization: "Bearer ingest-test-token", "content-type": "application/json" }, body: JSON.stringify({ sellerId: "seller-a", success: true, txHash: tx }) });
+    expect((await duplicate.json()).successes).toBe(seller.successes + 1);
+  } finally {
+    globalThis.fetch = previousFetch;
+    delete process.env.INGEST_TOKEN;
+    delete process.env.KAIOS_KEY;
+  }
 });
 
 test("measured provider histories drive provider selection", async () => {
