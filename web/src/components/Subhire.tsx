@@ -1,6 +1,6 @@
 import run from "@/data/subhire.json";
 
-// Source: agents/runs/2026-10-07T07-29-44-934Z-subhire.json (copied byte for byte to src/data/subhire.json), produced by subhire/agent.ts.
+// Source: agents/runs/2026-10-07T11-06-36-167Z-subhire.json (copied byte for byte to src/data/subhire.json), produced by subhire/agent.ts.
 const tx = (hash: string) => `https://preprod.cardanoscan.io/transaction/${hash}`;
 const WORDS: Record<string, string> = { hire_as_is: "Hire", hire_with_backup_keeper: "Hire with backup", require_coverage: "Hire only with coverage", do_not_hire: "Do not hire", insufficient_data: "Not enough history" };
 
@@ -34,7 +34,7 @@ export function Subhire() {
         {choice && hire && (
           <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-3 border-l-[6px] border-signal bg-paper-2 p-5 lg:grid-cols-12">
             <p className="m-0 font-extrabold lg:col-span-4">Sub-hired {choice.agent}: {WORDS[choice.decision]?.toLowerCase()}, expected {choice.expectedCostAda.toFixed(2)} ADA.</p>
-            <p className="m-0 text-[15px] lg:col-span-8">Cheapest of the {payments.length} reports among candidates whose input schema fits this job. The agent builds the MIP-003 <span className="fig">start_job</span> request from the registry entry, <a href={hire.request.url} className="fig break-all">{hire.request.url}</a>, and its <span className="fig">/availability</span> answers {hire.availability.status} in {hire.availability.ms} ms. Every Trust Check payment is confirmed on Cardano preprod through Koios.</p>
+            <p className="m-0 text-[15px] lg:col-span-8">The only one of {payments.length} registry entries the policy cleared. The other {run.refused.length} came back do not hire ({[...new Set(run.refused)].join(", ")}). The agent builds the MIP-003 <span className="fig">start_job</span> request from the registry entry, <a href={hire.request.url} className="fig break-all">{hire.request.url}</a>, and its <span className="fig">/availability</span> answers {hire.availability.status} in {hire.availability.ms} ms. Every Trust Check payment is confirmed on Cardano preprod through Koios.</p>
           </div>
         )}
       </div>

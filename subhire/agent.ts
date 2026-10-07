@@ -16,8 +16,8 @@ const WALLETS = "/Users/user/Desktop/canton/recourse/.wallets.json";
 const MAINNET_POLICIES = ["ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9", "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b"];
 
 const job = {
-  title: "market research brief",
-  query: "Brief on the European market for AI agent marketplaces: main players, pricing, and the last 90 days of news.",
+  title: "team structure review",
+  query: "We are a 6-person team building agent infrastructure. Two founders split strategy and product, three engineers report to the CTO, and decisions wait on one person. Recommend how to structure roles and decision rights before the next three hires.",
   taskValueAtRiskAda: 100,
   deadlineMinutes: 15,
   capabilityTags: ["research", "news", "analysis", "strategy", "ai"],
@@ -125,9 +125,11 @@ function line(payment: Payment): string {
 }
 
 async function hireRequest(candidate: Candidate) {
-  const schema = await fetch(`${candidate.apiBase}/input_schema`, { signal: AbortSignal.timeout(15_000) }).then((r) => r.json()) as { input_data: Array<{ id: string }> };
-  const input_data = schema.input_data.filter((field) => field.id === "query").map((field) => ({ key: field.id, value: job.query }));
-  if (!input_data.length) throw new Error(`${candidate.name} input_schema has no query field`);
+  const schema = await fetch(`${candidate.apiBase}/input_schema`, { signal: AbortSignal.timeout(15_000) }).then((r) => r.json()) as { input_data: Array<{ id: string; type?: string; validations?: Array<{ validation: string }> | null }> };
+  const required = (field: { validations?: Array<{ validation: string }> | null }) => !(field.validations ?? []).some((rule) => rule.validation === "optional");
+  const slot = schema.input_data.find((field) => field.id === "query") ?? schema.input_data.find((field) => (field.type === "text" || field.type === "string") && required(field) && schema.input_data.filter(required).length === 1);
+  if (!slot) throw new Error(`${candidate.name} input_schema has no single free-text slot for the job`);
+  const input_data = [{ key: slot.id, value: job.query }];
   const started = Date.now();
   const response = await fetch(`${candidate.apiBase}/availability`, { signal: AbortSignal.timeout(15_000) });
   const availability = await response.json() as { status?: string; message?: string };
