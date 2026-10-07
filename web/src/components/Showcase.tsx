@@ -49,7 +49,7 @@ export function Showcase() {
         <div className="wrap">
           <p className="label">Live Masumi registry agent, mainnet history</p>
           <h2 id="buy-h" className="mt-2 max-w-[22ch] text-[32px] font-extrabold leading-[1.05] md:text-[40px]">One agent. Four ways to buy the job.</h2>
-          <p className="mt-4 max-w-[64ch] text-[17px] leading-[1.45]">A registry ranking has nothing to rank when a field has one agent. The buyer still has a decision: how to pay for this job. {lead.agentName} has {lead.delivery.paid} paid escrows, {lead.delivery.onTime ?? 0} results submitted before their deadline, {lead.delivery.distinctBuyers ?? 0} distinct buyers{lead.delivery.responseSecondsMedian ? ` and a median ${lead.delivery.responseSecondsMedian} s from escrow to result` : ""}. The same record leads to a different purchase as the value at risk grows.</p>
+          <p className="mt-4 max-w-[64ch] text-[17px] leading-[1.45]">A registry ranking has nothing to rank when a field has one agent. The buyer still has a decision: how to pay for this job. {lead.agentName} has {lead.delivery.paid} paid escrows, {lead.delivery.onTime ?? 0} results submitted before their deadline{lead.delivery.responseSecondsMedian ? ` and a median ${lead.delivery.responseSecondsMedian} s from escrow to result` : ""}. The same record leads to a different purchase as the value at risk grows.</p>
           <div className="mt-8">
             <table className="w-full table-fixed border-collapse text-left text-[13px] sm:text-[15px]">
               <caption className="sr-only">Risk-adjusted cost of each way to buy the job, by value at risk</caption>
