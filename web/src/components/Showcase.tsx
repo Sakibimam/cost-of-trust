@@ -24,8 +24,10 @@ const ROUTE_OF: Record<string, keyof Scenario["options"]> = { hire_as_is: "singl
 // Source: web/src/data/showcase.json, written by coworker/scripts/showcase.ts from live mainnet Masumi registry entries,
 // their escrow history on Koios and their MIP-003 /availability endpoints.
 const agents = (showcase.agents as Agent[]);
-const lead = agents.find((a) => a.scenarios.some((s) => s.recommendation !== "do_not_hire")) ?? agents[0];
-const trap = agents.find((a) => a.delivery.disputed === 0 && a.delivery.refunded > 0 && a.delivery.paid === 0);
+// Lead: the most-used hireable agent (most resolved escrows); trap: a zero-dispute agent whose escrows mostly refund.
+const resolved = (a: Agent) => a.delivery.paid + a.delivery.refunded + a.delivery.disputed;
+const lead = [...agents].filter((a) => a.scenarios.some((s) => s.recommendation !== "do_not_hire")).sort((x, y) => resolved(y) - resolved(x))[0] ?? agents[0];
+const trap = agents.filter((a) => a.delivery.disputed === 0 && a.delivery.refunded > a.delivery.paid).sort((x, y) => y.delivery.refunded - x.delivery.refunded)[0];
 const independent = lead.scenarios.filter((s) => !s.sharedInfrastructure);
 
 function chosen(s: Scenario): keyof Scenario["options"] | null {
@@ -72,7 +74,7 @@ export function Showcase() {
           {trap && (
             <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-3 border-l-[6px] border-signal bg-paper-2 p-5 lg:grid-cols-12">
               <p className="m-0 font-extrabold lg:col-span-4">A dispute rate would rank {trap.agentName} as flawless.</p>
-              <p className="m-0 text-[15px] lg:col-span-8">It has 0 disputes, and 0 paid jobs: all {trap.delivery.refunded} of its escrows ended in refunds. Trust Check reads the escrow outcomes on chain and answers do not hire at every value at risk.</p>
+              <p className="m-0 text-[15px] lg:col-span-8">It has 0 disputes. Of its {resolved(trap)} resolved escrows, {trap.delivery.refunded} ended in refunds ({Math.round((trap.delivery.refunded / resolved(trap)) * 100)}%): buyers paid and got nothing delivered. Trust Check reads the escrow outcomes on chain and answers do not hire at every value at risk.</p>
             </div>
           )}
         </div>

@@ -34,7 +34,7 @@ export function Subhire() {
         {choice && hire && (
           <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-3 border-l-[6px] border-signal bg-paper-2 p-5 lg:grid-cols-12">
             <p className="m-0 font-extrabold lg:col-span-4">Sub-hired {choice.agent}: {WORDS[choice.decision]?.toLowerCase()}, expected {choice.expectedCostAda.toFixed(2)} ADA.</p>
-            <p className="m-0 text-[15px] lg:col-span-8">Lowest expected cost of the {payments.length} reports. The agent builds the MIP-003 <span className="fig">start_job</span> request from the registry entry, <a href={hire.request.url} className="fig break-all">{hire.request.url}</a>, and its <span className="fig">/availability</span> answers {hire.availability.status} in {hire.availability.ms} ms. Every Trust Check payment is confirmed on Cardano preprod through Koios.</p>
+            <p className="m-0 text-[15px] lg:col-span-8">Cheapest of the {payments.length} reports among candidates whose input schema fits this job. The agent builds the MIP-003 <span className="fig">start_job</span> request from the registry entry, <a href={hire.request.url} className="fig break-all">{hire.request.url}</a>, and its <span className="fig">/availability</span> answers {hire.availability.status} in {hire.availability.ms} ms. Every Trust Check payment is confirmed on Cardano preprod through Koios.</p>
           </div>
         )}
       </div>
