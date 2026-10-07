@@ -123,14 +123,17 @@ export async function registryFromChain(identifier: string, network: Network = "
 type PlutusJson = { constructor?: number; fields?: PlutusJson[]; bytes?: string; int?: number };
 
 // Escrow datum layouts from the Masumi vested_pay validators: V2 has 19 fields (seller at 2, agent_identifier at 8), V1 has 16 (seller at 1).
-export function escrowParty(datum: PlutusJson | undefined): { seller: string; agent?: string; state: number } | null {
+export function escrowParty(datum: PlutusJson | undefined): { seller: string; buyer?: string; agent?: string; submitResultTime?: number; state: number } | null {
   const fields = datum?.fields;
   if (!fields || (fields.length !== 19 && fields.length !== 16)) return null;
   const sellerAt = fields.length === 19 ? 2 : 1;
   const seller = fields[sellerAt]?.fields?.[0]?.fields?.[0]?.bytes;
   const state = fields[fields.length - 1]?.constructor;
   if (!seller || state === undefined) return null;
-  return { seller, agent: fields.length === 19 ? fields[8]?.bytes : undefined, state };
+  if (fields.length === 19) return { seller, agent: fields[8]?.bytes, state };
+  // V1 (16 fields): buyer at 0, blockchainIdentifier at 4 = 32-byte hash || agent registry unit (28-byte policy + 32-byte name), submitResultTime at 10.
+  const identifier = fields[4]?.bytes ?? "";
+  return { seller, buyer: fields[0]?.fields?.[0]?.fields?.[0]?.bytes, agent: identifier.length === 184 ? identifier.slice(64) : undefined, submitResultTime: fields[10]?.int, state };
 }
 
 // Redeemer constructors shared by V1 and V2 vested_pay: Withdraw 0, WithdrawRefund 3, WithdrawDisputed 4, SubmitResult 5.
@@ -144,12 +147,14 @@ type TxInfo = {
   plutus_contracts?: Array<{ valid_contract?: boolean; spends_input?: { tx_hash: string; tx_index: number } | null; input?: { redeemer?: { datum?: { value?: PlutusJson } } } }>;
 };
 
-export type DeliveryTally = { escrowsOpened: number; resultsSubmitted: number; paid: number; refunded: number; disputed: number; walletOnly?: number; events: Array<{ txHash: string; blockTime: number; action: string; contract: string }> };
+export type DeliveryTally = { escrowsOpened: number; resultsSubmitted: number; paid: number; refunded: number; disputed: number; walletOnly?: number; onTime?: number; late?: number; buyers?: string[]; submissions?: Array<{ openTx: string; at: number }>; responseSecondsMedian?: number | null; events: Array<{ txHash: string; blockTime: number; action: string; contract: string }> };
 
 export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: string, contract: string, tally: DeliveryTally): void {
   const ours = (datum: PlutusJson | undefined) => {
     const party = escrowParty(datum);
-    return party && (sellers.has(party.seller) || party.agent === agentUnit) ? party : null;
+    // The datum names the agent when it can, so a selling wallet shared by several registry agents does not merge their histories.
+    if (!party) return null;
+    return (party.agent ? party.agent === agentUnit : sellers.has(party.seller)) ? party : null;
   };
   for (const tx of txs) {
     let spentOurs = false;
@@ -161,6 +166,11 @@ export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: st
       const action = ACTIONS[spend.input?.redeemer?.datum?.value?.constructor ?? -1];
       if (!action) continue;
       tally[action] += 1;
+      const party = escrowParty(spent.inline_datum?.value);
+      if (action === "resultsSubmitted" && spend.spends_input?.tx_hash) (tally.submissions ??= []).push({ openTx: spend.spends_input.tx_hash, at: tx.tx_timestamp });
+      if (action === "resultsSubmitted" && party?.submitResultTime !== undefined) {
+        if (tx.tx_timestamp * 1000 <= party.submitResultTime) tally.onTime = (tally.onTime ?? 0) + 1; else tally.late = (tally.late ?? 0) + 1;
+      }
       // V1 escrow datums carry no agent identifier, so the outcome belongs to the selling wallet, which several registry agents can share.
       if (action !== "resultsSubmitted" && escrowParty(spent.inline_datum?.value)?.agent === undefined) tally.walletOnly = (tally.walletOnly ?? 0) + 1;
       tally.events.push({ txHash: tx.tx_hash, blockTime: tx.tx_timestamp, action, contract });
@@ -170,6 +180,7 @@ export function tallyDelivery(txs: TxInfo[], sellers: Set<string>, agentUnit: st
       const party = output.payment_addr?.bech32 === contract ? ours(output.inline_datum?.value) : null;
       if (party?.state !== 0) continue;
       tally.escrowsOpened += 1;
+      if (party.buyer && !(tally.buyers ??= []).includes(party.buyer)) tally.buyers.push(party.buyer);
       tally.events.push({ txHash: tx.tx_hash, blockTime: tx.tx_timestamp, action: "escrowOpened", contract });
     }
   }
@@ -207,6 +218,11 @@ export async function deliveryHistory(identifier: string, network: Network = "Pr
       coverage.push({ contract, scannedTxs: listed.length, truncated: listed.length >= SCAN_CAP });
     }
     tally.events.sort((a, b) => b.blockTime - a.blockTime);
+    // Time to respond: escrow opened -> result submitted, for submissions whose opening tx is inside the scanned window.
+    const opened = new Map(tally.events.filter((event) => event.action === "escrowOpened").map((event) => [event.txHash, event.blockTime]));
+    const waits = (tally.submissions ?? []).flatMap((s) => opened.has(s.openTx) ? [s.at - opened.get(s.openTx)!] : []).sort((a, b) => a - b);
+    tally.responseSecondsMedian = waits.length ? waits[Math.floor(waits.length / 2)] : null;
+    delete tally.submissions;
     return { source: "masumi_delivery_history", status: "ok", observedAt: observedAt(), data: { identifier, unit, network, sellerCredentials: [...sellers], registeredAtBlock, coverage, ...tally, events: tally.events.slice(0, 20) } };
   } catch (error) {
     return { source: "masumi_delivery_history", status: "unavailable", observedAt: observedAt(), error: error instanceof Error ? error.message : "Koios request failed" };

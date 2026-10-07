@@ -41,7 +41,8 @@ test("delivery tally classifies recorded escrow txs for the seller", async () =>
   const txs = await fixture("escrow-txs.json");
   const tally = empty();
   tallyDelivery(txs, new Set([SELLER]), TRUST_CHECK, V2_PREPROD, tally);
-  assert.deepEqual({ ...tally, events: tally.events.map((event) => `${event.action} ${event.txHash.slice(0, 8)}`) }, {
+  const { submissions: _submissions, ...counted } = tally;
+  assert.deepEqual({ ...counted, events: tally.events.map((event) => `${event.action} ${event.txHash.slice(0, 8)}`) }, {
     escrowsOpened: 1, resultsSubmitted: 1, paid: 1, refunded: 1, disputed: 0,
     events: ["escrowOpened a6e3fbda", "resultsSubmitted 8c9db324", "paid 9c560b70", "refunded d3e30266"],
   });
@@ -128,4 +129,28 @@ test("MIP-003 agent with /availability up and no /health route is not vetoed", (
   const down: Evidence = { source: "agent_availability", status: "unavailable", observedAt: "", error: "HTTP 502" };
   assert.notEqual(decide([delivery(28, 0), availability, noHealth], 100).recommendation, "do_not_hire");
   assert.equal(decide([delivery(28, 0), down, noHealth], 100).recommendation, "do_not_hire");
+});
+
+test("V1 escrows on a shared selling wallet are attributed per agent, with on-time delivery from the datum deadline", () => {
+  const POLICY = "ad6424e3ce9e47bbd8364984bd731b41de591f1d11f6d7d43d0da9b9";
+  const unitA = POLICY + "a".repeat(64), unitB = POLICY + "b".repeat(64);
+  const contract = "addr1escrow", seller = "f0".repeat(28), buyer = "e5".repeat(28);
+  const cred = (bytes: string) => ({ constructor: 0, fields: [{ constructor: 0, fields: [{ bytes }] }] });
+  const datum = (unit: string, deadline: number) => ({ constructor: 0, fields: [cred(buyer), cred(seller), { bytes: "" }, { bytes: "" }, { bytes: "1".repeat(64) + unit }, { bytes: "" }, { int: 1 }, { bytes: "" }, { bytes: "" }, { int: 0 }, { int: deadline }, { int: 0 }, { int: 0 }, { int: 0 }, { int: 0 }, { constructor: 0, fields: [] }] });
+  const submit = (hash: string, unit: string, deadlineMs: number, atSec: number) => ({
+    tx_hash: hash, tx_timestamp: atSec,
+    inputs: [{ tx_hash: "in" + hash, tx_index: 0, payment_addr: { bech32: contract }, inline_datum: { value: datum(unit, deadlineMs) } }],
+    plutus_contracts: [{ valid_contract: true, spends_input: { tx_hash: "in" + hash, tx_index: 0 }, input: { redeemer: { datum: { value: { constructor: 5 } } } } }],
+  });
+  const tally: DeliveryTally = { escrowsOpened: 0, resultsSubmitted: 0, paid: 0, refunded: 0, disputed: 0, events: [] };
+  tallyDelivery([submit("t1", unitA, 2_000_000, 1_000), submit("t2", unitA, 2_000_000, 3_000), submit("t3", unitB, 2_000_000, 1_000)] as never, new Set([seller]), unitA, contract, tally);
+  assert.equal(tally.resultsSubmitted, 2);
+  assert.equal(tally.onTime, 1);
+  assert.equal(tally.late, 1);
+});
+
+test("late result submissions raise the price of hiring the agent alone", () => {
+  const onTime = decide([{ source: "masumi_delivery_history", status: "ok", observedAt: "", data: { paid: 10, refunded: 0, disputed: 0, late: 0 } }], 100);
+  const lateOnes = decide([{ source: "masumi_delivery_history", status: "ok", observedAt: "", data: { paid: 10, refunded: 0, disputed: 0, late: 6 } }], 100);
+  assert.ok((lateOnes.options.single?.riskAdjustedCostAda ?? 0) > (onTime.options.single?.riskAdjustedCostAda ?? 0));
 });

@@ -154,7 +154,8 @@ async function gather(input: CheckInput): Promise<Evidence[]> {
   return [registryFact, ...endpointFacts, await deliveryHistory(input.agentIdentifier, network)];
 }
 
-type Delivery = { paid: number; refunded: number; disputed: number };
+// A result submitted after the escrow submitResultTime is a missed deadline, so it counts as a failure for deadline work.
+type Delivery = { paid: number; refunded: number; disputed: number; late?: number };
 
 export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput, "agentIdentifier" | "riskAversion" | "sharedInfrastructure"> = { agentIdentifier: "registry-agent" }): Decision {
   const delivery = facts.find((fact) => fact.source === "masumi_delivery_history");
@@ -163,7 +164,7 @@ export function decide(facts: Evidence[], atRisk: number, input: Pick<CheckInput
   const registryData = pricing?.data;
   const registryId = input.agentIdentifier;
   const price = lovelacePrice(registryData);
-  const registrySeller: Seller = { id: registryId, name: registryName(registryData, registryId), priceAda: price.priceAda, provider: advertisedUrl(registryData) ? new URL(advertisedUrl(registryData)!).host : "unknown", payTo: "registry-agent", endpoint: advertisedUrl(registryData) ?? "", successes: record?.paid ?? 0, failures: (record?.refunded ?? 0) + (record?.disputed ?? 0), evidence: [] };
+  const registrySeller: Seller = { id: registryId, name: registryName(registryData, registryId), priceAda: price.priceAda, provider: advertisedUrl(registryData) ? new URL(advertisedUrl(registryData)!).host : "unknown", payTo: "registry-agent", endpoint: advertisedUrl(registryData) ?? "", successes: record?.paid ?? 0, failures: (record?.refunded ?? 0) + (record?.disputed ?? 0) + (record?.late ?? 0), evidence: [] };
   const backups = (sellersSeed as Seller[]).filter((seller) => seller.type === "agent");
   const underwriter = underwriterSeed as UnderwriterConfig;
   const routes = record && record.paid + record.refunded + record.disputed > 0
