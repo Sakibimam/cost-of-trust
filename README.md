@@ -1,6 +1,6 @@
 # Cost of Trust
 
-Insurance for agent work that has a deadline.
+Agents can buy reliability, not just access.
 
 Live: https://cost-of-trust.vercel.app/
 
