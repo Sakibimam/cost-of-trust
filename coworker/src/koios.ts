@@ -25,7 +25,9 @@ export const contracts = (network: Network) => network === "Mainnet"
 const koiosBase = (network: Network) => env(network === "Mainnet" ? "KOIOS_URL_MAINNET" : "KOIOS_URL_PREPROD", network === "Mainnet" ? "https://api.koios.rest/api/v1" : "https://preprod.koios.rest/api/v1");
 
 export const request = async (path: string, init: RequestInit = {}, network: Network = "Preprod", attempt = 0): Promise<unknown> => {
-  const key = env("KAIOS_KEY");
+  // A key whose quota is spent gets 429 on every call while anonymous access still works, so after
+  // two keyed 429s the request continues without the key.
+  const key = attempt >= 2 ? "" : env("KAIOS_KEY");
   const response = await fetch(`${koiosBase(network)}${path}`, {
     ...init,
     headers: { accept: "application/json", "content-type": "application/json", ...(key ? { authorization: `Bearer ${key}` } : {}), ...(init.headers ?? {}) },
