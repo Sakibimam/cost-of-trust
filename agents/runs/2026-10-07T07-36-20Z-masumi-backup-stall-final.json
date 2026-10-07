@@ -1,0 +1,237 @@
+{
+  "mode": "stall",
+  "runFile": "agents/runs/2026-10-07T07-36-20-280Z-masumi-backup-stall.json",
+  "startedAt": "2026-10-07T07:36:20.280Z",
+  "buyerDeadline": "2026-10-07T07:56:20.280Z",
+  "primaryAgent": "Masumi Backup Primary (STALL=true)",
+  "backupAgent": "Masumi Backup Fallback ADA (3 ADA)",
+  "timeline": {
+    "A_hired": "2026-10-07T07:36:29Z",
+    "buyer_checkpoint": "2026-10-07T07:39:30Z (no A result, hireBackup=true)",
+    "B_hired": "2026-10-07T07:39:34Z",
+    "B_funds_locked_seen": "2026-10-07T07:45:20Z",
+    "B_result_on_chain": "2026-10-07T07:51:08Z",
+    "buyer_deadline": "2026-10-07T07:56:20.280Z",
+    "buyerDeadlineMet": true,
+    "A_submitResultTime": "2026-10-07T07:51:56Z",
+    "A_unlockTime": "2026-10-07T08:06:56Z",
+    "A_refund_requested": "2026-10-07T07:57:15Z",
+    "A_refund_withdrawn_confirmed": "2026-10-07T08:18:50Z (collect-refund tick; state seen RefundWithdrawn 08:20Z)",
+    "B_submitResultTime": "2026-10-07T08:00:03Z",
+    "B_unlockTime": "2026-10-07T08:15:03Z"
+  },
+  "txs": [
+    {
+      "txHash": "5d70db26db11b4e7e3711ce11febef7031b790f710e23c10927ff4ab3d9518d8",
+      "role": "A escrow lock",
+      "onChainState": "FundsLocked",
+      "at": "2026-10-07T07:39:39Z",
+      "koiosConfirmations": 145
+    },
+    {
+      "txHash": "d9b06473307dbf9c056bc51a66637d5af2e153c63b770d4650434967ab74c63e",
+      "role": "B escrow lock",
+      "onChainState": "FundsLocked",
+      "at": "2026-10-07T07:45:16Z",
+      "koiosConfirmations": 133
+    },
+    {
+      "txHash": "7934f7a085a4c491469994f6c7964f601219487cb6888bcefebce05862189fdf",
+      "role": "B ResultSubmitted",
+      "onChainState": "ResultSubmitted",
+      "at": "2026-10-07T07:51:08Z",
+      "koiosConfirmations": 116
+    },
+    {
+      "txHash": "b6dde9c1337932dcc5fd28713cf832ccb2788c9a374a55791791da40ae04ab5a",
+      "role": "A refund request",
+      "onChainState": "RefundRequested",
+      "at": "2026-10-07T08:00:08Z",
+      "koiosConfirmations": 91
+    },
+    {
+      "txHash": "f6445aa1b4a1eae1f69516d215763fe6e4cf20e8d6e4cb94340bd9e206ae9db8",
+      "role": "A refund withdrawn",
+      "onChainState": "RefundWithdrawn",
+      "at": "2026-10-07T08:18:50Z",
+      "koiosConfirmations": 31
+    }
+  ],
+  "koiosSource": "POST https://preprod.koios.rest/api/v1/tx_status at 2026-10-07T08:28Z",
+  "bResultHash": "a9b56a6205255a9c2e24642e080257972517bac687b620b6d0ebc7c1121024fb",
+  "bCollection": "pending at 08:28Z: B unlock passed 08:15:03Z, seller withdrawal not yet landed",
+  "rawRun": {
+    "mode": "stall",
+    "startedAt": "2026-10-07T07:36:20.280Z",
+    "buyerDeadline": "2026-10-07T07:56:20.280Z",
+    "records": [
+      {
+        "at": "2026-10-07T07:36:26.392Z",
+        "step": "trust_check_decision",
+        "recommendation": {
+          "recommendation": "do_not_hire",
+          "expectedCostAda": 0.2727272727272727,
+          "selectedRoute": "single",
+          "options": {
+            "single": {
+              "sellers": [
+                "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000"
+              ],
+              "expectedTotalCostAda": 0.2727272727272727,
+              "riskAdjustedCostAda": 0.6735528670008837,
+              "arithmetic": "0 + 0.2727272727272727 * 1 + 0.9 * 0.4453617714151233"
+            },
+            "redundant": {
+              "sellers": [
+                "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000",
+                "seller-a"
+              ],
+              "expectedTotalCostAda": 8.049586776859504,
+              "riskAdjustedCostAda": 8.244967487320782,
+              "arithmetic": "0 + 8 + 0.04958677685950413 * 1 + 0.9 * 0.21708967829030903"
+            },
+            "staggered": {
+              "sellers": [
+                "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000",
+                "seller-c"
+              ],
+              "expectedTotalCostAda": 1.7045454545454544,
+              "riskAdjustedCostAda": 1.9313973376311016,
+              "arithmetic": "0 * 0.7272727272727273 + 8 * 0.2727272727272727 * 0.75 + 0.06818181818181818 * 1 + 0.9 * 0.25205764787294127"
+            },
+            "underwritten": {
+              "sellers": [
+                "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000"
+              ],
+              "expectedTotalCostAda": 2.0777272727272726,
+              "riskAdjustedCostAda": 2.0777272727272726,
+              "arithmetic": "0 + 2.0777272727272726 + (0.2727272727272727 * 1 - 0.2727272727272727 * 1) + 0.9 * 0"
+            }
+          },
+          "pricingNote": "Registry agentPricing has no lovelace quote; router priceAda is 0 ADA.",
+          "deadlineStats": {
+            "within": 0,
+            "total": 0,
+            "deadlineSeconds": 600,
+            "median": null,
+            "p90": null
+          }
+        },
+        "reportRecommendation": "do_not_hire",
+        "selectedRoute": "redundant",
+        "selectedSellers": [
+          "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000",
+          "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10653cacce1093ec95156bb719ff7775f2e267f315113154a269755edc000000"
+        ]
+      },
+      {
+        "at": "2026-10-07T07:36:29.001Z",
+        "step": "primary_payment_request",
+        "blockchainIdentifier": "0b0560ec0ccc08c0a611019804c0c620270018315b433185d145a30023640432a0360098f0c306365a5400e3a286190e580514b01b260c55303a6169654ada7554d0eb42c5c3086a9c31d10b16082cb5a8c6a5cca08815a0806c0b1826156f22c76b1d7d7574344176a04605b012e54586d0a0a1041642e60900854396e6a0c0ccf6a485041687e442c6292803a2890540667683d550d44580a2c1052ae501e4c882c02b02c0eeaae30302d447d2a52606a1f581f46ea169121010846564af6e8318c60307b1a2c062e64304ae02e268a4a59753a195d86034848102e086c1c0c446a0cb40c0a7910c5429642c03c99671684e1a7e011d0045830c4a95102c910104e305a8b0491d150746eacc221047b39086338a20b4e92c221ce682a6c230e85e08190862189d74741e4f1c8ab1e2a38074d7a0cc13a2c041045c680c5eaa8148f9a04e75281a80c4e221b84e7b3abf4b05424a0d483d865d5903a16012885793984c01c7f4c086971832ca06e063d924c4030c0a0a818132530c7fc44e00c2ca401473b75990b1414b6c068d0c9955b628b1d18d5a6a2e874d233bbc86aabc1a3df4a3388a292b01125ec1b1713ca5730f4db249731518f62e20d86a371b2126d30c2ccbeb005b9796c935809b55b162edf60b2389cce1718a505bc8640009c00fa0017580019d0fd0003b800bc4f0eba05f14200005801ac2fb02bc006d50a8001585e300016d90000dc00472c1774824f001cc000f3a0af17ca06a0408001d0f1838244130800ec203002f60060a00",
+        "submitResultTime": "1791359516396",
+        "unlockTime": "1791360416396"
+      },
+      {
+        "at": "2026-10-07T07:36:30.019Z",
+        "step": "primary_escrow_lock_requested",
+        "purchaseId": "cmuxsni9l004qjqr2u6hlc400",
+        "blockchainIdentifier": "0b0560ec0ccc08c0a611019804c0c620270018315b433185d145a30023640432a0360098f0c306365a5400e3a286190e580514b01b260c55303a6169654ada7554d0eb42c5c3086a9c31d10b16082cb5a8c6a5cca08815a0806c0b1826156f22c76b1d7d7574344176a04605b012e54586d0a0a1041642e60900854396e6a0c0ccf6a485041687e442c6292803a2890540667683d550d44580a2c1052ae501e4c882c02b02c0eeaae30302d447d2a52606a1f581f46ea169121010846564af6e8318c60307b1a2c062e64304ae02e268a4a59753a195d86034848102e086c1c0c446a0cb40c0a7910c5429642c03c99671684e1a7e011d0045830c4a95102c910104e305a8b0491d150746eacc221047b39086338a20b4e92c221ce682a6c230e85e08190862189d74741e4f1c8ab1e2a38074d7a0cc13a2c041045c680c5eaa8148f9a04e75281a80c4e221b84e7b3abf4b05424a0d483d865d5903a16012885793984c01c7f4c086971832ca06e063d924c4030c0a0a818132530c7fc44e00c2ca401473b75990b1414b6c068d0c9955b628b1d18d5a6a2e874d233bbc86aabc1a3df4a3388a292b01125ec1b1713ca5730f4db249731518f62e20d86a371b2126d30c2ccbeb005b9796c935809b55b162edf60b2389cce1718a505bc8640009c00fa0017580019d0fd0003b800bc4f0eba05f14200005801ac2fb02bc006d50a8001585e300016d90000dc00472c1774824f001cc000f3a0af17ca06a0408001d0f1838244130800ec203002f60060a00",
+        "txs": []
+      },
+      {
+        "at": "2026-10-07T07:39:33.033Z",
+        "step": "buyer_checkpoint",
+        "checkpointAt": "2026-10-07T07:39:30.019Z",
+        "primaryResultArrivedAt": null,
+        "hireBackup": true
+      },
+      {
+        "at": "2026-10-07T07:39:34.529Z",
+        "step": "backup_escrow_lock_requested",
+        "purchaseId": "cmuxsrgnz0059jqr29znzqv2l",
+        "blockchainIdentifier": "2186308c0ec06601c0cc04e61c402600b0d50060ba06cd80266140298165e73a208700ac01184c184766d1652c96fbe086504e546498208838136c2012a10e94187c61b0c040cdbcfc0cc99069c9b0746180c2860198384dac65ca8edd8ef7b1e94a04197508e193c8d833e130b18021414040c431418aa20941c35982db5b2a264833e9108360161401d3a113e113a023e22ad8c0c1930215e914c3a030c3e121c36182a04361b56068c66941553111472a770a4437633159e2a031c354283082b6902023a043591236a0c110426e6388b13209abe013ee243041c0bfb62016ed43030021e420996430563d040dc0e121709a33ba950a8088806c082a3f40a9b10b405220643002804103e1bac2183d112b84918c72b00416d1a504c1e5607084484980c223e9816736009f01d481ac3a21743d3da385c5c8da71126811400a42a0f6f0881ecb4e86e87c34431488aecd8283b560e85418d5ea6444b111ad6c155ce28321c2c2b81004d502c6c099708f3c8acf64c36a4188ea1c990c6bf3a3c9d41e3819d36bd386d0e070a209c62ea8d141ec345a0111a930816caafe4b3c9d0861382c3a843d3d08db8c8b60c845530f55b49880e03cf0b170c20a371a4de9c019a75c88d45a418dab758acb666319ec0eece3a9dce4a7a984204c66d10880027003e8005cc8006723d8000ee002f53d97f097a08002c00d697b235e0036740015a5e10002d910001b8008ed81ee1069e00398001ef835e2f8d0c0301000391ed072050061001dabc97ba0d05000",
+        "txs": []
+      },
+      {
+        "at": "2026-10-07T07:45:20.493Z",
+        "step": "backup_funds_locked",
+        "state": "FundsLocked",
+        "submitResultTime": "1791360003037",
+        "unlockTime": "1791360903037",
+        "txs": [
+          {
+            "txHash": "d9b06473307dbf9c056bc51a66637d5af2e153c63b770d4650434967ab74c63e",
+            "state": "FundsLocked",
+            "status": "Confirmed",
+            "koios": {
+              "status": "HTTP 429"
+            }
+          }
+        ]
+      },
+      {
+        "at": "2026-10-07T07:51:08.439Z",
+        "step": "backup_result_submitted",
+        "resultHash": "a9b56a6205255a9c2e24642e080257972517bac687b620b6d0ebc7c1121024fb",
+        "resultArrivedAt": "2026-10-07T07:51:08.438Z",
+        "buyerDeadline": "2026-10-07T07:56:20.280Z",
+        "buyerDeadlineMet": true,
+        "txs": [
+          {
+            "txHash": "d9b06473307dbf9c056bc51a66637d5af2e153c63b770d4650434967ab74c63e",
+            "state": "FundsLocked",
+            "status": "Confirmed",
+            "koios": {
+              "status": "HTTP 429"
+            }
+          },
+          {
+            "txHash": "7934f7a085a4c491469994f6c7964f601219487cb6888bcefebce05862189fdf",
+            "state": "ResultSubmitted",
+            "status": "Confirmed",
+            "koios": {
+              "status": "HTTP 429"
+            }
+          }
+        ]
+      },
+      {
+        "at": "2026-10-07T07:51:08.440Z",
+        "step": "primary_refund_pending",
+        "error": "timeout waiting for 0b0560ec0ccc state; last=not found",
+        "refundExpectedAfter": "1791360416396"
+      },
+      {
+        "at": "2026-10-07T07:51:08.440Z",
+        "step": "backup_collection_pending",
+        "error": "timeout waiting for 2186308c0ec0 state; last=not found"
+      },
+      {
+        "at": "2026-10-07T07:57:15.164Z",
+        "step": "primary_refund_requested",
+        "onChainState": "FundsLocked",
+        "nextAction": "SetRefundRequestedRequested"
+      },
+      {
+        "at": "2026-10-07T08:11:59.421Z",
+        "step": "primary_refund_pending",
+        "error": "timeout waiting for 0b0560ec0ccc state; last=RefundRequested",
+        "refundExpectedAfter": "2026-10-07T08:06:56.396Z"
+      },
+      {
+        "at": "2026-10-07T08:27:03.342Z",
+        "step": "backup_collection_pending",
+        "error": "timeout waiting for 2186308c0ec0 state; last=ResultSubmitted"
+      }
+    ],
+    "primary": {
+      "agentIdentifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b106966a12f72a3343b258ce95bb551d8a353c7ac8a9a90ba734551122f000000",
+      "txTotal": []
+    },
+    "backup": {
+      "agentIdentifier": "67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b10653cacce1093ec95156bb719ff7775f2e267f315113154a269755edc000000",
+      "txTotal": []
+    },
+    "finishedAt": "2026-10-07T08:27:03.342Z"
+  }
+}

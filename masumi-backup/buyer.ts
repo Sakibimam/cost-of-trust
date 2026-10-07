@@ -29,13 +29,15 @@ const startedAt = resumed?.startedAt ?? nowIso();
 const run: any = resumed ?? { mode, startedAt, buyerDeadline: new Date(Date.now() + 20 * 60_000).toISOString(), records: [], primary: { agentIdentifier: primaryId }, backup: { agentIdentifier: backupId } };
 const record = (step: string, detail: any) => { run.records.push({ at: nowIso(), step, ...detail }); };
 const input = { url: "https://example.com/" };
-const finish = async (primaryIdentifier: string, primaryUnlockMs: number, backupIdentifier: string, backupUnlockMs: number) => {
+const finish = async (primaryIdentifier: string, primarySubmitMs: number, primaryUnlockMs: number, backupIdentifier: string, backupUnlockMs: number) => {
+  if (Date.now() < primarySubmitMs) await new Promise((resolve) => setTimeout(resolve, primarySubmitMs - Date.now() + 5_000));
+  try { const request = await mpsJson("/purchase/request-refund", { network: "Preprod", blockchainIdentifier: primaryIdentifier }); record("primary_refund_requested", { onChainState: request.onChainState, nextAction: request.NextAction?.requestedAction }); } catch (error) { record("primary_refund_request_failed", { error: error instanceof Error ? error.message : String(error) }); }
   try { const refunded = await wait(primaryIdentifier, (value) => value.onChainState === "RefundWithdrawn", Math.max(60_000, primaryUnlockMs + 300_000 - Date.now())); record("primary_refund", { state: refunded.onChainState, refundTime: nowIso(), txs: txs(refunded) }); } catch (error) { record("primary_refund_pending", { error: error instanceof Error ? error.message : String(error), refundExpectedAfter: new Date(primaryUnlockMs).toISOString() }); }
   try { const collected = await wait(backupIdentifier, (value) => value.onChainState === "Withdrawn", Math.max(60_000, backupUnlockMs + 720_000 - Date.now())); record("backup_collection", { state: collected.onChainState, txs: txs(collected) }); } catch (error) { record("backup_collection_pending", { error: error instanceof Error ? error.message : String(error) }); }
 };
 if (resumed) {
   const find = (step: string) => run.records.find((entry: any) => entry.step === step);
-  await finish(find("primary_escrow_lock_requested").blockchainIdentifier, Number(find("primary_payment_request").unlockTime), find("backup_escrow_lock_requested").blockchainIdentifier, Number(find("backup_funds_locked").unlockTime));
+  await finish(find("primary_escrow_lock_requested").blockchainIdentifier, Number(find("primary_payment_request").submitResultTime), Number(find("primary_payment_request").unlockTime), find("backup_escrow_lock_requested").blockchainIdentifier, Number(find("backup_funds_locked").unlockTime));
 } else {
 const report = await createReport({ agentIdentifier: primaryId, taskValueAtRiskAda: 1, deadlineMinutes: 10, riskAversion: 0.9, sharedInfrastructure: false });
 const primarySeller: Seller = { id: primaryId, name: "Masumi Backup Primary", priceAda: 0, provider: "localhost", payTo: "mps", endpoint: "", successes: 0, failures: mode === "stall" ? 1 : 0, evidence: [] };
@@ -65,7 +67,7 @@ else {
   const backupState = await wait(idOf(backupPurchase), (value) => Boolean(value.resultHash || value.onChainState === "ResultSubmitted"), 900_000);
   const resultArrivedAt = nowIso();
   record("backup_result_submitted", { resultHash: backupState.resultHash, resultArrivedAt, buyerDeadline: run.buyerDeadline, buyerDeadlineMet: Date.parse(resultArrivedAt) <= Date.parse(run.buyerDeadline), txs: txs(backupState) });
-  await finish(primaryIdValue, Number(primaryPayment.unlockTime), idOf(backupPurchase), Number(backupPayment.unlockTime));
+  await finish(primaryIdValue, Number(primaryPayment.submitResultTime), Number(primaryPayment.unlockTime), idOf(backupPurchase), Number(backupPayment.unlockTime));
 }
 }
 run.finishedAt = nowIso(); run.primary.txTotal = run.records.find((entry: any) => entry.step === "primary_escrow_lock_requested")?.txs ?? []; run.backup.txTotal = run.records.find((entry: any) => entry.step === "backup_escrow_lock_requested")?.txs ?? [];
