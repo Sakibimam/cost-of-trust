@@ -11,6 +11,7 @@ import { SelectionMap } from "./SelectionMap";
 import { Proof } from "./Proof";
 import { Showcase } from "./Showcase";
 import { Subhire } from "./Subhire";
+import { MasumiBackup } from "./MasumiBackup";
 import { Backtest } from "./Backtest";
 import { Sellers } from "./Sellers";
 import { Verdict } from "./Verdict";
@@ -124,6 +125,7 @@ export function Board({ runs }: { runs: React.ReactNode }) {
       </section>
 
       <Showcase />
+      <MasumiBackup />
       <Subhire />
       <Backtest />
       <Proof />
